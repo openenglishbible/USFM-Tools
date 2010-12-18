@@ -69,6 +69,74 @@ u'JUD': u'065',
 u'REV': u'066'
 }
 
+silNames = [
+u'GEN',
+u'EXO',
+u'LEV',
+u'NUM',
+u'DEU',
+u'JOS',
+u'JDG',
+u'RUT',
+u'1SA',
+u'2SA',
+u'1KI',
+u'2KI',
+u'1CH',
+u'2CH',
+u'EZR',
+u'NEH',
+u'EST',
+u'JOB',
+u'PSA',
+u'PRO',
+u'ECC',
+u'SNG',
+u'ISA',
+u'JER',
+u'LAM',
+u'EZK',
+u'DAN',
+u'HOS',
+u'JOL',
+u'AMO',
+u'OBA',
+u'JON',
+u'MIC',
+u'NAM',
+u'HAB',
+u'ZEP',
+u'HAG',
+u'ZEC',
+u'MAL',
+u'MAT',
+u'MRK',
+u'LUK',
+u'JHN',
+u'ACT',
+u'ROM',
+u'1CO',
+u'2CO',
+u'GAL',
+u'EPH',
+u'PHP',
+u'COL',
+u'1TH',
+u'2TH',
+u'1TI',
+u'2TI',
+u'TIT',
+u'PHM',
+u'HEB',
+u'JAS',
+u'1PE',
+u'2PE',
+u'1JN',
+u'2JN',
+u'3JN',
+u'JUD',
+u'REV' ]
+
 bookNames = [ 'Matthew',
              'Mark',
              'Luke',
@@ -130,10 +198,7 @@ psalms    = ['Psalms']
 
 books = nt
 
-def bookID(s):
-    #
-    #   Gives you an ID from a string of usfm
-    #
-    pass
-
-
+def bookID(usfm):
+    s = usfm.find(u'\id ') + 4
+    e = usfm.find(u'\n', s)
+    return usfm[s:e]

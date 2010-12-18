@@ -13,7 +13,7 @@ class PlainPrinter(object):
 
     def startNarrower(self, n):
         s = u'\n'
-        if self.narrower == False: s = s + u'\n'
+        if not self.narrower: s = s + u'\n'
         self.narrower = True
         return s + u'    ' * n
 
@@ -66,13 +66,9 @@ class PlainPrinter(object):
     
 class TransformToMarkdown(object):
 
-    def translateBook(self, name):
+    def translateBook(self, usfm):
 
-        f = open(self.patchedDir + '/' + name + '.usfm')
-        fc = self.stripUnicodeHeader(unicode(f.read(), 'utf-8'))
-        f.close()
-
-        tokens = parseUsfm.parseString(fc)
+        tokens = parseUsfm.parseString(usfm)
         s = u''
         tp = PlainPrinter()
         for t in tokens: s = s + t.renderOn(tp)
@@ -90,14 +86,28 @@ class TransformToMarkdown(object):
         f.write(allBooks.encode('utf-8'))
         f.close()
 
-    def setupAndRun(self, patchedDir, prefaceDir, outputDir):
-        self.patchedDir = patchedDir
-        self.prefaceDir = prefaceDir
+    def loadBooks(self, path):
+        books = {}
+        dirList=os.listdir(path)
+        for fname in dirList:
+          if fname[-5:] == '.usfm':
+              f = open(path + '/' + fname)
+              usfm = unicode(f.read(), 'utf-8')
+              books[self.bookID(usfm)] = usfm
+              f.close()
+        return books
+
+    def bookID(self, usfm):
+        return books.bookID(usfm)
+
+    def setupAndRun(self, patchedDir, outputDir):
         self.outputDir = outputDir
+        self.booksUsfm = self.loadBooks(patchedDir)
                   
-        preface = unicode(open(self.prefaceDir + '/preface.txt').read(), 'utf-8').strip()
-        bookTex = preface
-        for book in books.books:
-            bookTex = bookTex + self.translateBook(book)
-            print '      (' + book + ')'
+        bookTex = u''
+
+        for bookName in books.silNames:
+            if self.booksUsfm.has_key(bookName):
+                bookTex = bookTex + self.translateBook(self.booksUsfm[bookName])
+                print '      (' + bookName + ')'
         self.saveAll(bookTex)

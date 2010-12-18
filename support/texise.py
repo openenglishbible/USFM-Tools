@@ -148,7 +148,27 @@ class TexPrinter(object):
     def renderD(self, token):       return self.startD()
     def renderSP(self, token):      return self.startD()
     def renderPBR(self, token):     return u' \\\\ '
-    
+    def renderTOC2(self, token):    return u''
+    def renderR(self, token):       return u''
+    def renderFR(self, token):      return u''
+    def renderFK(self, token):      return u''
+    def renderFT(self, token):      return u''
+    def renderXS(self, token):      return u'\\footnote{'
+    def renderXE(self, token):      return u'}'
+    def renderXO(self, token):      return u''
+    def renderXT(self, token):      return u''
+    def renderM(self, token):       return u''
+    def renderMI(self, token):      return u''
+    def renderPI(self, token):      return u''
+    def renderTLS(self, token):     return u''
+    def renderTLE(self, token):     return u''
+    def renderSCS(self, token):     return u''
+    def renderSCE(self, token):     return u''
+    def renderXDCS(self, token):    return u''
+    def renderXDCE(self, token):    return u''
+
+
+
 class TransformToContext(object):
     
     texPrinter = None
@@ -229,18 +249,9 @@ class TransformToContext(object):
         return u'\lettrine[Lines=3, Ante={\C{1}}]{' + s[0] + u'}{\CapStretch{\sc ' + s[1:] + u'}}'
 
 
-    def translateBook(self, name, smallCap):
+    def translateBook(self, usfm, smallCap):
         
-        fn = self.patchedDir + '/' + name + '.usfm'
-        if not os.path.isfile(fn):
-            print(fn + ' Not Found')
-            return u''
-
-        f = open(fn)
-        fc = self.stripUnicodeHeader(unicode(f.read(), 'utf-8'))
-        f.close()
-
-        tokens = parseUsfm.parseString(fc)
+        tokens = parseUsfm.parseString(usfm)
         
         #self.markShortVerses(tokens)
         #tokens = self.lineDropFirstChapter(tokens)
@@ -252,6 +263,7 @@ class TransformToContext(object):
         s = s + u"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }"
 
         return s
+
         
     def stripUnicodeHeader(self, unicodeString):
         if unicodeString[0] == u'\ufeff':
@@ -336,20 +348,30 @@ class TransformToContext(object):
         f.write(s.encode('utf-8'))
         f.close()
 
-    def setupAndRun(self, patchedDir, prefaceDir, outputDir, smallCap = True):
-        self.patchedDir = patchedDir
-        self.prefaceDir = prefaceDir
+    def loadBooks(self, path):
+        books = {}
+        dirList=os.listdir(path)
+        for fname in dirList:
+          if fname[-5:] == '.usfm':
+              f = open(path + '/' + fname)
+              usfm = unicode(f.read(), 'utf-8')
+              books[self.bookID(usfm)] = usfm
+              f.close()
+        return books
+
+    def bookID(self, usfm):
+        return books.bookID(usfm)
+
+    def setupAndRun(self, patchedDir, outputDir, smallCap = True):
         self.outputDir = outputDir
+        self.patchedDir = patchedDir
+        self.booksUsfm = self.loadBooks(patchedDir)
         self.texPrinter = TexPrinter()
-                 
-        fn = self.prefaceDir + '/preface.tex'
-        if not os.path.isfile(fn):
-            print(fn + ' Not Found')
-            preface = u''
-        else:
-            preface = unicode(open(fn).read(), 'utf-8').strip()
-        bookTex = preface
-        for book in books.books:
-            bookTex = bookTex + self.translateBook(book, smallCap)
-            print '      (' + book + ')'
+
+        bookTex = u''
+
+        for bookName in books.silNames:
+            if self.booksUsfm.has_key(bookName):
+                bookTex = bookTex + self.translateBook(self.booksUsfm[bookName], smallCap)
+                print '      (' + bookName + ')'
         self.saveAll(bookTex)

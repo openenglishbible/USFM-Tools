@@ -1,6 +1,8 @@
 import sys
 sys.path.append("support")
 
+import os
+
 from subprocess import Popen, PIPE
 import getopt
 
@@ -9,9 +11,10 @@ import texise
 import htmlise
 import readerise
 import markdownise
+import mediawikiPrinter
 
 def runscript(c, prefix=''):
-    pp = Popen(c, shell=True, stdout=PIPE)
+    pp = Popen(c, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     for ln in pp.stdout:
         print prefix + ln[:-1]
 
@@ -42,7 +45,7 @@ def buildPDF(usfmDir, builtDir):
     # Convert to ConTeXt
     print '     Converting to TeX...'
     c = texise.TransformToContext()
-    c.setupAndRun(usfmDir, 'preface', 'working/tex')
+    c.setupAndRun(usfmDir, 'working/tex')
 
     # Build PDF
     print '     Building PDF..'
@@ -56,16 +59,27 @@ def buildWeb(usfmDir, builtDir):
     c.setupAndRun(usfmDir, 'preface', builtDir)
 
 def buildReader():
-        # Convert to HTML
+        # Convert to HTML for online reader
         print '#### Building for Reader...'
         c = readerise.TransformForReader()
         c.setupAndRun('usfmDir', 'preface', builtDir + '/reader')
 
-def buildMarkdown():
-        # Convert to HTML
+def buildMarkdown(usfmDir, builtDir):
+        # Convert to Markdown
         print '#### Building for Markdown...'
         c = markdownise.TransformToMarkdown()
-        c.setupAndRun('usfmDir', 'preface', builtDir)
+        c.setupAndRun(usfmDir, builtDir)
+
+def buildMediawiki(usfmDir, builtDir):
+        # Convert to MediaWiki format for Door43
+        print '#### Building for Mediawiki...'
+        # Check output directory
+        ensureOutputDir(builtDir + '/mediawiki')
+        mediawikiPrinter.Transform().setupAndRun(usfmDir, builtDir + '/mediawiki')
+
+def ensureOutputDir(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 def main(argv):
     print '#### Starting Build.'
@@ -94,8 +108,10 @@ def main(argv):
         buildPDF(usfmDir, buildDir)
     elif targets == 'html':
         buildWeb(usfmDir, buildDir)
-    elif targets == 'txt':
+    elif targets == 'text':
         buildMarkdown(usfmDir, buildDir)
+    elif targets == 'mediawiki':
+        buildMediawiki(usfmDir, buildDir)
     else:
         usage()
 
