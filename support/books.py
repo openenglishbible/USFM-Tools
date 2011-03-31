@@ -201,4 +201,4 @@ books = nt
 def bookID(usfm):
     s = usfm.find(u'\id ') + 4
     e = usfm.find(u'\n', s)
-    return usfm[s:e]
+    return usfm[s:e].strip()

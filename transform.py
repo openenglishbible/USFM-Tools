@@ -12,6 +12,7 @@ import htmlise
 import readerise
 import markdownise
 import mediawikiPrinter
+import singlehtmlise
 
 def runscript(c, prefix=''):
     pp = Popen(c, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
@@ -27,18 +28,19 @@ def setup():
     curl -o first-setup.sh http://minimals.contextgarden.net/setup/first-setup.sh
     sh ./first-setup.sh
     . ./tex/setuptex
+    cd ..
+    curl -o usfm2osis.pl http://crosswire.org/ftpmirror/pub/sword/utils/perl/usfm2osis.pl
     """
     runscript(c)
 
+def buildAll(usfmDir, buildDir, buildName):
 
-def buildAll(usfmDir, buildDir):
+    buildPDF(usfmDir, buildDir, buildName)
+    buildWeb(usfmDir, buildDir, buildName)
+    buildReader(usfmDir, buildDir, buildName)
+    buildMarkdown(usfmDir, buildDir, buildName)
 
-    buildPDF(usfmDir, buildDir)
-    buildWeb(usfmDir, buildDir)
-    buildReader(usfmDir, buildDir)
-    buildMarkdown(usfmDir, buildDir)
-
-def buildPDF(usfmDir, builtDir):
+def buildPDF(usfmDir, builtDir, buildName):
 
     print '#### Building PDF...'
 
@@ -49,28 +51,37 @@ def buildPDF(usfmDir, builtDir):
 
     # Build PDF
     print '     Building PDF..'
-    c = """. ./support/thirdparty/context/tex/setuptex ; cd working/tex-working; rm * ; context ../tex/Bible.tex; cp *.pdf ../../""" + builtDir + '/'
+    c = """. ./support/thirdparty/context/tex/setuptex ; cd working/tex-working; rm * ; context ../tex/Bible.tex; cp Bible.pdf ../../""" + builtDir + '/' + buildName + '.pdf'
     runscript(c, '     ')
 
-def buildWeb(usfmDir, builtDir):
+def buildWeb(usfmDir, builtDir, buildName):
     # Convert to HTML
     print '#### Building HTML...'
     c = htmlise.TransformToHTML()
-    c.setupAndRun(usfmDir, 'preface', builtDir)
+    ensureOutputDir(builtDir + '/simple')
+    c.setupAndRun(usfmDir, 'preface', builtDir + '/simple')
 
-def buildReader():
+def buildSingleHtml(usfmDir, builtDir, buildName):
+    # Convert to HTML
+    print '#### Building HTML...'
+    c = singlehtmlise.TransformToHTML()
+    ensureOutputDir(builtDir)
+    c.setupAndRun(usfmDir, 'preface', builtDir, buildName + '.html')
+
+def buildReader(usfmDir, builtDir, buildName):
         # Convert to HTML for online reader
         print '#### Building for Reader...'
+        ensureOutputDir(builtDir + '/assets/bib/en_oeb')
         c = readerise.TransformForReader()
-        c.setupAndRun('usfmDir', 'preface', builtDir + '/reader')
+        c.setupAndRun(usfmDir, 'preface', builtDir + '/assets/bib/en_oeb')
 
-def buildMarkdown(usfmDir, builtDir):
+def buildMarkdown(usfmDir, builtDir, buildName):
         # Convert to Markdown
         print '#### Building for Markdown...'
         c = markdownise.TransformToMarkdown()
-        c.setupAndRun(usfmDir, builtDir)
+        c.setupAndRun(usfmDir, builtDir, buildName + '.txt')
 
-def buildMediawiki(usfmDir, builtDir):
+def buildMediawiki(usfmDir, builtDir, buildName):
         # Convert to MediaWiki format for Door43
         print '#### Building for Mediawiki...'
         # Check output directory
@@ -84,7 +95,7 @@ def ensureOutputDir(dir):
 def main(argv):
     print '#### Starting Build.'
     try:
-        opts, args = getopt.getopt(argv, "sht:u:b:", ["setup", "help", "target=", "usfmDir=", "builtDir="])
+        opts, args = getopt.getopt(argv, "sht:u:b:n:", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -99,19 +110,25 @@ def main(argv):
             usfmDir = arg
         elif opt in ("-b", "--builtDir"):
             buildDir = arg
+        elif opt in ("-n", "--name"):
+            buildName = arg
         else:
             usage()
 
     if targets == 'all':
-        buildAll(usfmDir, buildDir)
+        buildAll(usfmDir, buildDir, buildName)
     elif targets == 'pdf':
-        buildPDF(usfmDir, buildDir)
+        buildPDF(usfmDir, buildDir, buildName)
     elif targets == 'html':
-        buildWeb(usfmDir, buildDir)
+        buildWeb(usfmDir, buildDir, buildName)
+    elif targets == 'singlehtml':
+        buildSingleHtml(usfmDir, buildDir, buildName)
     elif targets == 'text':
-        buildMarkdown(usfmDir, buildDir)
+        buildMarkdown(usfmDir, buildDir, buildName)
+    elif targets == 'reader':
+        buildReader(usfmDir, buildDir, buildName)
     elif targets == 'mediawiki':
-        buildMediawiki(usfmDir, buildDir)
+        buildMediawiki(usfmDir, buildDir, buildName)
     else:
         usage()
 

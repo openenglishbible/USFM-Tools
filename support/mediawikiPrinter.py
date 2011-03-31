@@ -93,6 +93,7 @@ class MediaWikiPrinter(object):
     def renderNDE(self, token):     pass
     def renderPBR(self, token):     pass
     def renderFR(self, token):      pass
+    def renderFRE(self, token):     pass
     def renderXS(self, token):      pass
     def renderXE(self, token):      pass
     def renderXDCS(self, token):    pass

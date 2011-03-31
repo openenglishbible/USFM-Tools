@@ -19,6 +19,8 @@ class ReaderPrinter(object):
         self.cc = u'001'    # Current Chapter
         self.cv = u'001'    # Currrent Verse
         self.indentFlag = False
+        self.inSpanFlag = False
+        self.inParaFlag = False
  
     def write(self, unicodeString):
         self.f.write(unicodeString.encode('utf-8'))
@@ -35,46 +37,82 @@ class ReaderPrinter(object):
         self.write(u'&nbsp;&nbsp;&nbsp;&nbsp;' * level)
 
     def renderID(self, token): 
-        self.write(u'</p></article>')
+        if self.inSpanFlag:
+                self.inSpanFlag = False
+                self.write(u'</span>')
+        if self.inParaFlag:
+                self.inParaFlag = False
+                self.write(u'\n</p>')
+        self.write(u'\n</article>')
         self.f.close()
         self.cb = books.bookKeys[token.value[:3]]
         self.f = open(self.outputDir + u'/c' + self.cb + u'001.html', 'w')
-        self.write(u'<article class="chapter nt oeb" lang="en" dir="ltr" rel="c' + self.cb + u'001">')
+        self.write(u'\n<!--\ntitle:  Matthew 1 (Open English Bible)\nauthor: http://www.biblewebapp.com/\ndate:   4/22/2010 3:34:43 PM\n-->\n<article class="chapter nt oeb" lang="en" dir="ltr" rel="c' + self.cb + u'001">')
         self.indentFlag = False
+
     def renderIDE(self, token):     pass
-    def renderH(self, token):       self.write(u'</p><h1 class="bookname">' + token.value + u'</h1><p>')
-    def renderMT(self, token):      self.write(u'</p><h3>' + token.value + u'</h3><p>')
-    def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p><br />')
-    def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p><br />')
+    def renderH(self, token):       self.write(u'\n<h1 class="bookname">' + token.value + u'</h1>')
+    def renderMT(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
+    def renderMS(self, token):
+        if self.inSpanFlag:
+                self.inSpanFlag = False
+                self.write(u'</span>')
+        if self.inParaFlag:
+                self.inParaFlag = False
+                self.write(u'\n</p>')
+        self.write(u'\n<h4>' + token.value + u'</h4>')
+    def renderMS2(self, token):     self.write(u'\n<h5>' + token.value + u'</h5>')
     def renderP(self, token):
+        if self.inSpanFlag:
+                self.inSpanFlag = False
+                self.write(u'</span>')
         self.indentFlag = False
-        self.write(u'<br /><br />')
+        if self.inParaFlag:
+                self.inParaFlag = False
+                self.write(u'\n</p>')
+        self.inParaFlag = True
+        self.write(u'\n<p>')
     def renderS(self, token):
         self.indentFlag = False
-        self.write(u'</p><p align="center">_____</p><p>')
     def renderS2(self, token):
         self.indentFlag = False
-        self.write(u'</p><p align="center">_</p><p>')
     def renderC(self, token):
         self.cc = token.value.zfill(3)
         if self.cc == u'001':
-            self.write(u'<h2 class="c-num">' + token.value + u'</h2><p>')
+            self.write(u'\n<h2 class="c-num">' + token.value + u'</h2>\n<p>')
+            self.inParaFlag = True  
         else:
-            self.write(u'<p></article>')
+            if self.inSpanFlag:
+                    self.inSpanFlag = False
+                    self.write(u'</span>')
+            if self.inParaFlag:
+                    self.inParaFlag = False
+                    self.write(u'\n</p>')
+            self.write(u'\n</article>')
             self.f.close()
             self.f = open(self.outputDir + u'/c' + self.cb + self.cc + u'.html', 'w')
-            self.write(u'<article class="chapter nt oeb" lang="en" dir="ltr" rel="c' + self.cb + self.cc + u'">\n')
-            self.write(u'<h2 class="c-num">' + token.value + u'</h2><p>\n')        
+            self.write(u'\n<!--\ntitle:  Matthew 1 (Open English Bible)\nauthor: http://www.biblewebapp.com/\ndate:   4/22/2010 3:34:43 PM\n-->')
+            self.write(u'\n<article class="chapter nt oeb" lang="en" dir="ltr" rel="c' + self.cb + self.cc + u'">')
+            self.write(u'\n<h2 class="c-num">' + token.value + u'</h2>\n<p>')      
+            self.inParaFlag = True  
     def renderV(self, token):
         self.cv = token.value.zfill(3)
         if self.cv == u'001':
-            self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'"><span class="v-num-1">' + token.value + u'&nbsp;</span>\n')
+            if self.inSpanFlag:
+                    self.inSpanFlag = False
+                    self.write(u'</span>')
+            self.inSpanFlag = True
+            self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'"><span class="v-num v-1">' + token.value + u'&nbsp;</span>')
         else:
-            self.write(u'</span>\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'"><span class="v-num">' + token.value + u'&nbsp;</span>\n')
+            if self.inSpanFlag:
+                    self.inSpanFlag = False
+                    self.write(u'</span>')
+            self.inSpanFlag = True
+            self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'"><span class="v-num">' + token.value + u'&nbsp;</span>')
  
     def renderWJS(self, token):     self.write(u'<span class="woc">')
     def renderWJE(self, token):     self.write(u'</span>')
-    def renderTEXT(self, token):    self.write(u" " + token.value + u" ")
+    def renderTEXT(self, token):    self.write(token.value)
     def renderQ(self, token):       self.writeIndent(1)
     def renderQ1(self, token):      self.writeIndent(1)
     def renderQ2(self, token):      self.writeIndent(2)
@@ -94,7 +132,7 @@ class ReaderPrinter(object):
     def renderSP(self, token):      self.write(u'<p />')
     def renderNDS(self, token):     return u''
     def renderNDE(self, token):     return u''
-    def renderPBR(self, token):      self.write(u'<br />')
+    def renderPBR(self, token):     self.write(u'<br />')
     
 class TransformForReader(object):
     outputDir = ''
@@ -116,13 +154,13 @@ class TransformForReader(object):
         print '        > ' + name
         tokens = parseUsfm.parseString(fc)
 
-        tp = ReaderPrinter(self.outputDir)
-        for t in tokens: t.renderOn(tp)
+        for t in tokens: t.renderOn(self.printer)
  
     def setupAndRun(self, patchedDir, prefaceDir, outputDir):
         self.patchedDir = patchedDir
         self.prefaceDir = prefaceDir
         self.outputDir = outputDir
+        self.printer = ReaderPrinter(self.outputDir)
 
         for book in books.books:
             self.translateBook(book)

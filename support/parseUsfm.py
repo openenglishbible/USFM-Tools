@@ -3,7 +3,7 @@
 
 import sys
 
-from pyparsing import Word, alphas, OneOrMore, nums, Literal, White, Group, Suppress, Empty, NoMatch, Optional, CharsNotIn
+from pyparsing import Word, alphas, OneOrMore, nums, Literal, White, Group, Suppress, Empty, NoMatch, Optional, CharsNotIn, unicodeString
 
 def usfmToken(key):
     return Group(Suppress(backslash) + Literal( key ) + Suppress(White()))
@@ -14,11 +14,12 @@ def usfmEndToken(key):
 def usfmTokenValue(key, value): 
     return Group(Suppress(backslash) + Literal( key ) + Suppress(White()) + Optional(value) )
 def usfmTokenNumber(key): 
-    return Group(Suppress(backslash) + Literal( key ) + Suppress(White()) + Word (nums + '-') + Suppress(White()))
+    return Group(Suppress(backslash) + Literal( key ) + Suppress(White()) + Word (nums + '-()') + Suppress(White()))
 
 
 # define grammar
-phrase      = Word( alphas + u"-.,!? —–‘“”’;:()'\"[]/&%=*…{}" + nums )
+#phrase      = Word( alphas + u"-.,!? —–‘“”’;:()'\"[]/&%=*…{}" + nums )
+phrase      = CharsNotIn( u"\n\\+"  )
 backslash   = Literal(u"\\")
 plus        = Literal(u"+")
 
@@ -56,6 +57,7 @@ m       = usfmToken(u"m")
 # Footnotes
 fs      = usfmTokenValue(u"f", plus)
 fr      = usfmTokenValue( u"fr", phrase )
+fre     = usfmEndToken( u"fr" )
 fk      = usfmTokenValue( u"fk", phrase )
 ft      = usfmTokenValue( u"ft", phrase )
 fe      = usfmEndToken(u"f")
@@ -90,7 +92,7 @@ nde     = usfmEndToken(u"nd")
 pbr     = usfmBackslashToken("\\\\")
 mi      = usfmToken(u"mi")
 
-element =   ide  | id | toc2 | h | mt | mt1 | ms | ms1 | ms2 | s | s1 | s2 | r | p | pi | mi | b | c | v | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m | fs | fr | fk | ft | fe \
+element =   ide  | id | toc2 | h | mt | mt1 | ms | ms1 | ms2 | s | s1 | s2 | r | p | pi | mi | b | c | v | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m | fs | fr | fre | fk | ft | fe \
           | xs   | xdcs | xdce | xo | xt | xe \
           | ist  | ien  | li | d | sp         \
           | adds | adde                       \
@@ -147,6 +149,7 @@ def createToken(t):
         u'qt*':  QTEToken,
         u'f':    FSToken,
         u'fr':   FRToken,
+        u'fr*':  FREToken,
         u'fk':   FKToken,
         u'ft':   FTToken,
         u'f*':   FEToken,
@@ -215,6 +218,7 @@ class UsfmToken(object):
     def isNB(self):     return False
     def isFS(self):     return False
     def isFR(self):     return False
+    def isFRE(self):    return False
     def isFK(self):     return False
     def isFT(self):     return False
     def isFE(self):     return False
@@ -374,6 +378,11 @@ class FRToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderFR(self)
     def isFR(self):      return True
+
+class FREToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderFRE(self)
+    def isFRE(self):      return True
 
 class FKToken(UsfmToken):
     def renderOn(self, printer):

@@ -2,6 +2,7 @@ import re
 import os
 import parseUsfm
 import books
+import datetime
 
 class TexPrinter(object):
     def __init__(self):
@@ -99,7 +100,7 @@ class TexPrinter(object):
     def renderMS2(self, token):     self.doNB = True; self.markForSmallCaps() ; return self.stopNarrower() + u'\n\MSS{' + token.value + '}' + self.newLine()
     def renderP(self, token):       return self.stopD() + self.stopLI() + self.stopNarrower() + self.newLine() 
     def renderB(self, token):       return self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank \n'
-    def renderS(self, token):       self.doNB = True; return self.stopD() + self.stopLI() + self.stopNarrower() +  u'\n\\blank[big] ' + u'\n\MSS{' + token.value + '}' + self.newLine() 
+    def renderS(self, token):       self.doNB = True; return self.stopD() + self.stopLI() + self.stopNarrower() +  u'\n\\blank[big] ' + u'\n\MSS{' + token.getValue() + '}' + self.newLine() 
     def renderS2(self, token):      self.doNB = True; return self.stopD() + self.stopLI() + self.stopNarrower() + u'\n\\blank[big] ' + u'\n\MSS{' + token.value + '}' + self.newLine() 
     def renderC(self, token):
         if not token.value == u'1':
@@ -116,11 +117,14 @@ class TexPrinter(object):
         if self.smallcaps and not self.doChapterOrVerse == u'':
             s = self.renderSmallCaps(s)
             i = s.find(u'}')
-            s = s[0:i+1] + self.doChapterOrVerse + s[i+1:]
+            s = s[:i+1] + self.doChapterOrVerse + s[i+1:]
             self.doChapterOrVerse = u''
         elif not self.doChapterOrVerse == u'':
-            i = s.find(u' ')              
-            s = s[0:i] + self.doChapterOrVerse + s[i+1:]
+            i = s.find(u' ')   
+            if i == -1: 
+                # No space found - try end
+                i = len(s)       
+            s = s[:i] + self.doChapterOrVerse + s[i+1:]
             self.doChapterOrVerse = u''
         elif self.smallcaps:
             s = self.renderSmallCaps(s)
@@ -137,11 +141,11 @@ class TexPrinter(object):
     def renderQTS(self, token):     return u''
     def renderQTE(self, token):     return u''
     def renderFS(self, token):      return u'\\footnote{'
-    def renderFE(self, token):      return u'}'
+    def renderFE(self, token):      return u'} '
     def renderIS(self, token):      return u'{\em '
-    def renderIE(self, token):      return u'}'
+    def renderIE(self, token):      return u'} '
     def renderADDS(self, token):    return u'{\em '
-    def renderADDE(self, token):    return u'}'
+    def renderADDE(self, token):    return u'} '
     def renderNDS(self, token):     return u'{\sc '
     def renderNDE(self, token):     self.justDidLORD = True; return u'}'
     def renderLI(self, token):      return self.startLI()
@@ -150,11 +154,12 @@ class TexPrinter(object):
     def renderPBR(self, token):     return u' \\\\ '
     def renderTOC2(self, token):    return u''
     def renderR(self, token):       return u''
-    def renderFR(self, token):      return u''
-    def renderFK(self, token):      return u''
-    def renderFT(self, token):      return u''
+    def renderFR(self, token):      return u' ' + token.getValue() + u' '
+    def renderFRE(self, token):     return u' '
+    def renderFK(self, token):      return u' ' + token.getValue() + u' '
+    def renderFT(self, token):      return u' ' + token.getValue() + u' '
     def renderXS(self, token):      return u'\\footnote{'
-    def renderXE(self, token):      return u'}'
+    def renderXE(self, token):      return u'} '
     def renderXO(self, token):      return u''
     def renderXT(self, token):      return u''
     def renderM(self, token):       return u''
@@ -302,7 +307,7 @@ class TransformToContext(object):
 
         \setuppagenumbering[location=]
         \setupheadertexts[{\em \getmarking[RASection]}][{\getmarking[RABook] ~\getmarking[RAChapter]}]
-        \setupfootertexts[pagenumber]
+        \setupfootertexts[pagenumber][""" + datetime.date.today().strftime("%A, %d %B %Y") + r"""]
         \setuphead[title][header=high,footer=chapter,page=right]
 
         \setupspacing[packed]   % normal word space at the end of sentences
@@ -327,8 +332,6 @@ class TransformToContext(object):
 
         \def\CapStretchAmount{.08em}
         \def\CapStretch#1{\def\stretchedspaceamount{\CapStretchAmount}\stretchednormalcase{\sc #1}}
-
-        \usemodule[lettrine]
 
         \setupnote[footnote][way=bypage]
         

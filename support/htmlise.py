@@ -4,6 +4,7 @@
 import os
 import parseUsfm
 import books
+import datetime
 
 class DummyFile(object):
     def close(self):
@@ -45,6 +46,20 @@ class ReaderPrinter(object):
         <head>
             <meta http-equiv="content-type" content="text/html; charset=utf-8" />
             <title>Open English Bible</title>
+            <!-- Start Google Analytics -->
+            <script type="text/javascript">
+
+             var _gaq = _gaq || [];
+             _gaq.push(['_setAccount', 'UA-20740582-1']);
+             _gaq.push(['_trackPageview']);
+
+             (function() {
+               var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+               ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+               var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+             })();
+
+            </script><!-- End Google Analytics -->
         </head>
 		<style media="all" type="text/css">
 		h2.c-num { position:absolute; margin-left:-30px; color: #AAAAAA; }
@@ -160,6 +175,20 @@ class TransformToHTML(object):
             <head>
                 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
                 <title>Open English Bible</title>
+                <!-- Start Google Analytics -->
+                <script type="text/javascript">
+
+                 var _gaq = _gaq || [];
+                 _gaq.push(['_setAccount', 'UA-20740582-1']);
+                 _gaq.push(['_trackPageview']);
+
+                 (function() {
+                   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                 })();
+
+                </script><!-- End Google Analytics -->
             </head>
             <body>
             <div style="position:absolute;left-margin:5;width:200px">
@@ -196,7 +225,7 @@ class TransformToHTML(object):
             </div>
             <div style="margin-left:200px">
             <h1>Open English Bible</h1>
-            <p>Working Release (7 August 2010)</p>
+            <p>Working Release (""" + datetime.date.today().strftime("%A %d. %B %Y") + u""")</p>
             </div>
             </body>
             </html>

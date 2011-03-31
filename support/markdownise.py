@@ -2,6 +2,7 @@ import re
 import os
 import parseUsfm
 import books
+import codecs
 
 
 class PlainPrinter(object):
@@ -10,6 +11,7 @@ class PlainPrinter(object):
         self.li = False
         self.narrower = False
         self.d = False
+        self.book = u''
 
     def startNarrower(self, n):
         s = u'\n'
@@ -31,7 +33,7 @@ class PlainPrinter(object):
                     
     def renderID(self, token):      return u''
     def renderIDE(self, token):     return u''
-    def renderH(self, token):       return u'\n\n\n\n' + (u'=' * len(token.value)) + u'\n' + token.value + u'\n' + (u'=' * len(token.value))
+    def renderH(self, token):       self.book = token.getValue(); return u'\n\n\n\n' + (u'=' * len(token.value)) + u'\n' + token.value + u'\n' + (u'=' * len(token.value))
     def renderMT(self, token):      return self.stopNarrower() + u'\n\n' + (u'-' * len(token.value)) + u'\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
     def renderMS(self, token):      return self.stopNarrower() + u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n\n'
     def renderMS2(self, token):     return self.stopNarrower() + u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
@@ -39,7 +41,7 @@ class PlainPrinter(object):
     def renderB(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
     def renderS(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n    '
     def renderS2(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n    '
-    def renderC(self, token):       self.currentC = token.value; return u''
+    def renderC(self, token):       self.currentC = token.value; return u'[' + self.book + u']'
     def renderV(self, token):       return u' [' + self.currentC + u':' + token.value + u'] '
     def renderWJS(self, token):     return u""
     def renderWJE(self, token):     return u""
@@ -80,10 +82,9 @@ class TransformToMarkdown(object):
         else:
             return unicodeString
 
-    def saveAll(self, allBooks):
-
-        f = open(self.outputDir + '/Bible.txt', 'w')
-        f.write(allBooks.encode('utf-8'))
+    def saveAll(self, allBooks, buildName):
+        f = codecs.open(self.outputDir + buildName, 'w', 'utf-8-sig')
+        f.write(allBooks)
         f.close()
 
     def loadBooks(self, path):
@@ -100,7 +101,7 @@ class TransformToMarkdown(object):
     def bookID(self, usfm):
         return books.bookID(usfm)
 
-    def setupAndRun(self, patchedDir, outputDir):
+    def setupAndRun(self, patchedDir, outputDir, buildName):
         self.outputDir = outputDir
         self.booksUsfm = self.loadBooks(patchedDir)
                   
@@ -110,4 +111,4 @@ class TransformToMarkdown(object):
             if self.booksUsfm.has_key(bookName):
                 bookTex = bookTex + self.translateBook(self.booksUsfm[bookName])
                 print '      (' + bookName + ')'
-        self.saveAll(bookTex)
+        self.saveAll(bookTex, buildName)
