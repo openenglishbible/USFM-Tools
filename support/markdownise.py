@@ -105,10 +105,17 @@ class TransformToMarkdown(object):
         self.outputDir = outputDir
         self.booksUsfm = self.loadBooks(patchedDir)
                   
-        bookTex = u''
+        bookText = u"""
 
+==================
+Open English Bible
+==================
+
+Version:""" + buildName + """
+
+"""
         for bookName in books.silNames:
             if self.booksUsfm.has_key(bookName):
-                bookTex = bookTex + self.translateBook(self.booksUsfm[bookName])
+                bookText = bookText + self.translateBook(self.booksUsfm[bookName])
                 print '      (' + bookName + ')'
-        self.saveAll(bookTex, buildName)
+        self.saveAll(bookText, buildName)

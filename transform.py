@@ -6,13 +6,13 @@ import os
 from subprocess import Popen, PIPE
 import getopt
 
-import patch
 import texise
 import htmlise
 import readerise
 import markdownise
 import mediawikiPrinter
 import singlehtmlise
+import loutise
 
 def runscript(c, prefix=''):
     pp = Popen(c, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
@@ -35,11 +35,22 @@ def setup():
 
 def buildAll(usfmDir, buildDir, buildName):
 
-    buildPDF(usfmDir, buildDir, buildName)
+    buildLout(usfmDir, buildDir, buildName)
     buildWeb(usfmDir, buildDir, buildName)
     buildReader(usfmDir, buildDir, buildName)
     buildMarkdown(usfmDir, buildDir, buildName)
+    buildSingleHtml(usfmDir, buildDir, buildName)
+    
 
+def buildLout(usfmDir, builtDir, buildName):
+ 
+    print '#### Building Lout...'
+
+    # Convert to Lout
+    c = loutise.TransformToLout()
+    c.setupAndRun(usfmDir, builtDir, buildName + '.lout')
+
+    
 def buildPDF(usfmDir, builtDir, buildName):
 
     print '#### Building PDF...'
@@ -47,7 +58,7 @@ def buildPDF(usfmDir, builtDir, buildName):
     # Convert to ConTeXt
     print '     Converting to TeX...'
     c = texise.TransformToContext()
-    c.setupAndRun(usfmDir, 'working/tex')
+    c.setupAndRun(usfmDir, 'working/tex', buildName)
 
     # Build PDF
     print '     Building PDF..'
@@ -71,9 +82,9 @@ def buildSingleHtml(usfmDir, builtDir, buildName):
 def buildReader(usfmDir, builtDir, buildName):
         # Convert to HTML for online reader
         print '#### Building for Reader...'
-        ensureOutputDir(builtDir + '/assets/bib/en_oeb')
+        ensureOutputDir(builtDir + 'read/assets/bib/en_oeb')
         c = readerise.TransformForReader()
-        c.setupAndRun(usfmDir, 'preface', builtDir + '/assets/bib/en_oeb')
+        c.setupAndRun(usfmDir, 'preface', builtDir + 'read/assets/bib/en_oeb')
 
 def buildMarkdown(usfmDir, builtDir, buildName):
         # Convert to Markdown
@@ -95,7 +106,7 @@ def ensureOutputDir(dir):
 def main(argv):
     print '#### Starting Build.'
     try:
-        opts, args = getopt.getopt(argv, "sht:u:b:n:", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name="])
+        opts, args = getopt.getopt(argv, "o:sht:u:b:n:", ["oeb=", "setup", "help", "target=", "usfmDir=", "builtDir=", "name="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -112,6 +123,18 @@ def main(argv):
             buildDir = arg
         elif opt in ("-n", "--name"):
             buildName = arg
+        elif opt in ("-o", "--oeb"):
+             # Build OEB
+             usfmDir = '../Open-English-Bible/patched/us'
+             buildDir = 'built/'
+             buildName = arg + '-US'
+             buildAll(usfmDir, buildDir, buildName)
+             usfmDir = '../Open-English-Bible/patched/cth'
+             buildName = arg + '-Cth'
+             buildPDF(usfmDir, buildDir, buildName)
+             buildSingleHtml(usfmDir, buildDir, buildName)
+             buildMarkdown(usfmDir, buildDir, buildName)
+             sys.exit()
         else:
             usage()
 
@@ -129,6 +152,8 @@ def main(argv):
         buildReader(usfmDir, buildDir, buildName)
     elif targets == 'mediawiki':
         buildMediawiki(usfmDir, buildDir, buildName)
+    elif targets == 'lout':
+        buildLout(usfmDir, buildDir, buildName)
     else:
         usage()
 
@@ -143,6 +168,7 @@ def usage():
 
         -h or --help for options
         -s or --setup to setup up environment and load third party support
+        -o or --oeb to build the current OEB
         
     """
 

@@ -49,7 +49,7 @@ class ReaderPrinter(object):
         self.write(u'</p><p align="center">----</p><p>')
     def renderC(self, token):
         self.cc = token.value.zfill(3)
-        self.write(u'<h2 class="c-num">' + self.bookname + ' ' + token.value + u'</h2><p>')
+        self.write(u'\n<span class="c-num">[' + self.bookname + ' ' + token.value + u']</span>\n')
     def renderV(self, token):
         self.cv = token.value.zfill(3)
         if self.cv == u'001':
@@ -123,14 +123,14 @@ class TransformToHTML(object):
             <title>Open English Bible</title>
         </head>
 		<style media="all" type="text/css">
-		h2.c-num { color: #AAAAAA; }
+		span.c-num { color: #AAAAAA; }
 		span.v-num-1 { display : none; }
 		span.v-num { color: #AAAAAA; font-size: small}
 		</style>
         <body>
         <h1>Open English Bible</h1>
         """.encode('utf-8'))
-        f.write('<p><i>Draft of ' + datetime.date.today().strftime("%A, %d %B %Y") + '</i></p>\n\n<p><p>')
+        f.write('<p><i>Draft built ' + datetime.date.today().strftime("%A, %d %B %Y") + '</i><br />Version ' + buildName + '</p>\n\n<p><p>')
         f.write(self.printer.rendered.encode('utf-8'))
         f.write('</body></html>')
         f.close()

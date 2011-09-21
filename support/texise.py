@@ -110,8 +110,8 @@ class TexPrinter(object):
         if not token.value == u'1':
             self.doChapterOrVerse =  u'\V{' + token.value + u'}'
         return ' '
-    def renderWJS(self, token):     return u""
-    def renderWJE(self, token):     return u""
+    def renderWJS(self, token):     return u" "
+    def renderWJE(self, token):     return u" "
     def renderTEXT(self, token):
         s = self.escapeText(token.value)
         if self.smallcaps and not self.doChapterOrVerse == u'':
@@ -307,7 +307,7 @@ class TransformToContext(object):
 
         \setuppagenumbering[location=]
         \setupheadertexts[{\em \getmarking[RASection]}][{\getmarking[RABook] ~\getmarking[RAChapter]}]
-        \setupfootertexts[pagenumber][""" + datetime.date.today().strftime("%A, %d %B %Y") + r"""]
+        \setupfootertexts[pagenumber][]
         \setuphead[title][header=high,footer=chapter,page=right]
 
         \setupspacing[packed]   % normal word space at the end of sentences
@@ -337,8 +337,19 @@ class TransformToContext(object):
         
         \starttext
 
-        \title{Open English Bible}
-
+        
+        \par 
+        \par 
+        \par 
+        \par
+        \par 
+        \par 
+        \par 
+        \par 
+        \externalfigure[../images/oeb-nt][wfactor=fit]
+        \page 
+        Open English Bible. \par Built """ + datetime.date.today().strftime("%A, %d %B %Y") + '. \par Version: ' + self.buildName + r"""     \page
+  
         \title{Table of Contents}
         \placelist[chapter]
         """, 'ascii') + allBooks + ur"""
@@ -365,9 +376,10 @@ class TransformToContext(object):
     def bookID(self, usfm):
         return books.bookID(usfm)
 
-    def setupAndRun(self, patchedDir, outputDir, smallCap = True):
+    def setupAndRun(self, patchedDir, outputDir, buildName, smallCap = True):
         self.outputDir = outputDir
         self.patchedDir = patchedDir
+        self.buildName = buildName
         self.booksUsfm = self.loadBooks(patchedDir)
         self.texPrinter = TexPrinter()
 
