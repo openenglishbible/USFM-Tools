@@ -21,16 +21,29 @@ class LoutPrinter(object):
         self.startTextType = 'drop' # Or nomal or smallcaps
         self.inDropCap = False
         self.inPoetry = False
-        
+        self.registerForNextText = u''
+        self.inD = False
+        self.afterLord = False
         
     #   SUPPORT
     #
     #
-    def escape(self, s):
-        return s.replace(u'“', u'{@Char quotedblleft }').replace(u'”', u'{@Char quotedblright }').replace(u'—', u'{@Char emdash }').replace(u'‘', u'{@Char quoteleft }').replace(u'’', u'{@Char quoteright }')
+    def escape(self, s, upper=False):
+        if upper:
+            t = s.upper()
+        else:
+            t = s
+        t = t.replace(u'“', u'{@Char quotedblleft}').replace(u'”', u'{@Char quotedblright}').replace(u'—', u'{@Char emdash}').replace(u'‘', u'{@Char quoteleft}').replace(u'’', u'{@Char quoteright}').replace(u'"', u'{@Char quotedbl}')
+        #t = t.replace(u'"', u'{@Char quotedbl}')
+        #t = t.replace(u'’', u'{@Char quoteright}')
+        return t
  
     def write(self, unicodeString):
         self.rendered = self.rendered + unicodeString
+        l = len(self.rendered)
+        lastBreak = self.rendered.rfind(u'\n', 0, l)
+        if l - lastBreak > 70:
+            self.rendered = self.rendered + u'\n' 
         
     def close(self):
         self.closeChapter()
@@ -49,6 +62,7 @@ class LoutPrinter(object):
             
     def closeSection(self):
         self.closeDropCap()
+        self.closePoetry()
         if self.inSection:          # We need to close previous section 
             self.inSection = False
             self.write(u'\n@End @Section\n')  
@@ -56,9 +70,19 @@ class LoutPrinter(object):
     def closeDropCap(self):
         if self.inDropCap:          # We need to close previous section 
             self.inDropCap = False
-            self.write(u'}')            
-
+            self.write(u'}')  
+            
+    def closeD(self):
+        if self.inD:          # We need to close the D 
+            self.inD = False
+            self.write(u'}}')  
+        
+    def closePoetry(self):
+        if self.inPoetry:
+            self.inPoetry = False
+ 
     def writeIndent(self, level):
+        self.closeD()
         self.closeDropCap()
         if not self.inPoetry:
             self.write(u'\n@DP ') 
@@ -70,6 +94,13 @@ class LoutPrinter(object):
     def formatText(self, text):
         t = text
         if len(t) < 60: self.startTextType = 'normal'  # Don't do funky things with short first lines.
+
+        # Handle poetry lines that want to wrap
+        if self.inPoetry and len(t) > 60:
+            n = t.find(u' ', 50) # Give us buffer
+            t = t[:n] + u'\n@LLP ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ' + t[n:]
+
+        if self.cb == u'019': self.startTextType = 'normal'  # Don't do funky things with Psalms.
         if self.startTextType == 'drop':
             self.inDropCap = True
             self.write(t[0] + u' @DropCapTwo {')
@@ -77,8 +108,11 @@ class LoutPrinter(object):
         elif self.startTextType == 'smallcaps':
             self.write(self.escape(self.smallCapText(t)))
         else:
+            if self.afterLord and not (t[0] == "'" or t[0] == ',' or t[0] == '?'):
+                self.afterLord = False
+                t = u' ' + t
             self.write(self.escape(self.addNextText(t)))
-        self.write(u'\n')
+        self.write(u' ')
         self.startTextType = 'normal'
         
     def addNextText(self, text):
@@ -105,13 +139,19 @@ class LoutPrinter(object):
                  i = i + 1
          return self.addNextText(s)     
          
-    def newPara(self, indent = True):
+    def newPara(self, indent = True, outdent=False):
+        # Don't indent at start of books
+        if self.startTextType == 'drop': indent = False 
+        if self.startTextType == 'smallcaps': indent = False 
+        
         self.closeDropCap()
         if self.inPoetry:
-            self.write(u'\n\n@DP\n')
-            self.inPoetry = False
+            self.closePoetry()
+            self.write(u'\n\n@DP ~\n')
         else:
-            if indent:
+            if outdent:
+                self.write(u'\n\noutdent @Break { @PP }\n')
+            elif indent:
                 self.write(u'\n\n@PP\n')
             else:
                 self.write(u'\n\n@LP\n')
@@ -120,32 +160,48 @@ class LoutPrinter(object):
     #
     #
     def renderID(self, token): 
-        self.cb = books.bookKeys[token.value]
+        self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
         self.closeChapter()
-    def renderIDE(self, token):     pass
-    def renderH(self, token):       
+    def renderIDE(self, token):
+        pass
+    def renderH(self, token):   
+        self.close()    
         self.bookname = token.value
-        self.write(u'\n@Chapter @Title {' + self.escape(token.value) + u'} @Begin\n')
+        self.write(u'\n@Chapter @Title { ' + self.escape(token.value) + u' } @RunningTitle { ' + self.bookname + u' } @Begin')
         self.inChapter = True
+    def renderMT(self, token): 
+        self.write(u'\n@Display  { 21p } @Font { ' + self.escape(token.value, upper=True) + u'}')
         self.startTextType = 'drop'
-    def renderMT(self, token):      self.write(u'\n@Display @Heading {' + self.escape(token.value) + u'}\n')
+    def renderMT2(self, token): 
+        self.write(u'\n@Display  { 13p } @Font { ' + self.escape(token.value, upper=True) + u'}')
+    def renderMT3(self, token): 
+        self.write(u'\n@Display  { 13p } @Font { ' + self.escape(token.value, upper=True) + u'}')
     def renderMS(self, token):
         self.closeSection()
         if not self.inSections: self.write(u'@BeginSections '); self.inSections = True
         self.write(u'\n@Section @Title {' + self.escape(token.value) + u'} @Begin @LP\n')
         self.inSection = True
         if self.startTextType == 'normal': self.startTextType = 'smallcaps'
-    def renderMS2(self, token):     self.write(u'\n@Display @Heading {' + self.escape(token.value) + u'}\n')
-    def renderP(self, token):       self.newPara()
-    def renderS(self, token):       self.inPoetry = False; self.closeDropCap(); self.write(u'\n\n@DP @LP\n')
-    def renderS2(self, token):      self.closeDropCap(); self.write(u'\n\n@DP\n')
+    def renderMS2(self, token):
+        self.write(u'\n@Display @Heading {' + self.escape(token.value) + u'}\n')
+    def renderP(self, token):
+        self.newPara()
+    def renderPI(self, token):
+        self.newPara(outdent = True)
+    def renderS(self, token): 
+        self.closePoetry();
+        self.closeDropCap(); 
+        self.write(u'\n@DP @CNP @Display @Heading {' + self.escape(token.value) + u'}\n') 
+    def renderS2(self, token):
+        self.closeDropCap(); 
+        self.write(u'\n\n@DP\n')
     def renderC(self, token):
         self.cc = token.value.zfill(3)
-        self.registerForNextText = u'{@OuterNote { 10.5p @Font {@B ' + token.value + u'}}}'
+        self.registerForNextText = u' {@OuterNote { 10.5p @Font {@B ' + token.value + u'}}}'
     def renderV(self, token):
         self.cv = token.value.zfill(3)
-        if not self.cv == u'001':   self.registerForNextText = u'{@OuterNote { 8p @Font {' + token.value + u'}}}'
+        if not self.cv == u'001':   self.registerForNextText = u' {@OuterNote { 8p @Font {' + token.value + u'}}}'
     def renderWJS(self, token):     pass
     def renderWJE(self, token):     pass
     def renderTEXT(self, token):    self.formatText(token.value)
@@ -154,86 +210,67 @@ class LoutPrinter(object):
     def renderQ2(self, token):      self.writeIndent(2)
     def renderQ3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.newPara(indent = False)
-    def renderB(self, token):       self.newPara()
+    def renderB(self, token):       self.newPara(indent = False); self.inPoetry = True
     def renderQTS(self, token):     pass
     def renderQTE(self, token):     pass
     def renderFS(self, token):      self.write(u'@FootNote { ')
     def renderFE(self, token):      self.write(u' }')
     def renderIS(self, token):      self.write(u'{@I {')
     def renderIE(self, token):      self.write(u'}}')
-    def renderNDS(self, token):     pass
-    def renderNDE(self, token):     pass
+    def renderNDS(self, token):     self.write(u'{@S {')
+    def renderNDE(self, token):     self.write(u'}}'); self.afterLord = True
     def renderPBR(self, token):     self.write(u'@LLP ')
     def renderSCS(self, token):     self.write(u'{@B {')
     def renderSCE(self, token):     self.write(u'}}')
+    def renderD(self, token):       self.write(u'{@I {'); self.inD = True
+    def renderREM(self, token):     pass # This is for comments in the USFM
+    def renderADDS(self, token):    pass
+    def renderADDE(self, token):    pass
 
 class TransformToLout(object):
     outputDir = ''
     patchedDir = ''
     prefaceDir = ''
 
-    def loadBooks(self, path):
-        books = {}
-        dirList=os.listdir(path)
-        for fname in dirList:
-          if fname[-5:] == '.usfm':
-              f = open(path + '/' + fname)
-              usfm = unicode(f.read(), 'utf-8')
-              books[self.bookID(usfm)] = usfm
-              f.close()
-        return books
-
-    def bookID(self, usfm):
-        return books.bookID(usfm)
-
     def setupAndRun(self, patchedDir, outputDir, buildName):
         self.patchedDir = patchedDir
         self.outputDir = outputDir
-        self.booksUsfm = self.loadBooks(patchedDir)
+        self.booksUsfm = books.loadBooks(patchedDir)
         self.printer = LoutPrinter(self.outputDir)
 
         for bookName in books.silNames:
             if self.booksUsfm.has_key(bookName):
                 tokens = parseUsfm.parseString(self.booksUsfm[bookName])
                 for t in tokens: t.renderOn(self.printer)
+                self.printer.close()
                 print '      (' + bookName + ')'
         self.printer.close()
 
         f = open(self.outputDir + buildName, 'w')
-        f.write(ur"""
-        @Include { oebbook } 
-        @Book
-            @Title {}
-            @Author {}
-            @Edition {}
-            @Publisher {}
-            @BeforeTitlePage {}
-            @OnTitlePage {}
-            @AfterTitlePage {}
-            @AtEnd {}
-            @InitialFont { Palatino Base 10.5p } 
-            @InitialBreak { adjust 1.2fx hyphen } 
-            @InitialSpace { lout } 
-            @InitialLanguage { English } 
-            @PageOrientation { Portrait } 
-            @PageHeaders { Titles } 
-            @ColumnNumber { 1 } 
-            @FirstPageNumber { 1 } 
-            @IntroFirstPageNumber { 1 } 
-            @OptimizePages { No } 
-            @GlossaryText { @Null } 
-            @IndexText { @Null }
-            @IndexAText { @Null }
-            @IndexBText { @Null } 
-        //
+        f.write(ur"""@Include { oebbook } 
+@Book
+    @Title {}
+    @Author {}
+    @Edition {}
+    @Publisher {}
+    @BeforeTitlePage {}
+    @OnTitlePage {}
+    @AfterTitlePage {}
+    @AtEnd {}
+    @InitialLanguage { English } 
+    @PageOrientation { Portrait } 
+    @PageHeaders { Titles } 
+    @ColumnNumber { 1 } 
+    @FirstPageNumber { 1 } 
+    @IntroFirstPageNumber { 1 } 
+    @OptimizePages { No } 
+    @GlossaryText { @Null } 
+    @IndexText { @Null }
+    @IndexAText { @Null }
+    @IndexBText { @Null } 
+//
 
-        @Preface
-        @Title { Preface }
-        @Begin
-        @PP
-        This is the preface to the Open English Bible.
-        @End @Preface
-        """.encode('utf-8'))
+""".encode('utf-8'))
         f.write(self.printer.rendered.encode('utf-8'))
         f.close()
         

@@ -1,5 +1,9 @@
 # Setup list of patches and books to use
 #
+
+import os
+import codecs
+
 bookKeys = {
 u'GEN': u'001',
 u'EXO': u'002',
@@ -137,68 +141,188 @@ u'3JN',
 u'JUD',
 u'REV' ]
 
-bookNames = [ 'Matthew',
-             'Mark',
-             'Luke',
-             'John',
-             'Acts',
-             'Romans',
-             '1 Corinthians',
-             '2 Corinthians',
-             'Galatians',
-             'Ephesians',
-             'Philippians',
-             'Colossians',
-             '1 Thessalonians',
-             '2 Thessalonians',
-             '1 Timothy',
-             '2 Timothy',
-             'Titus',
-             'Philemon',
-             'Hebrews',
-             'James',
-             '1 Peter',
-             '2 Peter',
-             '1 John',
-             '2 John',
-             '3 John',
-             'Jude',
-             'Revelation', 
-             'Psalms']
+readerNames = [
+u'Gen',
+u'Exod',
+u'Lev',
+u'Num',
+u'Deut',
+u'Josh',
+u'Judg',
+u'Ruth',
+u'1Sam',
+u'2Sam',
+u'1Kgs',
+u'2Kgs',
+u'1Chr',
+u'2Chr',
+u'Ezra',
+u'Nehm',
+u'Esth',
+u'Job',
+u'Ps',
+u'Prov',
+u'Eccl',
+u'Song',
+u'Isa',
+u'Jer',
+u'Lam',
+u'Ezek',
+u'Dan',
+u'Hos',
+u'Joel',
+u'Amos',
+u'Obad',
+u'Jonah',
+u'Mic',
+u'Nah',
+u'Hab',
+u'Zeph',
+u'Hag',
+u'Zech',
+u'Mal',
+u'Matt',
+u'Mark',
+u'Luke',
+u'John',
+u'Acts',
+u'Rom',
+u'1Cor',
+u'2Cor',
+u'Gal',
+u'Eph',
+u'Phil',
+u'Col',
+u'1Thess',
+u'2Thess',
+u'1Tim',
+u'2Tim',
+u'Titus',
+u'Phlm',
+u'Heb',
+u'Jas',
+u'1Pet',
+u'2Pet',
+u'1John',
+u'2John',
+u'3John',
+u'Jude',
+u'Rev' ]
 
-nt        = [ 'Matthew',
-              'Mark',
-              'Luke',
-              'John',
-              'Acts',
-              'Romans',
-              '1 Corinthians',
-              '2 Corinthians',
-              'Galatians',
-              'Ephesians',
-              'Philippians',
-              'Colossians',
-              '1 Thessalonians',
-              '2 Thessalonians',
-              '1 Timothy',
-              '2 Timothy',
-              'Titus',
-              'Philemon',
-              'Hebrews',
-              'James',
-              '1 Peter',
-              '2 Peter',
-              '1 John',
-              '2 John',
-              '3 John',
-              'Jude',
-              'Revelation']
+def readerName(num):
+    return readerNames[int(num)-1]
 
-psalms    = ['Psalms']
+def fullName(num):
+    return bookNames[int(num)-1]
+    
+def nextChapter(bookNumber, chapterNumber):
+    return (1,1)
+    
+def previousChapter(bookNumber, chapterNumber):
+    if chapterNumber > 1:
+        return (bookNumber, chapterNumber - 1)
+    else:
+        if bookNumber > 1:
+            return (bookNumber - 1, 50) #bookSize[bookNumber -1])
+        else:
+            return (1,1)
 
-books = nt
+bookNames = ['Genesis',
+            'Exodus',
+            'Leviticus',
+            'Numbers',
+            'Deuteronomy',
+            'Joshua',
+            'Judges',
+            'Ruth',
+            '1 Samuel',
+            '2 Samuel',
+            '1 Kings',
+            '2 Kings',
+            '1 Chronicles',
+            '2 Chronicles',
+            'Ezra',
+            'Nehemiah',
+            'Esther',
+            'Job',
+            'Psalms',
+            'Proverbs',
+            'Ecclesiastes',
+            'Song of Solomon',
+            'Isaiah',
+            'Jeremiah',
+            'Lamentations',
+            'Ezekiel',
+            'Daniel',
+            'Hosea',
+            'Joel',
+            'Amos',
+            'Obadiah',
+            'Jonah',
+            'Micah',
+            'Nahum',
+            'Habakkuk',
+            'Zephaniah',
+            'Haggai',
+            'Zechariah',
+            'Malachi',
+            'Matthew',
+            'Mark',
+            'Luke',
+            'John',
+            'Acts',
+            'Romans',
+            '1 Corinthians',
+            '2 Corinthians',
+            'Galatians',
+            'Ephesians',
+            'Philippians',
+            'Colossians',
+            '1 Thessalonians',
+            '2 Thessalonians',
+            '1 Timothy',
+            '2 Timothy',
+            'Titus',
+            'Philemon',
+            'Hebrews',
+            'James',
+            '1 Peter',
+            '2 Peter',
+            '1 John',
+            '2 John',
+            '3 John',
+            'Jude',
+            'Revelation']
+
+books = bookNames 
+
+def bookKeyForIdValue(id):
+    e = id.find(' ')
+    i = id if e == -1 else id[:e]
+    return bookKeys[i] 
 
 def bookID(usfm):
     s = usfm.find(u'\id ') + 4
-    e = usfm.find(u'\n', s)
+    e = usfm.find(u' ', s)
+    e2 = usfm.find(u'\n', s)
+    e = e if e < e2 else e2
     return usfm[s:e].strip()
+    
+def bookName(usfm):
+    id = bookID(usfm)
+    index = silNames.index(id)
+    return bookNames[index]
+
+    
+def loadBooks(path):
+    books = {}
+    dirList=os.listdir(path)
+    for fname in dirList:
+      if fname[-5:] == '.usfm':
+          f = open(path + '/' + fname)
+          usfm = f.read().decode('utf-8-sig')
+          books[bookID(usfm)] = usfm
+          f.close()
+    return books
+
+

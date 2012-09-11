@@ -31,6 +31,8 @@ toc2    = usfmTokenValue( u"toc2", phrase )
 h       = usfmTokenValue( u"h", phrase )
 mt      = usfmTokenValue( u"mt", phrase )
 mt1     = usfmTokenValue( u"mt1", phrase )
+mt2     = usfmTokenValue( u"mt2", phrase )
+mt3     = usfmTokenValue( u"mt3", phrase )
 ms      = usfmTokenValue( u"ms", phrase )
 ms1     = usfmTokenValue( u"ms1", phrase )
 ms2     = usfmTokenValue( u"ms2", phrase )
@@ -79,8 +81,8 @@ scs      = usfmToken(u"sc")
 sce      = usfmEndToken(u"sc")
 
 # Italics
-ist     = usfmToken(u"i")
-ien     = usfmEndToken(u"i")
+ist     = usfmToken(u"it")
+ien     = usfmEndToken(u"it")
 
 li      = usfmToken(u"li")
 d       = usfmToken(u"d")
@@ -92,12 +94,16 @@ nde     = usfmEndToken(u"nd")
 pbr     = usfmBackslashToken("\\\\")
 mi      = usfmToken(u"mi")
 
-element =   ide  | id | toc2 | h | mt | mt1 | ms | ms1 | ms2 | s | s1 | s2 | r | p | pi | mi | b | c | v | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m | fs | fr | fre | fk | ft | fe \
+# Comments
+rem     = usfmTokenValue( u"rem", phrase )
+
+
+element =   ide  | id | toc2 | h | mt | mt1 | mt2 | mt3 | ms | ms1 | ms2 | s | s1 | s2 | r | p | pi | mi | b | c | v | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m | fs | fr | fre | fk | ft | fe \
           | xs   | xdcs | xdce | xo | xt | xe \
           | ist  | ien  | li | d | sp         \
           | adds | adde                       \
           | tls  | tle                        \
-          | scs  | sce  | pbr | textBlock
+          | scs  | sce  | pbr | rem | textBlock
 usfm    = OneOrMore( element )
 
 # input string
@@ -125,6 +131,8 @@ def createToken(t):
         u'h':    HToken,
         u'mt':   MTToken,
         u'mt1':  MTToken,
+        u'mt2':  MT2Token,
+        u'mt3':  MT3Token,
         u'ms':   MSToken,
         u'ms1':  MSToken,
         u'ms2':  MS2Token,
@@ -159,8 +167,8 @@ def createToken(t):
         u'xo':   XOToken,
         u'xt':   XTToken,
         u'x*':   XEToken,
-        u'i':    ISToken,
-        u'i*':   IEToken,
+        u'it':    ISToken,
+        u'it*':   IEToken,
         u'li':   LIToken,
         u'd':    DToken,
         u'sp':   SPToken,
@@ -176,6 +184,7 @@ def createToken(t):
         u'tl':   TLSToken,
         u'tl*':  TLEToken,
         u'\\\\': PBRToken,
+        u'rem':  REMToken,
         u'text': TEXTToken
     }
     for k, v in options.iteritems():
@@ -195,6 +204,8 @@ class UsfmToken(object):
     def isTC2(self):    return False
     def isH(self):      return False
     def isMT(self):     return False
+    def isMT2(self):    return False
+    def isMT3(self):    return False
     def isMS(self):     return False
     def isMS2(self):    return False
     def isR(self):      return False
@@ -243,6 +254,7 @@ class UsfmToken(object):
     def isTLE(self):    return False
     def isPBR(self):    return False
     def isM(self):      return False
+    def isREM(self):    return False
 
 class IDToken(UsfmToken):
     def renderOn(self, printer):
@@ -268,6 +280,16 @@ class MTToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderMT(self)
     def isMT(self):     return True
+
+class MT2Token(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderMT2(self)
+    def isMT2(self):     return True
+
+class MT3Token(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderMT3(self)
+    def isMT3(self):    return True
 
 class MSToken(UsfmToken):
     def renderOn(self, printer):
@@ -513,3 +535,9 @@ class SCEToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderSCE(self)
     def isSCE(self):      return True
+    
+# REMarks
+class REMToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderREM(self)
+    def isREM(self):      return True

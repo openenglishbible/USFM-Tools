@@ -28,7 +28,7 @@ class MediaWikiPrinter(object):
     def renderID(self, token):
         self.write(u'</p>')
         self.f.close()
-        self.cb = books.bookKeys[token.value[:3]]
+        self.cb = books.bookKeyForIdValue(token.value)
         self.f = open(self.outputDir + u'/c' + self.cb + u'001.html', 'w')
         self.write(u'\n<!-- \\id ' + self.cb + u' -->')
         self.indentFlag = False
@@ -107,6 +107,8 @@ class MediaWikiPrinter(object):
     def renderPI(self, token):      pass
     def renderSCS(self, token):     pass
     def renderSCE(self, token):     pass
+    def renderD(self, token):       pass # For now    
+    def renderREM(self, token):     pass # This is for comments in the USFM
 
 class Transform(object):
 
@@ -121,23 +123,9 @@ class Transform(object):
          tp = MediaWikiPrinter(self.outputDir)
          for t in tokens: t.renderOn(tp)
 
-    def loadBooks(self, path):
-        books = {}
-        dirList=os.listdir(path)
-        for fname in dirList:
-          if fname[-5:] == '.usfm':
-              f = open(path + '/' + fname)
-              usfm = unicode(f.read(), 'utf-8')
-              books[self.bookID(usfm)] = usfm
-              f.close()
-        return books
-
-    def bookID(self, usfm):
-        return books.bookID(usfm)
-
     def setupAndRun(self, patchedDir, outputDir):
         self.outputDir = outputDir
-        self.booksUsfm = self.loadBooks(patchedDir)
+        self.booksUsfm = books.loadBooks(patchedDir)
 
         for bookName in books.silNames:
             if self.booksUsfm.has_key(bookName):

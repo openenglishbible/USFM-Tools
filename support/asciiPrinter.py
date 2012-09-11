@@ -8,7 +8,7 @@ import books
 import codecs
 
 
-class PlainPrinter(object):
+class ASCIIPrinter(object):
     def __init__(self):
         self.currentC = 1
         self.li = False
@@ -33,20 +33,29 @@ class PlainPrinter(object):
     def stopD(self):
         self.d = False
         return u''
+        
+    def escape(self, text):
+        # return text
+        #If we want ascii:
+        t = text.replace(u'‘', u"'")
+        t = t.replace(u'’', u"'")
+        t = t.replace(u'“', u'"')
+        t = t.replace(u'”', u'"')
+        return t
                     
     def renderID(self, token):      return u''
     def renderIDE(self, token):     return u''
-    def renderH(self, token):       self.book = token.getValue(); return u'\n\n\n\n' + (u'=' * len(token.value)) + u'\n' + token.value + u'\n' + (u'=' * len(token.value))
-    def renderMT(self, token):      return self.stopNarrower() + u'\n\n' + (u'-' * len(token.value)) + u'\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
-    def renderMT2(self, token):      return self.stopNarrower() + u'\n\n' + (u'-' * len(token.value)) + u'\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
-    def renderMS(self, token):      return self.stopNarrower() + u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n\n'
-    def renderMS2(self, token):     return self.stopNarrower() + u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
+    def renderH(self, token):       return u'\n\n[' + token.value + u']\n\n'
+    def renderMT(self, token):      return u''
+    def renderMT2(self, token):     return u''
+    def renderMS(self, token):      return u''
+    def renderMS2(self, token):     return u''
     def renderP(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
     def renderB(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
-    def renderS(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n    '
-    def renderS2(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n    '
-    def renderC(self, token):       self.currentC = token.value; return u'\n[' + self.book + u' ' + self.currentC + u' ]\n'
-    def renderV(self, token):       return u' [' + self.currentC + u':' + token.value + u'] '
+    def renderS(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
+    def renderS2(self, token):      return self.stopD() + self.stopNarrower() + u'\n\n    '
+    def renderC(self, token):       return u' ' 
+    def renderV(self, token):       return u' ' 
     def renderWJS(self, token):     return u""
     def renderWJE(self, token):     return u""
     def renderTEXT(self, token):    return self.escape(token.value)
@@ -57,13 +66,14 @@ class PlainPrinter(object):
     def renderNB(self, token):      return self.stopD() + self.stopNarrower() + u"\n\n"
     def renderQTS(self, token):     return u''
     def renderQTE(self, token):     return u''
-    def renderFS(self, token):      return u'[ footnote: '
-    def renderFE(self, token):      return u']'
+    def renderFS(self, token):      return u''
+    def renderFE(self, token):      return u''
     def renderIS(self, token):      return u''
     def renderIE(self, token):      return u''
     def renderADDS(self, token):    return u''
     def renderADDE(self, token):    return u''
-    def renderLI(self, token):      return u'* '
+    def renderPI(self, token):      return u''
+    def renderLI(self, token):      return u' '
     def renderD(self, token):       return self.startD()
     def renderSP(self, token):      return self.startD()
     def renderNDS(self, token):     return u''
@@ -72,13 +82,13 @@ class PlainPrinter(object):
     def renderD(self, token):       return u'' # For now
     def renderREM(self, token):     return u'' # This is for comments in the USFM
     
-class TransformToMarkdown(object):
+class TransformToASCII(object):
 
     def translateBook(self, usfm):
 
         tokens = parseUsfm.parseString(usfm)
         s = u''
-        tp = PlainPrinter()
+        tp = ASCIIPrinter()
         for t in tokens: s = s + t.renderOn(tp)
         return s
         

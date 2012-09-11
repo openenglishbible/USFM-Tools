@@ -31,11 +31,12 @@ class ReaderPrinter(object):
         self.write(u'&nbsp;&nbsp;&nbsp;&nbsp;' * level)
 
     def renderID(self, token): 
-        self.cb = books.bookKeys[token.value]
+        self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
     def renderIDE(self, token):     pass
-    def renderH(self, token):       self.bookname = token.value; self.write(u'</p><h1 class="bookname">' + token.value + u'</h1><p>')
-    def renderMT(self, token):      self.write(u'</p><h3>' + token.value + u'</h3><p>')
+    def renderH(self, token):       self.bookname = token.value #; self.write(u'</p><h1 class="bookname">' + token.value + u'</h1><p>')
+    def renderMT(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
+    def renderMT2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
     def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p><br />')
     def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p><br />')
     def renderP(self, token):
@@ -76,25 +77,13 @@ class ReaderPrinter(object):
     def renderPBR(self, token):     self.write(u'<br />')
     def renderSCS(self, token):     self.write(u'<b>')
     def renderSCE(self, token):     self.write(u'</b>')
+    def renderD(self, token):       pass # For now
+    def renderREM(self, token):     pass # This is for comments in the USFM
 
 class TransformToHTML(object):
     outputDir = ''
     patchedDir = ''
     prefaceDir = ''
-
-    def loadBooks(self, path):
-        books = {}
-        dirList=os.listdir(path)
-        for fname in dirList:
-          if fname[-5:] == '.usfm':
-              f = open(path + '/' + fname)
-              usfm = unicode(f.read(), 'utf-8')
-              books[self.bookID(usfm)] = usfm
-              f.close()
-        return books
-
-    def bookID(self, usfm):
-        return books.bookID(usfm)
 
     def translateBook(self, usfm):
         tokens = parseUsfm.parseString(usfm)
@@ -104,7 +93,7 @@ class TransformToHTML(object):
         self.patchedDir = patchedDir
         self.prefaceDir = prefaceDir
         self.outputDir = outputDir
-        self.booksUsfm = self.loadBooks(patchedDir)
+        self.booksUsfm = books.loadBooks(patchedDir)
         self.printer = ReaderPrinter(self.outputDir)
 
         bookTex = u''
