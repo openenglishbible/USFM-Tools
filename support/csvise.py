@@ -53,7 +53,7 @@ class CSVPrinter(object):
         self.cc = token.value.zfill(3)
     def renderV(self, token):
         self.cv = token.value.zfill(3)
-        self.write(u'\nOEB,' + str(int(self.cb)) + ',' + str(int(self.cc)) + ',' + str(int(self.cv)) + ',')
+        self.write(u'\nOEB,' + str(int(self.cb)) + ',' + str(int(self.cc)) + ',' + self.cv   + ',')
     def renderWJS(self, token):     pass
     def renderWJE(self, token):     pass
     def renderTEXT(self, token):    self.write(self.escape(token.value) + ' ')

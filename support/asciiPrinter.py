@@ -45,11 +45,11 @@ class ASCIIPrinter(object):
                     
     def renderID(self, token):      return u''
     def renderIDE(self, token):     return u''
-    def renderH(self, token):       return u'\n\n[' + token.value + u']\n\n'
+    def renderH(self, token):       return u'\n\n\n### ' + token.value + u' ###\n\n\n'
     def renderMT(self, token):      return u''
     def renderMT2(self, token):     return u''
     def renderMS(self, token):      return u''
-    def renderMS2(self, token):     return u''
+    def renderMS2(self, token):     return u'\n\n[' + token.value + u']\n\n'
     def renderP(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
     def renderB(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
     def renderS(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
@@ -107,7 +107,7 @@ class TransformToASCII(object):
         self.outputDir = outputDir
         self.booksUsfm = books.loadBooks(patchedDir)
                   
-        bookText = u"""
+        r = u"""
 
 ==================
 Open English Bible
@@ -116,8 +116,6 @@ Open English Bible
 Version:""" + buildName + """
 
 """
-        for bookName in books.silNames:
-            if self.booksUsfm.has_key(bookName):
-                bookText = bookText + self.translateBook(self.booksUsfm[bookName])
-                print '      (' + bookName + ')'
-        self.saveAll(bookText, buildName)
+        for book in books.orderFor(self.booksUsfm):
+            r = r + self.translateBook(book)
+        self.saveAll(r, buildName)

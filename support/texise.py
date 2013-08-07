@@ -92,7 +92,7 @@ class TexPrinter(object):
             s = s + ur'\indentation '
         return s
                     
-    def renderID(self, token):      return u''
+    def renderID(self, token):      print '     ' + token.value ; return u''
     def renderIDE(self, token):     return u''
     def renderH(self, token):       return u'\n\n\RAHeader{' + token.value + u'}\n'
     def renderMT(self, token):      return self.stopLI() + self.stopNarrower() + u'\n\MT{' + token.value + u'}\n'
@@ -245,7 +245,7 @@ class TransformToContext(object):
         \define[1]\V{\setupinmargin[style=small,stack=yes] \inouter{#1} }
         \define[1]\C{\setupinmargin[style=bold,stack=yes] \inouter{#1} \marking[RAChapter]{#1} }
         \define[1]\MS{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
-        \define[1]\MSS{{\midaligned{\em #1}}}
+        \define[1]\MSS{\blank{\midaligned{\em #1}}\blank}
         \define[1]\MT{  {\midaligned{\tfd{\WORD{#1}}}}\blank ~ } 
         \define[1]\MTT{ {\midaligned{\tfc{\WORD{#1}}}}\blank ~ }
         \define[1]\RAHeader{\page[right] \chapter{#1} \marking[RABook]{#1} }
@@ -300,9 +300,7 @@ class TransformToContext(object):
         self.texPrinter = TexPrinter()
 
         bookTex = u''
-
-        for bookName in books.silNames:
-            if self.booksUsfm.has_key(bookName):
-                bookTex = bookTex + self.translateBook(self.booksUsfm[bookName], smallCap)
-                print '      (' + bookName + ')'
+        
+        for book in books.orderFor(self.booksUsfm):
+            bookTex = bookTex + self.translateBook(book, smallCap)
         self.saveAll(bookTex)

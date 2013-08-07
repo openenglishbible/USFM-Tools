@@ -33,19 +33,22 @@ class PlainPrinter(object):
     def stopD(self):
         self.d = False
         return u''
+        
+    def escape(self, s):
+        return s
                     
     def renderID(self, token):      return u''
     def renderIDE(self, token):     return u''
-    def renderH(self, token):       self.book = token.getValue(); return u'\n\n\n\n' + (u'=' * len(token.value)) + u'\n' + token.value + u'\n' + (u'=' * len(token.value))
-    def renderMT(self, token):      return self.stopNarrower() + u'\n\n' + (u'-' * len(token.value)) + u'\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
-    def renderMT2(self, token):      return self.stopNarrower() + u'\n\n' + (u'-' * len(token.value)) + u'\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
+    def renderH(self, token):       self.book = token.getValue(); return u''
+    def renderMT(self, token):      return self.stopNarrower() + u'\n\n# ' + token.value.upper() + u'\n\n'
+    def renderMT2(self, token):     return self.stopNarrower() + u'\n\n## ' + token.value.upper() + u'\n\n'
     def renderMS(self, token):      return self.stopNarrower() + u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n\n'
     def renderMS2(self, token):     return self.stopNarrower() + u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n\n'
-    def renderP(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
-    def renderB(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n    '
-    def renderS(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n    '
-    def renderS2(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n    '
-    def renderC(self, token):       self.currentC = token.value; return u'\n[' + self.book + u' ' + self.currentC + u' ]\n'
+    def renderP(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n'
+    def renderB(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n'
+    def renderS(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n'
+    def renderS2(self, token):       return self.stopD() + self.stopNarrower() + u'\n\n----\n\n'
+    def renderC(self, token):       self.currentC = token.value; return u'\n\n[' + self.book + u' ' + self.currentC + u' ]\n\n'
     def renderV(self, token):       return u' [' + self.currentC + u':' + token.value + u'] '
     def renderWJS(self, token):     return u""
     def renderWJE(self, token):     return u""
@@ -63,6 +66,7 @@ class PlainPrinter(object):
     def renderIE(self, token):      return u''
     def renderADDS(self, token):    return u''
     def renderADDE(self, token):    return u''
+    def renderPI(self, token):      return u''
     def renderLI(self, token):      return u'* '
     def renderD(self, token):       return self.startD()
     def renderSP(self, token):      return self.startD()
@@ -97,17 +101,14 @@ class TransformToMarkdown(object):
         self.outputDir = outputDir
         self.booksUsfm = books.loadBooks(patchedDir)
                   
-        bookText = u"""
-
-==================
-Open English Bible
-==================
-
+        r = u"""Open English Bible
 Version:""" + buildName + """
 
 """
-        for bookName in books.silNames:
-            if self.booksUsfm.has_key(bookName):
-                bookText = bookText + self.translateBook(self.booksUsfm[bookName])
-                print '      (' + bookName + ')'
-        self.saveAll(bookText, buildName)
+        for book in books.orderFor(self.booksUsfm):
+            r = r + self.translateBook(book)
+                
+        # Clean up a bit
+        r = r.replace(u'\n [', u'\n[')
+        r = r.replace(u'\n\n\n', u'\n\n')
+        self.saveAll(r, buildName)

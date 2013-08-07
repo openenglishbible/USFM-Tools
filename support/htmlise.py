@@ -188,6 +188,8 @@ class ReaderPrinter(object):
     def renderPBR(self, token):     self.write(u'<br />')
     def renderD(self, token):       pass # For now
     def renderREM(self, token):     pass # This is for comments in the USFM
+    def renderPI(self, token):      pass
+    def renderLI(self, token):      pass
 
 class TransformToHTML(object):
     outputDir = ''

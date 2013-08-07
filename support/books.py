@@ -141,6 +141,36 @@ u'3JN',
 u'JUD',
 u'REV' ]
 
+silNamesNTPsalms = [
+u'MAT',
+u'MRK',
+u'LUK',
+u'JHN',
+u'ACT',
+u'ROM',
+u'1CO',
+u'2CO',
+u'GAL',
+u'EPH',
+u'PHP',
+u'COL',
+u'1TH',
+u'2TH',
+u'1TI',
+u'2TI',
+u'TIT',
+u'PHM',
+u'HEB',
+u'JAS',
+u'1PE',
+u'2PE',
+u'1JN',
+u'2JN',
+u'3JN',
+u'JUD',
+u'REV',
+u'PSA' ]
+
 readerNames = [
 u'Gen',
 u'Exod',
@@ -325,4 +355,13 @@ def loadBooks(path):
           f.close()
     return books
 
-
+def orderFor(booksDict):
+    order = silNames
+    if booksDict.has_key("PSA") and not booksDict.has_key("GEN") and booksDict.has_key("MAT"):
+        # This is a big hack. When doing Psalms + NT, put Psalms last
+        order = silNamesNTPsalms       
+    a = []
+    for bookName in order:
+        if booksDict.has_key(bookName):
+            a.append(booksDict[bookName])
+    return a
