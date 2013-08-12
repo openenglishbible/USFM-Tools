@@ -10,7 +10,7 @@ It is primarily used for the Open English Bible, and may need adjustment if used
 
 # Get code
 
-    git clone 
+    git clone https://github.com/openenglishbible/USFM-Tools.git
     cd USFM-Tools
     python transform.py --setup
  
