@@ -6,17 +6,17 @@ It is primarily used for the Open English Bible, and may need adjustment if used
 
 # Prerequisites
 
-   sudo easy_install pyparsing
+    sudo easy_install pyparsing
 
 # Get code
 
-   git clone 
-   cd USFM-Tools
-   python transform.py --setup
+    git clone 
+    cd USFM-Tools
+    python transform.py --setup
  
 (This downloads ConTeXt and may take a while.)
  
 # Run
 
-   python transform.py --target=context --usfmDir=/path/to/usfmfiles/ --builtDir=built/ --name=MyTranslation
+    python transform.py --target=context --usfmDir=/path/to/usfmfiles/ --builtDir=built/ --name=MyTranslation
 
