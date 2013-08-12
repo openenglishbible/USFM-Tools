@@ -347,12 +347,20 @@ def bookName(usfm):
 def loadBooks(path):
     books = {}
     dirList=os.listdir(path)
+    print '\n     LOADING ALL USFM FILES FROM ' + path
     for fname in dirList:
-      if fname[-5:] == '.usfm':
-          f = open(path + '/' + fname)
+      try:
+          f = open(path + '/' + fname,'U') # U handles line endings
           usfm = f.read().decode('utf-8-sig')
-          books[bookID(usfm)] = usfm
-          f.close()
+          if usfm[:4] == ur'\id ' and usfm[4:7] in silNames:
+              print '     Loaded ' + fname + ' as ' + usfm[4:7]
+              books[bookID(usfm)] = usfm
+              f.close()
+          else:
+              print '     Ignored ' + fname
+      except:
+          print '     Couldn\'t open ' + fname
+    print '     FINISHED LOADING\n'
     return books
 
 def orderFor(booksDict):

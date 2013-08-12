@@ -1,21 +1,22 @@
 import sys
-sys.path.append("support")
-
 import os
+
+# Set Path for files in support/
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'support'))
 
 #from subprocess import Popen, PIPE, call
 import subprocess
 import getopt
 
-import texise
 import htmlise
 import readerise
-import markdownise
 import mediawikiPrinter
 import singlehtmlise
 import loutise
-import csvise
-import asciiPrinter
+import asciiRenderer
+import csvRenderer
+import mdRenderer
+import contextRenderer
 
 def runscriptold(c, prefix=''):
     print prefix + ':: ' + c
@@ -69,19 +70,21 @@ def buildLout(usfmDir, builtDir, buildName):
     print '     Copying into builtDir'
     runscript('cp working/lout/' + buildName + '.pdf ' + builtDir + '/' + buildName + '.pdf ', '       ')
 
-    
 def buildConTeXt(usfmDir, builtDir, buildName):
 
-    print '#### Building PDF...'
+    print '#### Building PDF via ConTeXt...'
 
     # Convert to ConTeXt
     print '     Converting to ConTeXt...'
-    c = texise.TransformToContext()
-    c.setupAndRun(usfmDir, 'working/tex', buildName)
+    #c = texise.TransformToContext()
+    #c.setupAndRun(usfmDir, 'working/tex', buildName)
+    ensureOutputDir(builtDir)
+    c = contextRenderer.ConTeXtRenderer(usfmDir, 'working/tex/bible.tex')
+    c.render()
 
     # Build PDF
     print '     Building PDF..'
-    c = """. ./support/thirdparty/context/tex/setuptex ; cd working/tex-working; rm * ; context ../tex/Bible.tex; cp Bible.pdf ../../""" + builtDir + '/' + buildName + '.pdf'
+    c = """. ./support/thirdparty/context/tex/setuptex ; cd working/tex-working; rm * ; context ../tex/bible.tex; cp bible.pdf ../../""" + builtDir + '/' + buildName + '.pdf'
     runscript(c, '     ')
 
 def buildWeb(usfmDir, builtDir, buildName):
@@ -101,9 +104,9 @@ def buildSingleHtml(usfmDir, builtDir, buildName):
 def buildCSV(usfmDir, builtDir, buildName):
     # Convert to CSV
     print '#### Building CSV...'
-    c = csvise.TransformToCSV()
     ensureOutputDir(builtDir)
-    c.setupAndRun(usfmDir, builtDir, buildName + '.csv')
+    c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.cvs')
+    c.render()
 
 def buildReader(usfmDir, builtDir, buildName):
     # Convert to HTML for online reader
@@ -113,23 +116,24 @@ def buildReader(usfmDir, builtDir, buildName):
     c.setupAndRun(usfmDir, builtDir + 'en_oeb')
 
 def buildMarkdown(usfmDir, builtDir, buildName):
-        # Convert to Markdown
-        print '#### Building for Markdown...'
-        c = markdownise.TransformToMarkdown()
-        c.setupAndRun(usfmDir, builtDir, buildName + '.md')
+    # Convert to Markdown for Pandoc
+    print '#### Building for Markdown...'
+    ensureOutputDir(builtDir)
+    c = mdRenderer.MarkdownRenderer(usfmDir, builtDir + '/' + buildName + '.md')
+    c.render()
 
 def buildASCII(usfmDir, builtDir, buildName):
-        # Convert to ASCII
-        print '#### Building for ASCII...'
-        c = asciiPrinter.TransformToASCII()
-        c.setupAndRun(usfmDir, builtDir, buildName + '.txt')
+    # Convert to ASCII
+    print '#### Building for ASCII...'
+    c = asciiRenderer.ASCIIRenderer(usfmDir, builtDir + '/' + buildName + '.txt')
+    c.render()
 
 def buildMediawiki(usfmDir, builtDir, buildName):
-        # Convert to MediaWiki format for Door43
-        print '#### Building for Mediawiki...'
-        # Check output directory
-        ensureOutputDir(builtDir + '/mediawiki')
-        mediawikiPrinter.Transform().setupAndRun(usfmDir, builtDir + '/mediawiki')
+    # Convert to MediaWiki format for Door43
+    print '#### Building for Mediawiki...'
+    # Check output directory
+    ensureOutputDir(builtDir + '/mediawiki')
+    mediawikiPrinter.Transform().setupAndRun(usfmDir, builtDir + '/mediawiki')
 
 def ensureOutputDir(dir):
     if not os.path.exists(dir):
@@ -176,6 +180,8 @@ def main(argv):
         buildCSV(usfmDir, buildDir, buildName)
     elif targets == 'ascii':
         buildASCII(usfmDir, buildDir, buildName)
+    elif targets == 'csv':
+        buildCSV(usfmDir, buildDir, buildName)
     else:
         usage()
 
@@ -188,7 +194,8 @@ def usage():
 
         Build script.  See source for details.
         
-        Requires lout and Context
+        Setup:
+        transform.py --setup 
         
     """
 

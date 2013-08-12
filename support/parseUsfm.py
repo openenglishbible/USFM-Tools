@@ -27,7 +27,6 @@ textBlock   = Group(Optional(NoMatch(), u"text") + phrase )
 
 id      = usfmTokenValue( u"id", phrase )
 ide     = usfmTokenValue( u"ide", phrase )
-toc2    = usfmTokenValue( u"toc2", phrase )
 h       = usfmTokenValue( u"h", phrase )
 mt      = usfmTokenValue( u"mt", phrase )
 mt1     = usfmTokenValue( u"mt1", phrase )
@@ -36,9 +35,11 @@ mt3     = usfmTokenValue( u"mt3", phrase )
 ms      = usfmTokenValue( u"ms", phrase )
 ms1     = usfmTokenValue( u"ms1", phrase )
 ms2     = usfmTokenValue( u"ms2", phrase )
+mr      = usfmTokenValue( u"mr", phrase )
 s       = usfmTokenValue( u"s", phrase )
 s1      = usfmTokenValue( u"s1", phrase )
 s2      = usfmTokenValue( u"s2", phrase )
+s3      = usfmTokenValue( u"s3", phrase )
 r       = usfmTokenValue( u"r", phrase )
 p       = usfmToken(u"p")
 pi      = usfmToken(u"pi")
@@ -62,6 +63,7 @@ fr      = usfmTokenValue( u"fr", phrase )
 fre     = usfmEndToken( u"fr" )
 fk      = usfmTokenValue( u"fk", phrase )
 ft      = usfmTokenValue( u"ft", phrase )
+fq      = usfmTokenValue( u"fq", phrase )
 fe      = usfmEndToken(u"f")
 
 # Cross References
@@ -97,12 +99,35 @@ mi      = usfmToken(u"mi")
 # Comments
 rem     = usfmTokenValue( u"rem", phrase )
 
+# Table of Contents
+toc1    =  usfmTokenValue( u"toc1", phrase )
+toc2    =  usfmTokenValue( u"toc2", phrase )
+toc3    =  usfmTokenValue( u"toc3", phrase )
 
-element =   ide  | id | toc2 | h | mt | mt1 | mt2 | mt3 | ms | ms1 | ms2 | s | s1 | s2 | r | p | pi | mi | b | c | v | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m | fs | fr | fre | fk | ft | fe \
+# Introductory Materials
+is1     =  usfmTokenValue( u"is1", phrase ) | usfmTokenValue( u"is", phrase )
+ip      =  usfmTokenValue( u"ip", phrase )
+iot     =  usfmTokenValue( u"iot", phrase )
+io1     =  usfmTokenValue( u"io1", phrase ) | usfmTokenValue( u"io", phrase )
+io2     =  usfmTokenValue( u"io2", phrase ) 
+ior_s   =  usfmToken( u"ior")
+ior_e   =  usfmEndToken( u"ior")
+
+# Quoted book title
+bk_s    =  usfmToken( u"bk")
+bk_e    =  usfmEndToken( u"bk")
+
+element =   ide  | id | h | mt | mt1 | mt2 | mt3 | ms | ms1 | ms2 | mr     \
+          | s | s1 | s2 | s3 | r | p | pi | mi | b | c | v                 \
+          | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m  \
+          | fs   | fr   | fre  | fk | ft | fq | fe \
           | xs   | xdcs | xdce | xo | xt | xe \
           | ist  | ien  | li | d | sp         \
           | adds | adde                       \
           | tls  | tle                        \
+          | toc1 | toc2 | toc3                \
+          | is1  | ip   | iot | io1 | io2 | ior_s | ior_e  \
+          | bk_s | bk_e                       \
           | scs  | sce  | pbr | rem | textBlock
 usfm    = OneOrMore( element )
 
@@ -127,7 +152,6 @@ def createToken(t):
     options = {
         u'id':   IDToken,
         u'ide':  IDEToken,
-        u'toc2': TOC2Token,
         u'h':    HToken,
         u'mt':   MTToken,
         u'mt1':  MTToken,
@@ -136,12 +160,14 @@ def createToken(t):
         u'ms':   MSToken,
         u'ms1':  MSToken,
         u'ms2':  MS2Token,
+        u'mr':   MRToken,
         u'p':    PToken,
         u'pi':   PIToken,
         u'b':    BToken,
         u's':    SToken,
         u's1':   SToken,
         u's2':   S2Token,
+        u's3':   S3Token,
         u'mi':   MIToken,
         u'r':    RToken,
         u'c':    CToken,
@@ -160,6 +186,7 @@ def createToken(t):
         u'fr*':  FREToken,
         u'fk':   FKToken,
         u'ft':   FTToken,
+        u'fq':   FQToken,
         u'f*':   FEToken,
         u'x':    XSToken,
         u'xdc':  XDCSToken,
@@ -185,6 +212,20 @@ def createToken(t):
         u'tl*':  TLEToken,
         u'\\\\': PBRToken,
         u'rem':  REMToken,
+        u'toc1': TOC1Token,
+        u'toc2': TOC2Token,
+        u'toc3': TOC3Token,
+        u'is':   IS1_Token,
+        u'is1':  IS1_Token,
+        u'ip':   IP_Token,
+        u'iot':  IOT_Token,
+        u'io':   IO1_Token,
+        u'io1':  IO1_Token,
+        u'io2':  IO2_Token,
+        u'ior':  IOR_S_Token,
+        u'ior*': IOR_E_Token,
+        u'bk':   BK_S_Token,
+        u'bk*':  BK_E_Token,
         u'text': TEXTToken
     }
     for k, v in options.iteritems():
@@ -201,19 +242,20 @@ class UsfmToken(object):
     def getValue(self): return self.value
     def isID(self):     return False
     def isIDE(self):    return False
-    def isTC2(self):    return False
     def isH(self):      return False
     def isMT(self):     return False
     def isMT2(self):    return False
     def isMT3(self):    return False
     def isMS(self):     return False
     def isMS2(self):    return False
+    def isMR(self):     return False
     def isR(self):      return False
     def isP(self):      return False
     def isP(self):      return False
     def isPI(self):     return False
     def isS(self):      return False
     def isS2(self):     return False
+    def isS3(self):     return False
     def isMI(self):     return False
     def isC(self):      return False
     def isV(self):      return False
@@ -232,6 +274,7 @@ class UsfmToken(object):
     def isFRE(self):    return False
     def isFK(self):     return False
     def isFT(self):     return False
+    def isFQ(self):     return False
     def isFE(self):     return False
     def isXS(self):     return False
     def isXDCS(self):   return False
@@ -255,6 +298,18 @@ class UsfmToken(object):
     def isPBR(self):    return False
     def isM(self):      return False
     def isREM(self):    return False
+    def is_toc1(self):  return False
+    def is_toc2(self):  return False
+    def is_toc3(self):  return False
+    def is_is1(self):   return False
+    def is_ip(self):    return False
+    def is_iot(self):   return False
+    def is_io1(self):   return False
+    def is_io2(self):   return False
+    def is_ior_s(self): return False
+    def is_ior_e(self): return False
+    def is_bk_s(self):  return False
+    def is_bk_e(self):  return False
 
 class IDToken(UsfmToken):
     def renderOn(self, printer):
@@ -266,10 +321,20 @@ class IDEToken(UsfmToken):
         return printer.renderIDE(self)
     def isIDE(self):    return True
 
+class TOC1Token(UsfmToken):
+    def renderOn(self, printer):
+        return printer.render_toc1(self)
+    def is_toc1(self):    return True
+
 class TOC2Token(UsfmToken):
     def renderOn(self, printer):
-        return printer.renderTOC2(self)
-    def isTOC2(self):    return True
+        return printer.render_toc2(self)
+    def is_toc2(self):    return True
+
+class TOC3Token(UsfmToken):
+    def renderOn(self, printer):
+        return printer.render_toc3(self)
+    def is_toc3(self):    return True
 
 class HToken(UsfmToken):
     def renderOn(self, printer):
@@ -300,6 +365,11 @@ class MS2Token(UsfmToken):
     def renderOn(self, printer):
         return printer.renderMS2(self)
     def isMS2(self):    return True
+
+class MRToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderMR(self)
+    def isMR(self):    return True
 
 class MIToken(UsfmToken):
     def renderOn(self, printer):
@@ -355,6 +425,11 @@ class S2Token(UsfmToken):
     def renderOn(self, printer):
         return printer.renderS2(self)
     def isS2(self):      return True
+
+class S3Token(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderS3(self)
+    def isS3(self):      return True
 
 class QToken(UsfmToken):
     def renderOn(self, printer):
@@ -415,6 +490,11 @@ class FTToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderFT(self)
     def isFT(self):      return True
+
+class FQToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderFQ(self)
+    def isFQ(self):      return True
 
 class FEToken(UsfmToken):
     def renderOn(self, printer):
@@ -541,3 +621,44 @@ class REMToken(UsfmToken):
     def renderOn(self, printer):
         return printer.renderREM(self)
     def isREM(self):      return True
+    
+# Introductions
+class IS1_Token(UsfmToken):
+    def renderOn(self, printer):
+        return printer.render_is1(self)
+    def is_is1(self):     return True
+
+class IP_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_ip(self)
+    def is_ip(self):              return True
+    
+class IOT_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_iot(self)
+    def is_iot(self):             return True
+    
+class IO1_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_io1(self)
+    def is_io1(self):             return True
+    
+class IO2_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_io2(self)
+    def is_io2(self):             return True
+    
+class IOR_S_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_ior_s(self)
+    def is_ior_s(self):           return True
+
+class IOR_E_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_ior_e(self)
+    def is_ior_e(self):           return True
+
+# Quoted book title
+class BK_S_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_bk_s(self)
+    def is_bk_s(self):            return True
+
+class BK_E_Token(UsfmToken):
+    def renderOn(self, printer):  return printer.render_bk_e(self)
+    def is_bk_e(self):            return True
+
+
