@@ -34,7 +34,9 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.f.write(u"""
             \page[right] % Cover page
             \page[left]
-            \par \par Built """ + datetime.date.today().strftime("%A, %d %B %Y") + r"""
+            \par 
+            \par Built by github.com/openenglishbible/USFM-Tools
+            \par on """ + datetime.date.today().strftime("%A, %d %B %Y") + r"""
             \par     
             \page[right]
             \par ~

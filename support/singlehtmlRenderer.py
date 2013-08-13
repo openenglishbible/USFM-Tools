@@ -1,23 +1,52 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
-import parseUsfm
-import books
+import abstractRenderer
+import codecs
 import datetime
+import books
 
-class ReaderPrinter(object):
-    def __init__(self, outputDir):
-        self.outputDir = outputDir
+#
+#   Simplest renderer. Ignores everything except ascii text.
+#
+
+class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
+    
+    def __init__(self, inputDir, outputFilename):
+        # Unset
+        self.f = None  # output file stream
+        # IO
+        self.outputFilename = outputFilename
+        self.inputDir = inputDir
+        # Position
         self.cb = u''    # Current Book
         self.cc = u'001'    # Current Chapter
         self.cv = u'001'    # Currrent Verse
         self.indentFlag = False
-        self.rendered = u''
         self.bookName = u''
- 
+        
+    def render(self):
+        self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
+        self.f.write(u"""
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+            <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+            <title>Bible</title>
+        </head>
+        <body>
+        """.encode('utf-8'))
+        self.f.write('<p>Draft built ' + datetime.date.today().strftime("%A, %d %B %Y") + '</p>\n\n')
+        self.loadUSFM(self.inputDir)
+        self.run()
+        self.f.write('</body></html>')
+        self.f.close()
+        
+    def writeLog(self, s):
+        print s
+        
     def write(self, unicodeString):
-        self.rendered = self.rendered + unicodeString
+        self.f.write(unicodeString)
         
     def writeIndent(self, level):
         self.write(u'\n\n')
@@ -33,7 +62,6 @@ class ReaderPrinter(object):
     def renderID(self, token): 
         self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
-    def renderIDE(self, token):     pass
     def renderH(self, token):       self.bookname = token.value 
     def renderMT(self, token):      self.write(u'\n\n<h1>' + token.value + u'</h1>')
     def renderMT2(self, token):     self.write(u'\n\n<h2>' + token.value + u'</h2>')
@@ -63,10 +91,6 @@ class ReaderPrinter(object):
     def renderQ3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.writeIndent(0)
     def renderB(self, token):       self.write(u'\n\n<p class="indent-0">&nbsp;</p>')
-    def renderQTS(self, token):     pass
-    def renderQTE(self, token):     pass
-    def renderFS(self, token):      pass
-    def renderFE(self, token):      pass
     def renderIS(self, token):      self.write(u'<i>')
     def renderIE(self, token):      self.write(u'</i>')
     def renderNDS(self, token):     self.write(u'<span class="tetragrammaton">')
@@ -74,45 +98,3 @@ class ReaderPrinter(object):
     def renderPBR(self, token):     self.write(u'<br />')
     def renderSCS(self, token):     self.write(u'<b>')
     def renderSCE(self, token):     self.write(u'</b>')
-    def renderD(self, token):       pass # For now
-    def renderREM(self, token):     pass # This is for comments in the USFM
-    def renderPI(self, token):      pass
-    def renderLI(self, token):      pass
-
-class TransformToHTML(object):
-    outputDir = ''
-    patchedDir = ''
-    prefaceDir = ''
-
-    def translateBook(self, usfm):
-        tokens = parseUsfm.parseString(usfm)
-        for t in tokens: t.renderOn(self.printer)
- 
-    def setupAndRun(self, patchedDir, prefaceDir, outputDir, buildName):
-        self.patchedDir = patchedDir
-        self.prefaceDir = prefaceDir
-        self.outputDir = outputDir
-        self.booksUsfm = books.loadBooks(patchedDir)
-        self.printer = ReaderPrinter(self.outputDir)
-
-        bookTex = u''
-
-        for book in books.orderFor(self.booksUsfm):
-            self.translateBook(book)
-
-        f = open(self.outputDir + buildName, 'w')
-        f.write(u"""
-        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-        <html xmlns="http://www.w3.org/1999/xhtml">
-        <head>
-            <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-            <title>Open English Bible</title>
-        </head>
-        <body>
-        <p>Open English Bible</p>
-        """.encode('utf-8'))
-        f.write('<p>Draft built ' + datetime.date.today().strftime("%A, %d %B %Y") + '<br />Version ' + buildName + '</p>\n\n')
-        f.write(self.printer.rendered.encode('utf-8'))
-        f.write('</body></html>')
-        f.close()
-        

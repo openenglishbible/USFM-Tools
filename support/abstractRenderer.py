@@ -79,6 +79,9 @@ class AbstractRenderer(object):
     def renderXO(self, token):      pass
     def renderXT(self, token):      pass
 
+    def renderADDS(self, token):    pass
+    def renderADDE(self, token):    pass
+    
     def render_toc1(self, token):   pass
     def render_toc2(self, token):   pass
     def render_toc3(self, token):   pass
@@ -93,3 +96,6 @@ class AbstractRenderer(object):
     
     def render_bk_s(self, token):   pass
     def render_bk_e(self, token):   pass
+
+    # This is unknown!
+    def renderUnknown(self, token):  self.writeLog("WARNING: Unknown token '" + token.value + "'" )

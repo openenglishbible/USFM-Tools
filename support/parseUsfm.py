@@ -3,7 +3,7 @@
 
 import sys
 
-from pyparsing import Word, alphas, OneOrMore, nums, Literal, White, Group, Suppress, Empty, NoMatch, Optional, CharsNotIn, unicodeString
+from pyparsing import Word, alphas, OneOrMore, nums, Literal, White, Group, Suppress, Empty, NoMatch, Optional, CharsNotIn, unicodeString, MatchFirst
 
 def usfmToken(key):
     return Group(Suppress(backslash) + Literal( key ) + Suppress(White()))
@@ -24,7 +24,8 @@ backslash   = Literal(u"\\")
 plus        = Literal(u"+")
 
 textBlock   = Group(Optional(NoMatch(), u"text") + phrase )
-
+unknown     = Group(Optional(NoMatch(), u"unknown") + Suppress(backslash) + CharsNotIn(u' \n\t\\') )
+ 
 id      = usfmTokenValue( u"id", phrase )
 ide     = usfmTokenValue( u"ide", phrase )
 h       = usfmTokenValue( u"h", phrase )
@@ -117,18 +118,75 @@ ior_e   =  usfmEndToken( u"ior")
 bk_s    =  usfmToken( u"bk")
 bk_e    =  usfmEndToken( u"bk")
 
-element =   ide  | id | h | mt | mt1 | mt2 | mt3 | ms | ms1 | ms2 | mr     \
-          | s | s1 | s2 | s3 | r | p | pi | mi | b | c | v                 \
-          | wjs | wje | nds | nde | q | q1 | q2 | q3 | qts | qte | nb | m  \
-          | fs   | fr   | fre  | fk | ft | fq | fe \
-          | xs   | xdcs | xdce | xo | xt | xe \
-          | ist  | ien  | li | d | sp         \
-          | adds | adde                       \
-          | tls  | tle                        \
-          | toc1 | toc2 | toc3                \
-          | is1  | ip   | iot | io1 | io2 | ior_s | ior_e  \
-          | bk_s | bk_e                       \
-          | scs  | sce  | pbr | rem | textBlock
+element =  MatchFirst([ide, id, h, mt, mt1, mt2, mt3,
+ ms,
+ ms1,
+ ms2,
+ mr,
+ s,
+ s1,
+ s2,
+ s3,
+ r,
+ p,
+ pi,
+ mi,
+ b,
+ c,
+ v,
+ wjs,
+ wje,
+ nds,
+ nde,
+ q,
+ q1,
+ q2,
+ q3,
+ qts,
+ qte,
+ nb,
+ m,
+ fs,
+ fr,
+ fre,
+ fk,
+ ft,
+ fq,
+ fe,
+ xs,
+ xdcs,
+ xdce,
+ xo,
+ xt,
+ xe,
+ ist,
+ ien,
+ li,
+ d,
+ sp,
+ adds,
+ adde,
+ tls,
+ tle,
+ toc1,
+ toc2,
+ toc3,
+ is1,
+ ip,
+ iot,
+ io1,
+ io2,
+ ior_s,
+ ior_e,
+ bk_s,
+ bk_e,
+ scs,
+ sce,
+ pbr,
+ rem,
+ textBlock,
+ unknown])
+          
 usfm    = OneOrMore( element )
 
 # input string
@@ -226,7 +284,8 @@ def createToken(t):
         u'ior*': IOR_E_Token,
         u'bk':   BK_S_Token,
         u'bk*':  BK_E_Token,
-        u'text': TEXTToken
+        u'text': TEXTToken,
+        u'unknown': UnknownToken
     }
     for k, v in options.iteritems():
         if t[0] == k:
@@ -240,6 +299,7 @@ class UsfmToken(object):
     def __init__(self, value=u""):
         self.value = value
     def getValue(self): return self.value
+    def isUknown(self): return False
     def isID(self):     return False
     def isIDE(self):    return False
     def isH(self):      return False
@@ -310,6 +370,11 @@ class UsfmToken(object):
     def is_ior_e(self): return False
     def is_bk_s(self):  return False
     def is_bk_e(self):  return False
+
+class UnknownToken(UsfmToken):
+    def renderOn(self, printer):
+        return printer.renderUnknown(self)
+    def isUnknown(self):     return True
 
 class IDToken(UsfmToken):
     def renderOn(self, printer):

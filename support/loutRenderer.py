@@ -1,19 +1,28 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
-import parseUsfm
-import books
+import abstractRenderer
+import codecs
 import datetime
+import books
 
-class LoutPrinter(object):
-    def __init__(self, outputDir):
-        self.outputDir = outputDir
+#
+#   Renders using Lout (TeX alternative)
+#
+
+class LoutRenderer(abstractRenderer.AbstractRenderer):
+    
+    def __init__(self, inputDir, outputFilename):
+        # Unset
+        self.f = None  # output file stream
+        # IO
+        self.outputFilename = outputFilename
+        self.inputDir = inputDir
+        # Position
         self.cb = u''    # Current Book
         self.cc = u'001'    # Current Chapter
         self.cv = u'001'    # Currrent Verse
         self.indentFlag = False
-        self.rendered = u''
         self.bookName = u''
         self.inChapter = False
         self.inSections = False
@@ -25,6 +34,42 @@ class LoutPrinter(object):
         self.inD = False
         self.afterLord = False
         
+    def render(self):
+        self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
+        self.f.write(ur"""@Include { oebbook } 
+@Book
+    @Title {}
+    @Author {}
+    @Edition {}
+    @Publisher {}
+    @BeforeTitlePage {}
+    @OnTitlePage {}
+    @AfterTitlePage {}
+    @AtEnd {}
+    @InitialLanguage { English } 
+    @PageOrientation { Portrait } 
+    @PageHeaders { Titles } 
+    @ColumnNumber { 1 } 
+    @FirstPageNumber { 1 } 
+    @IntroFirstPageNumber { 1 } 
+    @OptimizePages { No } 
+    @GlossaryText { @Null } 
+    @IndexText { @Null }
+    @IndexAText { @Null }
+    @IndexBText { @Null } 
+//
+
+""".encode('utf-8'))
+        self.loadUSFM(self.inputDir)
+        self.run()
+        self.f.close()
+        
+    def writeLog(self, s):
+        print s
+        
+    def write(self, unicodeString):
+        self.f.write(unicodeString + '\n')
+                
     #   SUPPORT
     #
     #
@@ -37,14 +82,7 @@ class LoutPrinter(object):
         #t = t.replace(u'"', u'{@Char quotedbl}')
         #t = t.replace(u'’', u'{@Char quoteright}')
         return t
- 
-    def write(self, unicodeString):
-        self.rendered = self.rendered + unicodeString
-        l = len(self.rendered)
-        lastBreak = self.rendered.rfind(u'\n', 0, l)
-        if l - lastBreak > 70:
-            self.rendered = self.rendered + u'\n' 
-        
+         
     def close(self):
         self.closeChapter()
     
@@ -202,8 +240,6 @@ class LoutPrinter(object):
     def renderV(self, token):
         self.cv = token.value.zfill(3)
         if not self.cv == u'001':   self.registerForNextText = u' {@OuterNote { 8p @Font {' + token.value + u'}}}'
-    def renderWJS(self, token):     pass
-    def renderWJE(self, token):     pass
     def renderTEXT(self, token):    self.formatText(token.value)
     def renderQ(self, token):       self.writeIndent(1)
     def renderQ1(self, token):      self.writeIndent(1)
@@ -211,8 +247,6 @@ class LoutPrinter(object):
     def renderQ3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.newPara(indent = False)
     def renderB(self, token):       self.newPara(indent = False); self.inPoetry = True
-    def renderQTS(self, token):     pass
-    def renderQTE(self, token):     pass
     def renderFS(self, token):      self.write(u'@FootNote { ')
     def renderFE(self, token):      self.write(u' }')
     def renderIS(self, token):      self.write(u'{@I {')
@@ -223,54 +257,6 @@ class LoutPrinter(object):
     def renderSCS(self, token):     self.write(u'{@B {')
     def renderSCE(self, token):     self.write(u'}}')
     def renderD(self, token):       self.write(u'{@I {'); self.inD = True
-    def renderREM(self, token):     pass # This is for comments in the USFM
-    def renderADDS(self, token):    pass
-    def renderADDE(self, token):    pass
 
-class TransformToLout(object):
-    outputDir = ''
-    patchedDir = ''
-    prefaceDir = ''
 
-    def setupAndRun(self, patchedDir, outputDir, buildName):
-        self.patchedDir = patchedDir
-        self.outputDir = outputDir
-        self.booksUsfm = books.loadBooks(patchedDir)
-        self.printer = LoutPrinter(self.outputDir)
-
-        for bookName in books.silNames:
-            if self.booksUsfm.has_key(bookName):
-                tokens = parseUsfm.parseString(self.booksUsfm[bookName])
-                for t in tokens: t.renderOn(self.printer)
-                self.printer.close()
-                print '      (' + bookName + ')'
-        self.printer.close()
-
-        f = open(self.outputDir + buildName, 'w')
-        f.write(ur"""@Include { oebbook } 
-@Book
-    @Title {}
-    @Author {}
-    @Edition {}
-    @Publisher {}
-    @BeforeTitlePage {}
-    @OnTitlePage {}
-    @AfterTitlePage {}
-    @AtEnd {}
-    @InitialLanguage { English } 
-    @PageOrientation { Portrait } 
-    @PageHeaders { Titles } 
-    @ColumnNumber { 1 } 
-    @FirstPageNumber { 1 } 
-    @IntroFirstPageNumber { 1 } 
-    @OptimizePages { No } 
-    @GlossaryText { @Null } 
-    @IndexText { @Null }
-    @IndexAText { @Null }
-    @IndexBText { @Null } 
-//
-
-""".encode('utf-8'))
-        f.write(self.printer.rendered.encode('utf-8'))
-        f.close()
-        
+   

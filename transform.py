@@ -2,21 +2,23 @@ import sys
 import os
 
 # Set Path for files in support/
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),'support'))
+rootdiroftools = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(rootdiroftools,'support'))
 
 #from subprocess import Popen, PIPE, call
 import subprocess
 import getopt
 
-import htmlise
 import readerise
 import mediawikiPrinter
-import singlehtmlise
-import loutise
+
 import asciiRenderer
 import csvRenderer
 import mdRenderer
 import contextRenderer
+import singlehtmlRenderer
+import loutRenderer
+import htmlRenderer
 
 def runscriptold(c, prefix=''):
     print prefix + ':: ' + c
@@ -57,8 +59,9 @@ def buildLout(usfmDir, builtDir, buildName):
 
     # Convert to Lout
     print '     Converting to Lout'
-    c = loutise.TransformToLout()
-    c.setupAndRun(usfmDir, 'working/lout/', buildName + '.lout')
+    ensureOutputDir('working/lout')
+    c = loutRenderer.LoutRenderer(usfmDir, 'working/lout/' + buildName + '.lout')
+    c.render()
     
     # Run Lout
     print '     Copying support files'
@@ -90,22 +93,22 @@ def buildConTeXt(usfmDir, builtDir, buildName):
 def buildWeb(usfmDir, builtDir, buildName):
     # Convert to HTML
     print '#### Building HTML...'
-    c = htmlise.TransformToHTML()
-    ensureOutputDir(builtDir + '/simple')
-    c.setupAndRun(usfmDir, 'preface', builtDir + '/simple')
+    ensureOutputDir(builtDir + '/' + buildName + '_html')
+    c = htmlRenderer.HTMLRenderer(usfmDir, builtDir + '/' + buildName + '_html')
+    c.render()
 
 def buildSingleHtml(usfmDir, builtDir, buildName):
     # Convert to HTML
     print '#### Building HTML...'
-    c = singlehtmlise.TransformToHTML()
     ensureOutputDir(builtDir)
-    c.setupAndRun(usfmDir, 'preface', builtDir, buildName + '.html')
+    c = singlehtmlRenderer.SingleHTMLRenderer(usfmDir, builtDir + '/' + buildName + '.html')
+    c.render()
 
 def buildCSV(usfmDir, builtDir, buildName):
     # Convert to CSV
     print '#### Building CSV...'
     ensureOutputDir(builtDir)
-    c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.cvs')
+    c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.csv')
     c.render()
 
 def buildReader(usfmDir, builtDir, buildName):
@@ -139,7 +142,12 @@ def ensureOutputDir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
+savedCWD = ''
+def saveCWD():    global savedCWD ; savedCWD = os.getcwd() ; os.chdir(rootdiroftools)
+def restoreCWD(): os.chdir(savedCWD)
+    
 def main(argv):
+    saveCWD()    
     print '#### Starting Build.'
     try:
         opts, args = getopt.getopt(argv, "sht:u:b:n:", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name="])
@@ -186,6 +194,7 @@ def main(argv):
         usage()
 
     print '#### Finished.'
+    restoreCWD()
 
 def usage():
     print """
