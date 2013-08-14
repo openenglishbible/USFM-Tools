@@ -55,23 +55,23 @@ def buildLout(usfmDir, builtDir, buildName):
 
     # Prepare
     print '     Clean working dir'
-    runscript('rm working/lout/*', '       ')
+    runscript('rm ' + builtDir + '/working/lout/*', '       ')
 
     # Convert to Lout
     print '     Converting to Lout'
-    ensureOutputDir('working/lout')
-    c = loutRenderer.LoutRenderer(usfmDir, 'working/lout/' + buildName + '.lout')
+    ensureOutputDir(builtDir + '/working/lout')
+    c = loutRenderer.LoutRenderer(usfmDir, builtDir + '/working/lout/' + buildName + '.lout')
     c.render()
     
     # Run Lout
     print '     Copying support files'
     runscript('cp support/lout/oebbook working/lout', '       ')
     print '     Running Lout'
-    runscript('cd working/lout; lout ./' + buildName + '.lout > ' + buildName + '.ps', '       ', repeatFilter='unresolved cross reference')
+    runscript('cd ' + builtDir + '/working/lout; lout ./' + buildName + '.lout > ' + buildName + '.ps', '       ', repeatFilter='unresolved cross reference')
     print '     Running ps2pdf'
-    runscript('cd working/lout; ps2pdf -dDEVICEWIDTHPOINTS=432 -dDEVICEHEIGHTPOINTS=648 ' + buildName + '.ps ' + buildName + '.pdf ', '       ')
+    runscript('cd ' + builtDir + '/working/lout; ps2pdf -dDEVICEWIDTHPOINTS=432 -dDEVICEHEIGHTPOINTS=648 ' + buildName + '.ps ' + buildName + '.pdf ', '       ')
     print '     Copying into builtDir'
-    runscript('cp working/lout/' + buildName + '.pdf ' + builtDir + '/' + buildName + '.pdf ', '       ')
+    runscript('cp ' + builtDir + '/working/lout/' + buildName + '.pdf ' + builtDir + '/' + buildName + '.pdf ', '       ')
 
 def buildConTeXt(usfmDir, builtDir, buildName):
 
@@ -82,12 +82,12 @@ def buildConTeXt(usfmDir, builtDir, buildName):
     #c = texise.TransformToContext()
     #c.setupAndRun(usfmDir, 'working/tex', buildName)
     ensureOutputDir(builtDir)
-    c = contextRenderer.ConTeXtRenderer(usfmDir, 'working/tex/bible.tex')
+    c = contextRenderer.ConTeXtRenderer(usfmDir, builtDir + '/working/tex/bible.tex')
     c.render()
 
     # Build PDF
     print '     Building PDF..'
-    c = """. ./support/thirdparty/context/tex/setuptex ; cd working/tex-working; rm * ; context ../tex/bible.tex; cp bible.pdf ../../""" + builtDir + '/' + buildName + '.pdf'
+    c = '. ./support/thirdparty/context/tex/setuptex ; cd ' + builtDir + '/working/tex-working; rm * ; context ../tex/bible.tex; cp bible.pdf ../../' + builtDir + '/' + buildName + '.pdf'
     runscript(c, '     ')
 
 def buildWeb(usfmDir, builtDir, buildName):
