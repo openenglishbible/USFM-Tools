@@ -81,13 +81,14 @@ def buildConTeXt(usfmDir, builtDir, buildName):
     print '     Converting to ConTeXt...'
     #c = texise.TransformToContext()
     #c.setupAndRun(usfmDir, 'working/tex', buildName)
-    ensureOutputDir(builtDir)
+    ensureOutputDir(builtDir + '/working/tex')
+    ensureOutputDir(builtDir + '/working/tex-working')
     c = contextRenderer.ConTeXtRenderer(usfmDir, builtDir + '/working/tex/bible.tex')
     c.render()
 
     # Build PDF
     print '     Building PDF..'
-    c = '. ./support/thirdparty/context/tex/setuptex ; cd ' + builtDir + '/working/tex-working; rm * ; context ../tex/bible.tex; cp bible.pdf ../../' + builtDir + '/' + buildName + '.pdf'
+    c = '. ./support/thirdparty/context/tex/setuptex ; cd ' + builtDir + '/working/tex-working; rm * ; context ../tex/bible.tex; cp bible.pdf ../../' + buildName + '.pdf'
     runscript(c, '     ')
 
 def buildWeb(usfmDir, builtDir, buildName):
@@ -128,6 +129,7 @@ def buildMarkdown(usfmDir, builtDir, buildName):
 def buildASCII(usfmDir, builtDir, buildName):
     # Convert to ASCII
     print '#### Building for ASCII...'
+    ensureOutputDir(builtDir)
     c = asciiRenderer.ASCIIRenderer(usfmDir, builtDir + '/' + buildName + '.txt')
     c.render()
 
