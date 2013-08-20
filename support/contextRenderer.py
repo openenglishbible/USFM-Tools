@@ -49,7 +49,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.f.close()
         
     def writeLog(self, s):
-        print s
+        print s.encode('ascii', 'ignore')
         
     
     #
@@ -200,10 +200,10 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def renderFT(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
     def renderPI(self, token):      self.renderQ(token)
     
-    def render_is1(self, token):    print 'is1-' + token.value ; self.renderS(token)
-    def render_ip(self, token):     print 'ip-' + token.value  ; self.renderP(token)
-    def render_iot(self, token):    print 'iot-' + token.value ; self.renderQ(token)
-    def render_io1(self, token):    print 'io1-' + token.value ; self.renderQ2(token)
+    def render_is1(self, token):    self.renderS(token)
+    def render_ip(self, token):     self.renderP(token)
+    def render_iot(self, token):    self.renderQ(token)
+    def render_io1(self, token):    self.renderQ2(token)
     
     
     #
