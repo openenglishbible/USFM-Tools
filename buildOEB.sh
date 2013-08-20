@@ -98,6 +98,19 @@ pdf-all-us() {
 
 ###############
 #
+#	HTML All US
+#
+###############
+
+html-all-us() {
+	make-tmp
+	cp $OEBDIR/us/* tmp
+	python transform.py --target=html    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
+	clean-tmp
+}
+
+###############
+#
 #	Full Release 
 #
 ###############
@@ -231,11 +244,11 @@ buildbooks()
 #cthnt
 #buildbooks
 #simple-all-us
-#pdf-all-us
+html-all-us
 
-BOOKFILE=30-Amos.usfm
-BOOKNAME=Amos
-build-book-tex
+#BOOKFILE=30-Amos.usfm
+#BOOKNAME=Amos
+#`build-book-tex
 
 #ID=2013.D2
 #all

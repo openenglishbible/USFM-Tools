@@ -45,7 +45,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
             \placelist[chapter]
         """)
         self.run()
-        self.f.write(self.closeTeXt)
+        self.f.write(self.stopNarrower() + self.closeTeXt)
         self.f.close()
         
     def writeLog(self, s):
@@ -177,7 +177,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
                 s = u' ' + s
             self.justDidLORD = False    
         self.f.write( s )
-    def renderQ(self, token):       self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
+    def renderQ(self, token):       self.renderQ1(token)
     def renderQ1(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
     def renderQ2(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(2) )
     def renderQ3(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(3) )
@@ -198,7 +198,13 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def renderFRE(self, token):     self.f.write( u' ' )
     def renderFK(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
     def renderFT(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
-    def renderPI(self, token):      self.f.write( self.renderQ(token) )
+    def renderPI(self, token):      self.renderQ(token)
+    
+    def render_is1(self, token):    print 'is1-' + token.value ; self.renderS(token)
+    def render_ip(self, token):     print 'ip-' + token.value  ; self.renderP(token)
+    def render_iot(self, token):    print 'iot-' + token.value ; self.renderQ(token)
+    def render_io1(self, token):    print 'io1-' + token.value ; self.renderQ2(token)
+    
     
     #
     #   Introductory codes

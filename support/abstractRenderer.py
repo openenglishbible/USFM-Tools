@@ -28,11 +28,14 @@ class AbstractRenderer(object):
     def renderM(self, token):       pass
     def renderMT(self, token):      pass
     def renderMT2(self, token):     pass
+    def renderMT3(self, token):     pass
     def renderMS(self, token):      pass
     def renderMS2(self, token):     pass
     def renderMR(self, token):      pass
+    def renderMI(self, token):      pass
 
     def renderP(self, token):       pass
+    def renderSP(self, token):      pass
 
     def renderS(self, token):       pass
     def renderS2(self, token):      pass
@@ -60,6 +63,8 @@ class AbstractRenderer(object):
     def renderFS(self, token):      pass
     def renderFE(self, token):      pass
     def renderFR(self, token):      pass    
+    def renderFRE(self, token):     pass    
+    def renderFK(self, token):      pass    
     def renderFT(self, token):      pass    
     def renderFQ(self, token):      pass    
 
@@ -68,6 +73,7 @@ class AbstractRenderer(object):
 
     def renderNDS(self, token):     pass
     def renderNDE(self, token):     pass
+
     def renderPBR(self, token):     pass
     def renderD(self, token):       pass 
     def renderREM(self, token):     pass 
@@ -78,6 +84,11 @@ class AbstractRenderer(object):
     def renderXE(self, token):      pass
     def renderXO(self, token):      pass
     def renderXT(self, token):      pass
+    def renderXDCS(self, token):    pass
+    def renderXDCE(self, token):    pass
+
+    def renderTLS(self, token):     pass
+    def renderTLE(self, token):     pass
 
     def renderADDS(self, token):    pass
     def renderADDE(self, token):    pass
@@ -96,6 +107,9 @@ class AbstractRenderer(object):
     
     def render_bk_s(self, token):   pass
     def render_bk_e(self, token):   pass
+
+    def renderSCS(self, token):     pass
+    def renderSCE(self, token):     pass
 
     # This is unknown!
     def renderUnknown(self, token):  self.writeLog("WARNING: Unknown token '" + token.value + "'" )

@@ -55,7 +55,7 @@ def buildLout(usfmDir, builtDir, buildName):
 
     # Prepare
     print '     Clean working dir'
-    runscript('rm ' + builtDir + '/working/lout/*', '       ')
+    runscript('rm "' + builtDir + '/working/lout/*"', '       ')
 
     # Convert to Lout
     print '     Converting to Lout'
@@ -67,11 +67,11 @@ def buildLout(usfmDir, builtDir, buildName):
     print '     Copying support files'
     runscript('cp support/lout/oebbook working/lout', '       ')
     print '     Running Lout'
-    runscript('cd ' + builtDir + '/working/lout; lout ./' + buildName + '.lout > ' + buildName + '.ps', '       ', repeatFilter='unresolved cross reference')
+    runscript('cd "' + builtDir + '/working/lout"; lout "./' + buildName + '.lout" > "' + buildName + '.ps"', '       ', repeatFilter='unresolved cross reference')
     print '     Running ps2pdf'
-    runscript('cd ' + builtDir + '/working/lout; ps2pdf -dDEVICEWIDTHPOINTS=432 -dDEVICEHEIGHTPOINTS=648 ' + buildName + '.ps ' + buildName + '.pdf ', '       ')
+    runscript('cd "' + builtDir + '/working/lout"; ps2pdf -dDEVICEWIDTHPOINTS=432 -dDEVICEHEIGHTPOINTS=648 "' + buildName + '.ps" "' + buildName + '.pdf" ', '       ')
     print '     Copying into builtDir'
-    runscript('cp ' + builtDir + '/working/lout/' + buildName + '.pdf ' + builtDir + '/' + buildName + '.pdf ', '       ')
+    runscript('cp "' + builtDir + '/working/lout/' + buildName + '.pdf" "' + builtDir + '/' + buildName + '.pdf" ', '       ')
 
 def buildConTeXt(usfmDir, builtDir, buildName):
 
@@ -88,7 +88,7 @@ def buildConTeXt(usfmDir, builtDir, buildName):
 
     # Build PDF
     print '     Building PDF..'
-    c = '. ./support/thirdparty/context/tex/setuptex ; cd ' + builtDir + '/working/tex-working; rm * ; context ../tex/bible.tex; cp bible.pdf ../../' + buildName + '.pdf'
+    c = '. ./support/thirdparty/context/tex/setuptex ; cd "' + builtDir + '/working/tex-working"; rm * ; context ../tex/bible.tex; cp bible.pdf "../../' + buildName + '.pdf"'
     runscript(c, '     ')
 
 def buildWeb(usfmDir, builtDir, buildName):

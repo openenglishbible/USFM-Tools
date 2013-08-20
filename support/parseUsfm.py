@@ -19,7 +19,7 @@ def usfmTokenNumber(key):
 
 # define grammar
 #phrase      = Word( alphas + u"-.,!? —–‘“”’;:()'\"[]/&%=*…{}" + nums )
-phrase      = CharsNotIn( u"\n\\+"  )
+phrase      = CharsNotIn( u"\n\\"  )
 backslash   = Literal(u"\\")
 plus        = Literal(u"+")
 
@@ -107,10 +107,10 @@ toc3    =  usfmTokenValue( u"toc3", phrase )
 
 # Introductory Materials
 is1     =  usfmTokenValue( u"is1", phrase ) | usfmTokenValue( u"is", phrase )
-ip      =  usfmTokenValue( u"ip", phrase )
-iot     =  usfmTokenValue( u"iot", phrase )
-io1     =  usfmTokenValue( u"io1", phrase ) | usfmTokenValue( u"io", phrase )
-io2     =  usfmTokenValue( u"io2", phrase ) 
+ip      =  usfmToken( u"ip" )
+iot     =  usfmToken( u"iot" )
+io1     =  usfmToken( u"io1" ) | usfmToken( u"io" )
+io2     =  usfmToken( u"io2" ) 
 ior_s   =  usfmToken( u"ior")
 ior_e   =  usfmEndToken( u"ior")
 
@@ -299,7 +299,7 @@ class UsfmToken(object):
     def __init__(self, value=u""):
         self.value = value
     def getValue(self): return self.value
-    def isUknown(self): return False
+    def isUnknown(self): return False
     def isID(self):     return False
     def isIDE(self):    return False
     def isH(self):      return False
@@ -683,15 +683,13 @@ class SCEToken(UsfmToken):
     
 # REMarks
 class REMToken(UsfmToken):
-    def renderOn(self, printer):
-        return printer.renderREM(self)
-    def isREM(self):      return True
+    def renderOn(self, printer):  return printer.renderREM(self)
+    def isREM(self):              return True
     
 # Introductions
 class IS1_Token(UsfmToken):
-    def renderOn(self, printer):
-        return printer.render_is1(self)
-    def is_is1(self):     return True
+    def renderOn(self, printer):  return printer.render_is1(self)
+    def is_is1(self):             return True
 
 class IP_Token(UsfmToken):
     def renderOn(self, printer):  return printer.render_ip(self)

@@ -107,6 +107,11 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderIE(self, token):      self.write(u'</i>')
     def renderPBR(self, token):     self.write(u'<br />')
 
+    def render_is1(self, token):    self.renderS(token)
+    def render_ip(self, token):     self.renderP(token)
+    def render_iot(self, token):    self.renderQ(token)
+    def render_io1(self, token):    self.renderQ2(token)
+
 #
 #  Structure
 #
