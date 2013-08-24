@@ -40,13 +40,13 @@ usnt() {
 	cp $OEBDIR/us/4* tmp
 	cp $OEBDIR/us/5* tmp
 	cp $OEBDIR/us/6* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
-	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
-	python transform.py --target=reader     --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
-	python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
-	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US
+	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
+	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
+	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
+	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
+	python transform.py --target=reader     --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
+	python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
+	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-US --oeb
 	clean-tmp
 }
 
@@ -61,10 +61,10 @@ cthnt() {
 	cp $OEBDIR/cth/4* tmp
 	cp $OEBDIR/cth/5* tmp
 	cp $OEBDIR/cth/6* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth
-	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth
+	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth --oeb
+	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth --oeb
+	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth --oeb
+	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-NT-$ID-Cth --oeb
 	clean-tmp
 }
 
@@ -77,9 +77,9 @@ cthnt() {
 simple-all-us() {
 	make-tmp
 	cp $OEBDIR/us/* tmp
-	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
+	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
 	clean-tmp
 }
 
@@ -92,7 +92,7 @@ simple-all-us() {
 pdf-all-us() {
 	make-tmp
 	cp $OEBDIR/us/* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
+	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
 	clean-tmp
 }
 
@@ -105,7 +105,7 @@ pdf-all-us() {
 html-all-us() {
 	make-tmp
 	cp $OEBDIR/us/* tmp
-	python transform.py --target=html    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
+	python transform.py --target=html    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
 	clean-tmp
 }
 
@@ -118,21 +118,21 @@ html-all-us() {
 all() {
 	make-tmp
 	cp $OEBDIR/us/* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=reader     --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
-	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US
+	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=reader     --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
+	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-US --oeb
 	clean-tmp
 	make-tmp
 	cp $OEBDIR/cth/* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth
-	python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth
-	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth
+	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth --oeb
+	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth --oeb
+	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth --oeb
+	python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth --oeb
+	python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-All-$ID-Cth --oeb
 	clean-tmp
 }
 
@@ -146,7 +146,7 @@ build-book ()
 {
 	make-tmp
 	cp $OEBDIR/us/$BOOKFILE tmp
-	python transform.py --target=lout --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US
+	python transform.py --target=lout --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US --oeb
 	clean-tmp
 }
 
@@ -154,7 +154,7 @@ build-book-tex ()
 {
 	make-tmp
 	cp $OEBDIR/us/$BOOKFILE tmp
-	python transform.py --target=context --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US
+	python transform.py --target=context --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US --oeb
 	clean-tmp
 }
 
@@ -162,7 +162,7 @@ build-book-text ()
 {
 	make-tmp
 	cp $OEBDIR/us/$BOOKFILE tmp
-	python transform.py --target=ascii --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US
+	python transform.py --target=ascii --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US --oeb
 	clean-tmp
 }
 
@@ -170,7 +170,7 @@ build-book-md ()
 {
 	make-tmp
 	cp $OEBDIR/us/$BOOKFILE tmp
-	python transform.py --target=md --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US
+	python transform.py --target=md --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US --oeb
 	clean-tmp
 }
 
@@ -178,7 +178,7 @@ build-book-singlehtml ()
 {
 	make-tmp
 	cp $OEBDIR/us/$BOOKFILE tmp
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US
+	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-$BOOKNAME-Current-US --oeb
 	clean-tmp
 }
 

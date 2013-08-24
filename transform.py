@@ -91,11 +91,11 @@ def buildConTeXt(usfmDir, builtDir, buildName):
     c = '. ./support/thirdparty/context/tex/setuptex ; cd "' + builtDir + '/working/tex-working"; rm * ; context ../tex/bible.tex; cp bible.pdf "../../' + buildName + '.pdf"'
     runscript(c, '     ')
 
-def buildWeb(usfmDir, builtDir, buildName):
+def buildWeb(usfmDir, builtDir, buildName, oebFlag=False):
     # Convert to HTML
     print '#### Building HTML...'
     ensureOutputDir(builtDir + '/' + buildName + '_html')
-    c = htmlRenderer.HTMLRenderer(usfmDir, builtDir + '/' + buildName + '_html')
+    c = htmlRenderer.HTMLRenderer(usfmDir, builtDir + '/' + buildName + '_html', oebFlag)
     c.render()
 
 def buildSingleHtml(usfmDir, builtDir, buildName):
@@ -152,7 +152,7 @@ def main(argv):
     saveCWD()    
     print '#### Starting Build.'
     try:
-        opts, args = getopt.getopt(argv, "sht:u:b:n:", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name="])
+        opts, args = getopt.getopt(argv, "sht:u:b:n:o", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name=","oeb"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -169,13 +169,15 @@ def main(argv):
             buildDir = arg
         elif opt in ("-n", "--name"):
             buildName = arg
+        elif opt in ("-o", "--oeb"):
+            oebFlag = True
         else:
             usage()
 
     if targets == 'context':
         buildConTeXt(usfmDir, buildDir, buildName)
     elif targets == 'html':
-        buildWeb(usfmDir, buildDir, buildName)
+        buildWeb(usfmDir, buildDir, buildName, oebFlag)
     elif targets == 'singlehtml':
         buildSingleHtml(usfmDir, buildDir, buildName)
     elif targets == 'md':
