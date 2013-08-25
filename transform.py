@@ -149,7 +149,8 @@ def saveCWD():    global savedCWD ; savedCWD = os.getcwd() ; os.chdir(rootdiroft
 def restoreCWD(): os.chdir(savedCWD)
     
 def main(argv):
-    saveCWD()    
+    saveCWD() 
+    oebFlag = False   
     print '#### Starting Build.'
     try:
         opts, args = getopt.getopt(argv, "sht:u:b:n:o", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name=","oeb"])

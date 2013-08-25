@@ -44,7 +44,7 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         # Write pages
         self.loadUSFM(self.inputDir)
         self.run()
-        self.f.close()
+        self.close()
         
     def writeLog(self, s):
         print s
@@ -66,6 +66,7 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     def cleanHTML(self, t):
         c = t
         c = t.replace(u'<p><br /><br />', u'<p>')
+        c = c.replace(ur'~', u'&nbsp;')
         if self.oebFlag:
             c = c.replace(ur'%navmarker%', u'OEB')
             c = c.replace(ur'%linkToWebsite%',u'<tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>')
@@ -109,7 +110,10 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.writeChapterMarker()
     def renderS(self, token):
         self.indentFlag = False
-        self.write(u'</p><h6>' + token.value + u'</h6><p>')
+        if token.value == u'~':
+            self.write(u'<p>&nbsp;</p><p>')
+        else:
+            self.write(u'</p><h6>' + token.value + u'</h6><p>')
     def renderS2(self, token):
         self.indentFlag = False
         self.write(u'</p><h7>' + token.value + u'</h7><p>')
@@ -146,6 +150,10 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     def render_ip(self, token):     self.renderP(token)
     def render_iot(self, token):    self.renderQ(token)
     def render_io1(self, token):    self.renderQ2(token)
+    
+    def renderFS(self, token):      self.write(u'<span class="rightnotemarker">*</span><span class="rightnote">')
+    def renderFE(self, token):      self.write(u'</span>')
+    
 
 #
 #  Structure
@@ -215,6 +223,9 @@ header = ur"""<!DOCTYPE html>
         	font-size: 80%;
         	color: gray;
         }
+        .rightnotemarker{
+            color: gray;
+        }
         .rightnote{
         	position: absolute;
         	right: 0rem;
@@ -242,21 +253,25 @@ header = ur"""<!DOCTYPE html>
         	font-family: 'Verdana', sans-serif;
         	font-size: 100%;
         	color: #202020;
+            padding-top:2em;
         }
         h5{
         	font-family: 'Verdana', sans-serif;
         	font-size: 100%;
         	color: #202020;
+            padding-top:2em;
         }
         h6{
         	font-family: 'Verdana', sans-serif;
         	font-size: 100%;
         	color: #202020;
+            padding-top:0em;
         }
         h7{
         	font-family: 'Verdana', sans-serif;
         	font-size: 100%;
         	color: #202020;
+            padding-top:0em;
         }
         p{
         	-webkit-hyphens: auto;
@@ -295,6 +310,9 @@ header = ur"""<!DOCTYPE html>
         }
         .nd { /* Lord */
             font-variant:small-caps;
+        }
+        .vspacer{
+            height:1em;
         }
     }
     @media all and (max-width:800px){html {font-size: 19px;}}
