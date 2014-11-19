@@ -73,7 +73,7 @@ def buildLout(usfmDir, builtDir, buildName):
     print '     Copying into builtDir'
     runscript('cp "' + builtDir + '/working/lout/' + buildName + '.pdf" "' + builtDir + '/' + buildName + '.pdf" ', '       ')
 
-def buildConTeXt(usfmDir, builtDir, buildName):
+def buildConTeXt(usfmDir, builtDir, buildName, order):
 
     print '#### Building PDF via ConTeXt...'
 
@@ -84,7 +84,7 @@ def buildConTeXt(usfmDir, builtDir, buildName):
     ensureOutputDir(builtDir + '/working/tex')
     ensureOutputDir(builtDir + '/working/tex-working')
     c = contextRenderer.ConTeXtRenderer(usfmDir, builtDir + '/working/tex/bible.tex')
-    c.render()
+    c.render(order)
 
     # Build PDF
     print '     Building PDF..'
@@ -98,18 +98,18 @@ def buildWeb(usfmDir, builtDir, buildName, oebFlag=False):
     c = htmlRenderer.HTMLRenderer(usfmDir, builtDir + '/' + buildName + '_html', oebFlag)
     c.render()
 
-def buildSingleHtml(usfmDir, builtDir, buildName):
+def buildSingleHtml(usfmDir, builtDir, buildName, order="normal"):
     # Convert to HTML
     print '#### Building HTML...'
     ensureOutputDir(builtDir)
     c = singlehtmlRenderer.SingleHTMLRenderer(usfmDir, builtDir + '/' + buildName + '.html')
-    c.render()
+    c.render(order)
 
 def buildCSV(usfmDir, builtDir, buildName):
     # Convert to CSV
     print '#### Building CSV...'
     ensureOutputDir(builtDir)
-    c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.csv')
+    c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.csv.txt')
     c.render()
 
 def buildReader(usfmDir, builtDir, buildName):
@@ -119,12 +119,12 @@ def buildReader(usfmDir, builtDir, buildName):
     c = readerise.TransformForReader()
     c.setupAndRun(usfmDir, builtDir + 'en_oeb')
 
-def buildMarkdown(usfmDir, builtDir, buildName):
+def buildMarkdown(usfmDir, builtDir, buildName, order="normal"):
     # Convert to Markdown for Pandoc
     print '#### Building for Markdown...'
     ensureOutputDir(builtDir)
     c = mdRenderer.MarkdownRenderer(usfmDir, builtDir + '/' + buildName + '.md')
-    c.render()
+    c.render(order)
 
 def buildASCII(usfmDir, builtDir, buildName):
     # Convert to ASCII
@@ -150,10 +150,11 @@ def restoreCWD(): os.chdir(savedCWD)
     
 def main(argv):
     saveCWD() 
-    oebFlag = False   
+    oebFlag = False  
+    order="normal" 
     print '#### Starting Build.'
     try:
-        opts, args = getopt.getopt(argv, "sht:u:b:n:o", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name=","oeb"])
+        opts, args = getopt.getopt(argv, "sht:u:b:n:or:", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name=","oeb","order="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -170,19 +171,21 @@ def main(argv):
             buildDir = arg
         elif opt in ("-n", "--name"):
             buildName = arg
+        elif opt in ("-r", "--order"):
+            order = arg
         elif opt in ("-o", "--oeb"):
             oebFlag = True
         else:
             usage()
 
     if targets == 'context':
-        buildConTeXt(usfmDir, buildDir, buildName)
+        buildConTeXt(usfmDir, buildDir, buildName, order)
     elif targets == 'html':
         buildWeb(usfmDir, buildDir, buildName, oebFlag)
     elif targets == 'singlehtml':
-        buildSingleHtml(usfmDir, buildDir, buildName)
+        buildSingleHtml(usfmDir, buildDir, buildName, order)
     elif targets == 'md':
-        buildMarkdown(usfmDir, buildDir, buildName)
+        buildMarkdown(usfmDir, buildDir, buildName, order)
     elif targets == 'reader':
         buildReader(usfmDir, buildDir, buildName)
     elif targets == 'mediawiki':

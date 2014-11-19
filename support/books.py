@@ -239,6 +239,75 @@ u'3John',
 u'Jude',
 u'Rev' ]
 
+accordanceNames = [
+    'Gen',
+    'Ex',
+    'Lev',
+    'Num',
+    'Deut',
+    'Josh',
+    'Judg',
+    'Ruth',
+    '1Sam',
+    '2Sam',
+    '1Kings',
+    '2Kings',
+    '1Chr',
+    '2Chr',
+    'Ezra',
+    'Neh',
+    'Esth',
+    'Job',
+    'Psa',
+    'Prov',
+    'Eccl',
+    'Song',
+    'Is',
+    'Jer',
+    'Lam',
+    'Ezek',
+    'Dan',
+    'Hos',
+    'Joel',
+    'Amos',
+    'Obad',
+    'Jonah',
+    'Mic',
+    'Nah',
+    'Hab',
+    'Zeph',
+    'Hag',
+    'Zech',
+    'Mal',
+    'Matt',
+    'Mark',
+    'Luke',
+    'John',
+    'Acts',
+    'Rom',
+    '1Cor',
+    '2Cor',
+    'Gal',
+    'Eph',
+    'Phil',
+    'Col',
+    '1Th',
+    '2Th',
+    '1Tim',
+    '2Tim',
+    'Titus',
+    'Philem',
+    'Heb',
+    'James',
+    '1Pet',
+    '2Pet',
+    '1John',
+    '2John',
+    '3John',
+    'Jude',
+    'Rev'
+]
+
 def readerName(num):
     return readerNames[int(num)-1]
 
@@ -343,6 +412,11 @@ def bookName(usfm):
     index = silNames.index(id)
     return bookNames[index]
 
+def silNameForBookKey(bk):
+    return silNames[int(bk) - 1]
+
+def accordanceNameForBookKey(bk):
+    return accordanceNames[int(bk) - 1]
     
 def loadBooks(path):
     books = {}

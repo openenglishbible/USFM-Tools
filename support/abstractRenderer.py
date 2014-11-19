@@ -14,12 +14,19 @@ class AbstractRenderer(object):
     def loadUSFM(self, usfmDir):
         self.booksUsfm = books.loadBooks(usfmDir)
 
-    def run(self):
-        for bookName in books.silNames:
-            if self.booksUsfm.has_key(bookName):
-                tokens = parseUsfm.parseString(self.booksUsfm[bookName])
-                for t in tokens: t.renderOn(self)
-                self.writeLog('     (' + bookName + ')')
+    def run(self, order='normal'):
+        if order == 'normal':
+            for bookName in books.silNames:
+                self.renderBook(bookName)
+        elif order == 'ntpsalms':
+            for bookName in books.silNamesNTPsalms:
+                self.renderBook(bookName)
+            
+    def renderBook(self, bookName):
+        if self.booksUsfm.has_key(bookName):
+            tokens = parseUsfm.parseString(self.booksUsfm[bookName])
+            for t in tokens: t.renderOn(self)
+            self.writeLog('     (' + bookName + ')')
         
     def renderID(self, token):      pass
     def renderIDE(self, token):     pass

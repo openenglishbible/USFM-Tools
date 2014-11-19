@@ -27,7 +27,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.doChapterOrVerse = u''
         self.smallcaps = False
 
-    def render(self):
+    def render(self, order='normal'):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
         self.loadUSFM(self.inputDir)
         self.f.write(self.introTeXt)
@@ -35,7 +35,10 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
             \page[right] % Cover page
             \page[left]
             \par 
+            \par Version 2014.11
             \par Built by github.com/openenglishbible/USFM-Tools
+            \par from source USFM files at
+            \par github.com/openenglishbible/Open-English-Bible
             \par on """ + datetime.date.today().strftime("%A, %d %B %Y") + r"""
             \par     
             \page[right]
@@ -44,7 +47,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
             \par ~
             \placelist[chapter]
         """)
-        self.run()
+        self.run(order)
         self.f.write(self.stopNarrower() + self.closeTeXt)
         self.f.close()
         
@@ -217,7 +220,12 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
 
     \definepapersize [Trade][width=6in, height=9in]
     \setuppapersize [Trade][Trade]
-    %\setuparranging [2UP, rotated, doublesided]
+
+    %\definepapersize [TwoTrade][width=12in, height=9in]
+    %\setuppapersize [Trade][TwoTrade]
+    %\setuparranging [2UP] % page numbering doesn't work this way
+ 
+ 
     \setuppagenumbering [alternative=doublesided]
     \setuplayout [location=middle, 
         rightmargin=20mm,

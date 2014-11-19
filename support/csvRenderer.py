@@ -22,9 +22,10 @@ class CSVRenderer(abstractRenderer.AbstractRenderer):
         self.cc = u'001'    # Current Chapter
         self.cv = u'001'    # Currrent Verse  
         self.infootnote = False
+        self.verseHadContent = True
         
     def render(self):
-        self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
+        self.f = codecs.open(self.outputFilename, 'w', 'macroman') # 'utf_8_sig macroman
         self.loadUSFM(self.inputDir)
         self.run()
         self.f.close()
@@ -45,7 +46,9 @@ class CSVRenderer(abstractRenderer.AbstractRenderer):
         self.cc = token.value.zfill(3)
     def renderV(self, token):
         self.cv = token.value.zfill(3)
-        self.f.write(u'\n' + str(int(self.cb)) + ',' + str(int(self.cc)) + ',' + self.cv   + ',')
-    def renderTEXT(self, token):    self.f.write(self.escape(token.value) + ' ')
+        if not self.verseHadContent: self.f.write(u' ~')
+        self.verseHadContent = False
+        self.f.write(u'\n' + books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + str(int(self.cv.split('-')[0]))   + ' ') # str(int(self.cb))
+    def renderTEXT(self, token):    self.verseHadContent = True ; self.f.write(self.escape(token.value) + ' ')
     def renderFS(self, token):      self.infootnote = True
     def renderFE(self, token):      self.infootnote = False
