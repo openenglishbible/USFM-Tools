@@ -70,6 +70,8 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
         <body>
         <h1>Table of Contents</h1>
         <p><b>Old Testament</b></p>
+        <p class="indent-1"><a href="#008">Ruth</a></p>
+        <p class="indent-1"><a href="#017">Esther</a></p>
         <p class="indent-1"><a href="#019">Psalms</a></p>
         <p><b>New Testament</b></p>
         <p class="indent-1"><a href="#040">Matthew</a></p>

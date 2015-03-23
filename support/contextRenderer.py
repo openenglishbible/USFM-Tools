@@ -18,7 +18,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.outputFilename = outputFilename
         self.inputDir = inputDir
         # Flags
-        self.printerState = {u'li': False, u'd': False}
+        self.printerState = {u'li': False, u'd': False, u'm': False}
         self.smallCapSections = True  # Sometimes we don't want to do this, like for Psalms
         self.justDidLORD = False
         self.justDidNB = False
@@ -31,22 +31,6 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
         self.loadUSFM(self.inputDir)
         self.f.write(self.introTeXt)
-        self.f.write(u"""
-            \page[right] % Cover page
-            \page[left]
-            \par 
-            \par Version 2014.11
-            \par Built by github.com/openenglishbible/USFM-Tools
-            \par from source USFM files at
-            \par github.com/openenglishbible/Open-English-Bible
-            \par on """ + datetime.date.today().strftime("%A, %d %B %Y") + r"""
-            \par     
-            \page[right]
-            \par ~
-            {\midaligned {\tfc{\WORD{Table of Contents}}}}
-            \par ~
-            \placelist[chapter]
-        """)
         self.run(order)
         self.f.write(self.stopNarrower() + self.closeTeXt)
         self.f.close()
@@ -119,12 +103,27 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         return u'\par {\startalignment[center] \em '
 
     def stopD(self):
+        self.stopM()
         if self.printerState[u'd'] == False:
             return u''
         else:
             self.printerState[u'd'] = False
             return u'\stopalignment }'
             
+    def startM(self):
+        r = self.stopD() + self.stopLI() + self.stopNarrower()
+        r = r + self.newLine()
+        if self.printerState[u'm'] == False:
+            self.printerState[u'm'] = True
+        return r + u'{\startalignment[left] '
+
+    def stopM(self):
+        if self.printerState[u'm'] == False:
+            return u''
+        else:
+            self.printerState[u'm'] = False
+            return u'\stopalignment }'
+
     def newLine(self):
         s = u'\n\par \n'
         if self.doNB:
@@ -208,7 +207,19 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def render_iot(self, token):    self.renderQ(token)
     def render_io1(self, token):    self.renderQ2(token)
     
+    def render_pb(self, token):     self.f.write(u'\page ')
     
+    def render_m(self, token):      self.f.write( self.startM() )
+    
+    def render_periph(self, token):
+        if token.getValue() == u'Table of Contents':
+            self.f.write(u"""
+            \page[right]
+            \par ~
+            {\midaligned {\tfd{\WORD{Table of Contents}}}}
+            \par ~
+            \placelist[chapter]    
+            """)
     #
     #   Introductory codes
     #
@@ -264,7 +275,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     \define[1]\MS{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
     \define[1]\MSS{\blank{\midaligned{\em #1}}\blank}
     \define[1]\MT{  {\midaligned{\tfd{\WORD{#1}}}}\blank ~ } 
-    \define[1]\MTT{ {\midaligned{\tfc{\WORD{#1}}}}\blank ~ }
+    \define[1]\MTT{ {\midaligned{\tfd{\WORD{#1}}}}\blank ~ }
     \define[1]\RAHeader{\page[right] \chapter{#1} \marking[RABook]{#1} }
     \define[2]\Q{\startnarrower[#1*left,1*right] #2\stopnarrower }
     

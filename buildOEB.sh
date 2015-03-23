@@ -124,6 +124,13 @@ md-all-us() {
 	clean-tmp
 }
 
+reader-all-cth() {
+	make-tmp
+	cp $OEBDIR/cth/* tmp
+	python transform.py --target=reader --usfmDir=tmp/ --builtDir=built/ --name=oeb-cth-dev --oeb
+	clean-tmp
+}
+
 ###############
 #
 #	Full Release 
@@ -153,32 +160,35 @@ all() {
 
 release() {
 	make-tmp
+    cp $OEBDIR/us/00* tmp    
     cp $OEBDIR/us/08* tmp
     cp $OEBDIR/us/17* tmp
     cp $OEBDIR/us/19* tmp
 	cp $OEBDIR/us/4* tmp
 	cp $OEBDIR/us/5* tmp
 	cp $OEBDIR/us/6* tmp
-	python transform.py --target=context   --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb --order=normal
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb --order=normal
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb --order=normal
-	python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb
+	#python transform.py --target=context   --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb --order=normal
+	#python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb --order=normal
+	#python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb --order=normal
+	#python transform.py --target=html       --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb
 	python transform.py --target=reader     --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb
 	#python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb
 	#python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-US --oeb
 	clean-tmp
 	make-tmp
+    cp $OEBDIR/cth/00* tmp    
     cp $OEBDIR/cth/08* tmp
     cp $OEBDIR/cth/17* tmp
     cp $OEBDIR/cth/19* tmp
 	cp $OEBDIR/cth/4* tmp
 	cp $OEBDIR/cth/5* tmp
 	cp $OEBDIR/cth/6* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb --order=normal
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb --order=normal
-	    python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb --order=normal
+	#python transform.py --target=context    --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb --order=normal
+	#python transform.py --target=md         --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb --order=normal
+	#python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb --order=normal
 	#python transform.py --target=csv        --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb
 	#python transform.py --target=ascii      --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb
+	python transform.py --target=reader     --usfmDir=tmp/ --builtDir=built/ --name=OEB-$ID-Cth --oeb
 	clean-tmp
 }
 
@@ -296,12 +306,12 @@ buildbooks()
 #BOOKNAME=Esther
 #build-book-text
 
-ID=2014.11
-release
+#ID=2014.11
+#release
 #usnt
 #all-nt-psalms
 #all
 
-#html-all-us
+pdf-all-us
 
 

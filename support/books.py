@@ -3,8 +3,10 @@
 
 import os
 import codecs
+import sys
 
 bookKeys = {
+u'FRT': u'000',
 u'GEN': u'001',
 u'EXO': u'002',
 u'LEV': u'003',
@@ -74,6 +76,7 @@ u'REV': u'066'
 }
 
 silNames = [
+u'FRT',
 u'GEN',
 u'EXO',
 u'LEV',

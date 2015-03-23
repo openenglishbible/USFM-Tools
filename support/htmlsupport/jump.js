@@ -1,36 +1,36 @@
     $( document ).ready(function() {
  
         $( "html" ).click(function( e ) {
-            var container = $("div.navbar");
+            var container = $("navtable");
             if (!container.is(e.target)
                 && container.has(e.target).length === 0) 
             {
-                $("table").css( "left", "-9999px" ); 
+                container.css( "left", "-99999px" ); 
             }           
          });
         
-        $( "div.navbar" ).click(function( event ) {
+        $( "#navbar" ).click(function( event ) {
            if (screen.width < 500) {
                window.location.href = 'index.html';
                //window.open(newPosition);
                return false;
            };
-           $("table").css( "left", "0px" );
+           $("#navtable").css( "left", "0px" );
         });
  
-        $( "div.navbar" ).hover(
+        $( "#navbar" ).hover(
             function( e ) {
                  if (screen.width < 500) {
                      return false;
                  };
-                 $("table").css( "left", "0px"    ); },
+                 $("#navtable").css( "left", "0px"    ); },
             function( e ) {
                  if (screen.width < 500) {
                      return false;
                  };
-                 $("table").css( "left", "-999px" ); }
+                 $("#navtable").css( "left", "-99999px" ); }
         );
-
+        
         $("#navform").submit(function() {
             var bookNames = {
                 'Hk':           '035',
@@ -146,7 +146,7 @@
                     }
                 }
                 // Hide popup
-                $("table").css( "left", "-9999px" ); 
+                $("table").css( "left", "-99999px" ); 
                 // Jump to new position
                 var newPosition = "b" + book + ".html#" + offset;
                 window.location.href = newPosition;

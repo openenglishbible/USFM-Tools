@@ -168,32 +168,30 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
 #  Structure
 #
 
-header_release = ur"""<!DOCTYPE html>
+header_header = ur"""<!DOCTYPE html>
     <html lang="en">
     <head>
     <title>Open English Bible</title>
     <meta charset='utf-8'>
-    <link href="normalize.css" rel="stylesheet">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="jump.js"></script>
     </head>
 
     <body>
-    <div class="navbar">
-        <p>OEB</p>
+    <div id="navbar">
+        <p id="navoeb">OEB</p>
+        <div id="navtable">
         <table>
         <tr><td colspan = "5" style="font-size:100%;">
             <form id="navform">
                 <input type="text" style="font-size: 140%;" id="txtSearch"/> (eg Ps 23)
             </form>
         </td></tr>
-        <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr>
-        <tr>
-            <td>
-            <a href="b019.html">Psalms</a>
-            </td>
-        </tr>
+"""
+
+header_nt = ur"""
     <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>New Testament</td></tr>
         <tr><td>
             <a href="b040.html">Matthew</a>&nbsp;<br>
@@ -237,31 +235,22 @@ header_release = ur"""<!DOCTYPE html>
         <tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>
     </table>
     </div>
-        """
+    </div>
+"""
 
-
-header_dev = ur"""<!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <title>Open English Bible</title>
-    <meta charset='utf-8'>
-    <link href="normalize.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="jump.js"></script>
-    </head>
-
-    <body>
-    <div class="navbar">
-        <p>OEB</p>
-        <table>
-        <tr><td colspan = "5" style="font-size:100%;">
-            <form id="navform">
-                <input type="text" style="font-size: 140%;" id="txtSearch"/> (eg Ps 23)
-            </form>
-        </td></tr>
+header_release = header_header + ur"""
         <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr>
         <tr>
+            <td>
+            <a href="b008.html">Ruth</a>&nbsp;<br>
+            <a href="b017.html">Esther</a>&nbsp;<br>
+            <a href="b019.html">Psalms</a>
+            </td>
+        </tr>
+""" + header_nt
+
+header_dev = header_header + ur"""
+        <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr>
             <td>
             <a href="b001.html">Genesis</a>&nbsp;<br>
             Exodus&nbsp;<br>
@@ -314,173 +303,11 @@ header_dev = ur"""<!DOCTYPE html>
             <a href="b039.html">Malachi</a>
             </td>
         </tr>
-    <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>New Testament</td></tr>
-        <tr><td>
-            <a href="b040.html">Matthew</a>&nbsp;<br>
-            <a href="b041.html">Mark</a>&nbsp;<br>
-            <a href="b042.html">Luke</a>&nbsp;<br>
-            <a href="b043.html">John</a>&nbsp;<br>
-            <a href="b044.html">Acts</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b045.html">Romans</a>
-            <a href="b046.html">1&nbsp;Corinthians</a>&nbsp;<br>
-            <a href="b047.html">2&nbsp;Corinthians</a>&nbsp;<br>
-            <a href="b048.html">Galatians</a>&nbsp;<br>
-            <a href="b049.html">Ephesians</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b050.html">Philippians</a>&nbsp;<br>
-            <a href="b051.html">Colossians</a>
-            <a href="b052.html">1&nbsp;Thessalonians</a>&nbsp;<br>
-            <a href="b053.html">2&nbsp;Thessalonians</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b054.html">1&nbsp;Timothy</a>&nbsp;<br>
-            <a href="b055.html">2&nbsp;Timothy</a>&nbsp;<br>
-            <a href="b056.html">Titus</a>&nbsp;<br>
-            <a href="b057.html">Philemon</a>
-            <a href="b058.html">Hebrews</a>&nbsp;<br>
-            <a href="b059.html">James</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b060.html">1&nbsp;Peter</a>&nbsp;<br>
-            <a href="b061.html">2&nbsp;Peter</a>&nbsp;<br>
-            <a href="b062.html">1&nbsp;John</a>&nbsp;<br>
-            <a href="b063.html">2&nbsp;John</a>
-            <a href="b064.html">3&nbsp;John</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b065.html">Jude</a>&nbsp;<br>
-            <a href="b066.html">Revelation</a>
-        </td></tr>
-        <tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>
-    </table>
-    </div>
-        """
-
-header = ur"""<!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <title>Open English Bible</title>
-    <meta charset='utf-8'>
-    <link href="normalize.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="jump.js"></script>
-    </head>
-
-    <body>
-    <div class="navbar">
-        <p>OEB</p>
-        <table>
-        <tr><td colspan = "5" style="font-size:100%;">
-            <form id="navform">
-                <input type="text" style="font-size: 140%;" id="txtSearch"/> (eg Ps 23)
-            </form>
-        </td></tr>
-        <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr>
-        <tr>
-            <td>
-            <a href="b001.html">Genesis</a>&nbsp;<br>
-            <a href="b002.html">Exodus</a>&nbsp;<br>
-            <a href="b003.html">Leviticus</a>&nbsp;<br>
-            <a href="b004.html">Numbers</a>&nbsp;<br>
-            <a href="b005.html">Deuteronomy</a>&nbsp;<br>
-            <a href="b006.html">Joshua</a>&nbsp;<br>
-            <a href="b007.html">Judges</a>
-            </td>
-            <td>
-            <a href="b008.html">Ruth</a>&nbsp;<br>
-            <a href="b009.html">1&nbsp;Samuel</a>&nbsp;<br>
-            <a href="b010.html">2&nbsp;Samuel</a>&nbsp;<br>
-            <a href="b011.html">1&nbsp;Kings</a>&nbsp;<br>
-            <a href="b012.html">2&nbsp;Kings</a>
-            <a href="b013.html">1&nbsp;Chronicles</a>&nbsp;<br>
-            <a href="b014.html">2&nbsp;Chronicles</a>&nbsp;<br>
-            </td>
-            <td>
-            <a href="b015.html">Ezra</a>&nbsp;<br>
-            <a href="b016.html">Nehemiah</a>&nbsp;<br>
-            <a href="b017.html">Esther</a>&nbsp;<br>
-            <a href="b018.html">Job</a>&nbsp;<br>
-            <a href="b019.html">Psalms</a>&nbsp;<br>
-            <a href="b020.html">Proverbs</a>&nbsp;<br>
-            <a href="b021.html">Ecclesiastes</a>&nbsp;<br>
-            </td>
-            <td>
-            <a href="b022.html">Song&nbsp;of&nbsp;Solomon</a>&nbsp;<br>
-            <a href="b023.html">Isaiah</a>&nbsp;<br>
-            <a href="b024.html">Jeremiah</a>
-            <a href="b025.html">Lamentations</a>&nbsp;<br>
-            <a href="b026.html">Ezekiel</a>&nbsp;<br>
-            <a href="b027.html">Daniel</a>&nbsp;<br>
-            <a href="b028.html">Hosea</a>&nbsp;<br>
-            </td>
-            <td>
-            <a href="b029.html">Joel</a>&nbsp;<br>
-            <a href="b030.html">Amos</a>
-            <a href="b031.html">Obadiah</a>&nbsp;<br>
-            <a href="b032.html">Jonah</a>&nbsp;<br>
-            <a href="b033.html">Micah</a>&nbsp;<br>
-            <a href="b034.html">Nahum</a>&nbsp;<br>
-            <a href="b035.html">Habakkuk</a>&nbsp;<br>
-            </td>
-            <td>
-            <a href="b036.html">Zephaniah</a>
-            <a href="b037.html">Haggai</a>&nbsp;<br>
-            <a href="b038.html">Zechariah</a>&nbsp;<br>
-            <a href="b039.html">Malachi</a>
-            </td>
-        </tr>
-    <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>New Testament</td></tr>
-        <tr><td>
-            <a href="b040.html">Matthew</a>&nbsp;<br>
-            <a href="b041.html">Mark</a>&nbsp;<br>
-            <a href="b042.html">Luke</a>&nbsp;<br>
-            <a href="b043.html">John</a>&nbsp;<br>
-            <a href="b044.html">Acts</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b045.html">Romans</a>
-            <a href="b046.html">1&nbsp;Corinthians</a>&nbsp;<br>
-            <a href="b047.html">2&nbsp;Corinthians</a>&nbsp;<br>
-            <a href="b048.html">Galatians</a>&nbsp;<br>
-            <a href="b049.html">Ephesians</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b050.html">Philippians</a>&nbsp;<br>
-            <a href="b051.html">Colossians</a>
-            <a href="b052.html">1&nbsp;Thessalonians</a>&nbsp;<br>
-            <a href="b053.html">2&nbsp;Thessalonians</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b054.html">1&nbsp;Timothy</a>&nbsp;<br>
-            <a href="b055.html">2&nbsp;Timothy</a>&nbsp;<br>
-            <a href="b056.html">Titus</a>&nbsp;<br>
-            <a href="b057.html">Philemon</a>
-            <a href="b058.html">Hebrews</a>&nbsp;<br>
-            <a href="b059.html">James</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b060.html">1&nbsp;Peter</a>&nbsp;<br>
-            <a href="b061.html">2&nbsp;Peter</a>&nbsp;<br>
-            <a href="b062.html">1&nbsp;John</a>&nbsp;<br>
-            <a href="b063.html">2&nbsp;John</a>
-            <a href="b064.html">3&nbsp;John</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b065.html">Jude</a>&nbsp;<br>
-            <a href="b066.html">Revelation</a>
-        </td></tr>
-        <tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>
-    </table>
-    </div>
-        """
+""" + header_nt
 
 footer = ur"""
         </p></body>   
         """
 
-indexPage = header + ur"""<h1>Bible</h1>""" + footer
+indexPage = header_dev + ur"""<h1>Open English Bible</h1>""" + footer
 

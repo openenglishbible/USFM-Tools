@@ -35,20 +35,6 @@ def runscript(c, prefix='', repeatFilter = ''):
     if not repeatFilter == '' and not stderrdata.find(repeatFilter) == -1:
         runscript(c, prefix, repeatFilter)
 
-def setup():
-    c = """
-    cd support/thirdparty
-    rm -rf context
-    mkdir context
-    cd context
-    curl -o first-setup.sh http://minimals.contextgarden.net/setup/first-setup.sh
-    sh ./first-setup.sh
-    . ./tex/setuptex
-    cd ..
-    curl -o usfm2osis.pl http://crosswire.org/ftpmirror/pub/sword/utils/perl/usfm2osis.pl
-    """
-    runscript(c)
-
 def buildLout(usfmDir, builtDir, buildName):
  
     print '#### Building Lout...'
@@ -112,12 +98,12 @@ def buildCSV(usfmDir, builtDir, buildName):
     c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.csv.txt')
     c.render()
 
-def buildReader(usfmDir, builtDir, buildName):
-    # Convert to HTML for online reader
+def buildReader(usfmDir, builtDir, buildName, order="normal"):
+    # Convert to js for online reader
     print '#### Building for Reader...'
     ensureOutputDir(builtDir + 'en_oeb')
-    c = readerise.TransformForReader()
-    c.setupAndRun(usfmDir, builtDir + 'en_oeb')
+    c = readerise.ReaderRenderer(usfmDir, builtDir + '/' + buildName + '.js')
+    c.render(order)
 
 def buildMarkdown(usfmDir, builtDir, buildName, order="normal"):
     # Convert to Markdown for Pandoc
@@ -154,15 +140,13 @@ def main(argv):
     order="normal" 
     print '#### Starting Build.'
     try:
-        opts, args = getopt.getopt(argv, "sht:u:b:n:or:", ["setup", "help", "target=", "usfmDir=", "builtDir=", "name=","oeb","order="])
+        opts, args = getopt.getopt(argv, "ht:u:b:n:or:", ["help", "target=", "usfmDir=", "builtDir=", "name=","oeb","order="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             return usage()
-        elif opt in ("-s", "--setup"):
-            return setup()
         elif opt in ("-t", "--target"):
             targets =  arg
         elif opt in ("-u", "--usfmDir"):

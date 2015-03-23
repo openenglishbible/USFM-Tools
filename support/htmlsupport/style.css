@@ -100,28 +100,28 @@
             -o-font-feature-settings: "liga", "dlig","onum";
             font-feature-settings: "liga", "dlig","onum";
         }
-        .navbar { 
+        #navbar { 
             position:fixed; 
             margin-left:5px; 
             font-family: 'Verdana', sans-serif;
             background-color:white;
             z-index:999;
          }
-        .navbar a { 
+        #navbar a { 
             color: green;  
             text-decoration: none; 
         }
-        .navbar p { 
+        #navbar p { 
             color:green; 
         }
-        .navbar table {
+        #navtable {
             position:absolute; 
             left:-999em; 
             background-color:#E6FAE6;
             border-top:solid green;
             font-size:80%;
         }
-        .navbar table td {
+        #navbar table td {
             vertical-align:top;
         }
         .nd { /* Lord */

@@ -6,15 +6,16 @@ It is primarily used for the Open English Bible, and may need adjustment if used
 
 # Prerequisites
 
-    sudo easy_install pyparsing
+    pip install pyparsing
 
 # Get code
 
     git clone https://github.com/openenglishbible/USFM-Tools.git
     cd USFM-Tools
-    python transform.py --setup
- 
-(This downloads ConTeXt and may take a while.)
+
+# Install ConTeXt for PDF output
+
+    See http://wiki.contextgarden.net/ConTeXt_Standalone 
  
 # Run
 
