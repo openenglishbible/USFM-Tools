@@ -41,15 +41,12 @@ class ReaderRenderer(abstractRenderer.AbstractRenderer):
         t = "'], ['".join(t.split())
         return t
 
-    def writeLog(self, s):
-        print s
-        
     def write(self, unicodeString):
         self.f.write(unicodeString.replace(u'~', u' '))
         
     def writeIndent(self, level):   pass
 
-    def renderID(self, token): 
+    def render_id(self, token): 
         i = int(books.bookKeyForIdValue(token.value)) - 1
         self.cb = books.bookNames[i]
         if self.cb == "Psalms":
@@ -57,14 +54,14 @@ class ReaderRenderer(abstractRenderer.AbstractRenderer):
         if i > 0:
             self.write(u"']]]],\n\n")
         self.write(u"'" + self.cb + u"' : [")
-    def renderH(self, token):       pass 
-    def renderMT(self, token):      pass
-    def renderMT2(self, token):     pass
+    def render_h(self, token):       pass 
+    def render_mt(self, token):      pass
+    def render_mt2(self, token):     pass
     def renderMS(self, token):      pass
     def renderMS2(self, token):     pass
-    def renderP(self, token):       pass
-    def renderS(self, token):       pass
-    def renderS2(self, token):      pass
+    def render_p(self, token):       pass
+    def render_s1(self, token):       pass
+    def render_s2(self, token):      pass
     def renderC(self, token):
         if not token.value == '1':
             self.write(u"']]],")
@@ -82,16 +79,16 @@ class ReaderRenderer(abstractRenderer.AbstractRenderer):
     def renderTEXT(self, token):
         if not self.preVFlag and not self.waitingForFirstVerse:
             self.write(self.escape(token.value) + ' ')
-    def renderQ(self, token):       pass
-    def renderQ1(self, token):      pass
-    def renderQ2(self, token):      pass
-    def renderQ3(self, token):      pass
+    def render_q(self, token):       pass
+    def render_q1(self, token):      pass
+    def render_q2(self, token):      pass
+    def render_q3(self, token):      pass
     def renderNB(self, token):      pass
     def renderB(self, token):       pass
     def renderIS(self, token):      pass
     def renderIE(self, token):      pass
-    def renderNDS(self, token):     pass
-    def renderNDE(self, token):     pass
+    def render_nd_s(self, token):     pass
+    def render_nd_e(self, token):     pass
     def renderPBR(self, token):     pass
     def renderSCS(self, token):     pass
     def renderSCE(self, token):     pass

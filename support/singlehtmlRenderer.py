@@ -112,9 +112,6 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def escape(self, s):
         return s.replace(u'~',u'&nbsp;')
 
-    def writeLog(self, s):
-        print s
-        
     def write(self, unicodeString):
         self.f.write(unicodeString.replace(u'~', u' '))
         
@@ -129,22 +126,22 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
             self.write(u'<p>')
         self.write(u'<p class="indent-' + str(level) + u'">')
 
-    def renderID(self, token): 
+    def render_id(self, token): 
         self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
         self.write(u'\n\n<h1 id="' + self.cb + u'"></h1>\n')
-    def renderH(self, token):       self.bookname = token.value 
-    def renderMT(self, token):      self.write(u'\n\n<h1>' + token.value + u'</h1>')
-    def renderMT2(self, token):     self.write(u'\n\n<h2>' + token.value + u'</h2>')
+    def render_h(self, token):       self.bookname = token.value 
+    def render_mt(self, token):      self.write(u'\n\n<h1>' + token.value + u'</h1>')
+    def render_mt2(self, token):     self.write(u'\n\n<h2>' + token.value + u'</h2>')
     def renderMS(self, token):      self.write(u'\n\n<h3>' + token.value + u'</h3>')
     def renderMS2(self, token):     self.write(u'\n\n<h4>' + token.value + u'</h4>')
-    def renderP(self, token):
+    def render_p(self, token):
         self.indentFlag = False
         self.write(u'\n\n<p>')
-    def renderS(self, token):
+    def render_s1(self, token):
         self.indentFlag = False
         self.write(u'\n\n<h5>' + token.getValue() + u'</h5>')
-    def renderS2(self, token):
+    def render_s2(self, token):
         self.indentFlag = False
         self.write(u'\n\n<p align="center">----</p>')
     def renderC(self, token):
@@ -156,16 +153,16 @@ class SingleHTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderWJS(self, token):     self.write(u'<span class="woc">')
     def renderWJE(self, token):     self.write(u'</span>')
     def renderTEXT(self, token):    self.write(u" " + self.escape(token.value) + u" ")
-    def renderQ(self, token):       self.writeIndent(1)
-    def renderQ1(self, token):      self.writeIndent(1)
-    def renderQ2(self, token):      self.writeIndent(2)
-    def renderQ3(self, token):      self.writeIndent(3)
+    def render_q(self, token):       self.writeIndent(1)
+    def render_q1(self, token):      self.writeIndent(1)
+    def render_q2(self, token):      self.writeIndent(2)
+    def render_q3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.writeIndent(0)
     def renderB(self, token):       self.write(u'\n\n<p class="indent-0">&nbsp;</p>')
     def renderIS(self, token):      self.write(u'<i>')
     def renderIE(self, token):      self.write(u'</i>')
-    def renderNDS(self, token):     self.write(u'<span class="tetragrammaton">')
-    def renderNDE(self, token):     self.write(u'</span>')
+    def render_nd_s(self, token):     self.write(u'<span class="tetragrammaton">')
+    def render_nd_e(self, token):     self.write(u'</span>')
     def renderPBR(self, token):     self.write(u'<br />')
     def renderSCS(self, token):     self.write(u'<b>')
     def renderSCE(self, token):     self.write(u'</b>')

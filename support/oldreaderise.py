@@ -150,7 +150,7 @@ class ReaderPrinter(object):
         self.write(u'<br />')
         self.write(u'&nbsp;&nbsp;&nbsp;&nbsp;' * level)
 
-    def renderID(self, token): 
+    def render_id(self, token): 
         if self.inSpanFlag:
                 self.inSpanFlag = False
                 self.write(u'</span>')
@@ -168,10 +168,10 @@ class ReaderPrinter(object):
         self.writeHeader()
         self.indentFlag = False
 
-    def renderIDE(self, token):     pass
-    def renderH(self, token):       self.write(u'\n<h1 class="book-name">' + token.value + u'</h1>')
-    def renderMT(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
-    def renderMT2(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
+    def render_ide(self, token):     pass
+    def render_h(self, token):       self.write(u'\n<h1 class="book-name">' + token.value + u'</h1>')
+    def render_mt(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
+    def render_mt2(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
     def renderMS(self, token):
         if self.inSpanFlag:
                 self.inSpanFlag = False
@@ -181,7 +181,7 @@ class ReaderPrinter(object):
                 self.write(u'\n</p>')
         self.write(u'\n<h4>' + token.value + u'</h4>')
     def renderMS2(self, token):     self.write(u'\n<h5>' + token.value + u'</h5>')
-    def renderP(self, token):
+    def render_p(self, token):
         if self.inSpanFlag:
                 self.inSpanFlag = False
                 self.write(u'</span>')
@@ -191,9 +191,9 @@ class ReaderPrinter(object):
                 self.write(u'\n</p>')
         self.inParaFlag = True
         self.write(u'\n<p>')
-    def renderS(self, token):
+    def render_s1(self, token):
         self.indentFlag = False
-    def renderS2(self, token):
+    def render_s2(self, token):
         self.indentFlag = False
     def renderC(self, token):
         if token.value.zfill(3) == u'001':
@@ -236,10 +236,10 @@ class ReaderPrinter(object):
     def renderWJS(self, token):     self.write(u'<span class="woc">')
     def renderWJE(self, token):     self.write(u'</span>')
     def renderTEXT(self, token):    self.write(token.value)
-    def renderQ(self, token):       self.writeIndent(1)
-    def renderQ1(self, token):      self.writeIndent(1)
-    def renderQ2(self, token):      self.writeIndent(2)
-    def renderQ3(self, token):      self.writeIndent(3)
+    def render_q(self, token):       self.writeIndent(1)
+    def render_q1(self, token):      self.writeIndent(1)
+    def render_q2(self, token):      self.writeIndent(2)
+    def render_q3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.writeIndent(0)
     def renderQTS(self, token):     pass
     def renderQTE(self, token):     pass
@@ -253,8 +253,8 @@ class ReaderPrinter(object):
     def renderADDE(self, token):    self.write(u'</i>')
     def renderLI(self, token):      self.write(u'<p />')
     def renderSP(self, token):      self.write(u'<p />')
-    def renderNDS(self, token):     self.write(u' ')
-    def renderNDE(self, token):     self.write(u' ')
+    def render_nd_s(self, token):     self.write(u' ')
+    def render_nd_e(self, token):     self.write(u' ')
     def renderPBR(self, token):     self.write(u'<br />')
     def renderD(self, token):       pass # For now
     def renderREM(self, token):     pass # This is for comments in the USFM

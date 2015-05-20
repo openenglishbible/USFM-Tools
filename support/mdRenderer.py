@@ -39,9 +39,6 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
         f.write(self.rendered)
         f.close()
         
-    def writeLog(self, s):
-        print s
-        
     def write(self, s):
         self.stringStream.write(s)
         
@@ -64,25 +61,25 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
                     
     def renderTEXT(self, token):    self.write(self.escape(token.value))
 
-    def renderH(self, token):       self.book = token.getValue() ; self.write(u'\n\n\n\n')
-    def renderMT(self, token):      self.write(u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n')
-    def renderMT2(self, token):     self.write(u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n')
+    def render_h(self, token):       self.book = token.getValue() ; self.write(u'\n\n\n\n')
+    def render_mt(self, token):      self.write(u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n')
+    def render_mt2(self, token):     self.write(u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n')
     def renderMS(self, token):      self.write(u'\n\n### ' + token.value + u' ###\n')
     def renderMS2(self, token):     self.write(u'\n\n#### ' + token.value + u' ####\n')
-    def renderS(self, token):       self.qStatus = OUT ; self.write(u'\n\n##### ' + token.value + u' #####\n\n')
-    def renderS2(self, token):      self.qStatus = OUT ; self.write(u'\n\n###### ' + token.value + u' ######\n\n')
-    def renderP(self, token):       self.qStatus = OUT ; self.write(u'\n\n')
+    def render_s1(self, token):       self.qStatus = OUT ; self.write(u'\n\n##### ' + token.value + u' #####\n\n')
+    def render_s2(self, token):      self.qStatus = OUT ; self.write(u'\n\n###### ' + token.value + u' ######\n\n')
+    def render_p(self, token):       self.qStatus = OUT ; self.write(u'\n\n')
     def renderB(self, token):       self.write(u'\n\n')
     def renderC(self, token):       self.currentC = token.value; self.write(u'\n\n [' + self.book + u' ' + self.currentC + u'] \n\n')
     def renderV(self, token):       self.write(u' [' + self.currentC + u':' + token.value + u'] ')
-    def renderQ(self, token):
+    def render_q(self, token):
         if self.qStatus == OUT: 
             self.write(u'\n\n')
             self.qStatus = IN
         self.write(u'\n|  ') 
-    def renderQ1(self, token):      self.renderQ(token) 
-    def renderQ2(self, token):      self.write(u'\n|    ') 
-    def renderQ3(self, token):      self.write(u'\n|      ') 
+    def render_q1(self, token):      self.render_q(token) 
+    def render_q2(self, token):      self.write(u'\n|    ') 
+    def render_q3(self, token):      self.write(u'\n|      ') 
     def renderNB(self, token):      self.write(u'\n|  ') 
     def renderLI(self, token):      self.write(u'* ')
     def renderPBR(self, token):     self.write(u'\n')
@@ -101,6 +98,6 @@ class MarkdownRenderer(abstractRenderer.AbstractRenderer):
     def renderXO(self, token):      self.write(self.escape(token.value))
     def renderXT(self, token):      self.write(self.escape(token.value))
     
-    def renderNDS(self,token):      self.ndStatus = IN
-    def renderNDE(self,token):      self.ndStatus = JUSTOUT
+    def render_nd_s(self,token):      self.ndStatus = IN
+    def render_nd_e(self,token):      self.ndStatus = JUSTOUT
             

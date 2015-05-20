@@ -30,9 +30,6 @@ class CSVRenderer(abstractRenderer.AbstractRenderer):
         self.run()
         self.f.close()
         
-    def writeLog(self, s):
-        print s
-                
     #   SUPPORT
 
     def escape(self, s):
@@ -40,7 +37,7 @@ class CSVRenderer(abstractRenderer.AbstractRenderer):
             
     #   TOKENS
 
-    def renderID(self, token): 
+    def render_id(self, token): 
         self.cb = books.bookKeyForIdValue(token.value)
     def renderC(self, token):
         self.cc = token.value.zfill(3)

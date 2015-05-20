@@ -1,5 +1,6 @@
 import sys
 import os
+import importlib
 
 # Set Path for files in support/
 rootdiroftools = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +20,7 @@ import contextRenderer
 import singlehtmlRenderer
 import loutRenderer
 import htmlRenderer
+import wordRenderer
 
 def runscriptold(c, prefix=''):
     print prefix + ':: ' + c
@@ -89,6 +91,13 @@ def buildSingleHtml(usfmDir, builtDir, buildName, order="normal"):
     print '#### Building HTML...'
     ensureOutputDir(builtDir)
     c = singlehtmlRenderer.SingleHTMLRenderer(usfmDir, builtDir + '/' + buildName + '.html')
+    c.render(order)
+
+def buildWord(usfmDir, builtDir, buildName, order="normal"):
+    # Convert to HTML
+    print '#### Building Word...'
+    ensureOutputDir(builtDir)
+    c = wordRenderer.WordRenderer(usfmDir, builtDir + '/' + buildName + '.docx')
     c.render(order)
 
 def buildCSV(usfmDir, builtDir, buildName):
@@ -182,8 +191,16 @@ def main(argv):
         buildASCII(usfmDir, buildDir, buildName)
     elif targets == 'csv':
         buildCSV(usfmDir, buildDir, buildName)
+    elif targets == 'word':
+        buildWord(usfmDir, buildDir, buildName)
     else:
-        usage()
+        try:
+            m = importlib.import_module(targets + 'Renderer')
+            ensureOutputDir(buildDir)
+            c = m.Renderer(usfmDir, buildDir + '/' + buildName + m.STANDARD_SUFFIX)
+            c.render()
+        except Exception as e:
+            print 'ERROR:', e
 
     print '#### Finished.'
     restoreCWD()
@@ -194,10 +211,7 @@ def usage():
         ----------
 
         Build script.  See source for details.
-        
-        Setup:
-        transform.py --setup 
-        
+                
     """
 
 if __name__ == "__main__":

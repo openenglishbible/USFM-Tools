@@ -18,7 +18,7 @@ def usfmEndToken(key):
 def usfmTokenValue(key, value): 
     return Group(Suppress(backslash) + Literal( key ) + Suppress(White()) + Optional(value) )
 def usfmTokenNumber(key): 
-    return Group(Suppress(backslash) + Literal( key ) + Suppress(White()) + Word (nums + '-()') + Suppress(White()))
+    return Group(Suppress(backslash) + Literal( key ) + Suppress(White()) + CharsNotIn(u' \n\t\\') + Suppress(White()))
 
 #
 # DEFINE GRAMMAR
@@ -119,10 +119,10 @@ class UsfmToken(object):
     
     # Handler for 'is' style calls
     def __getattr__(self, name):
-        if name[:2] == 'is':
-            return False
+        if name[:3] == 'is_':
+            return name[3:] == self.getType().lower().replace('*', '_e')
         else:
-            return super._getattr(name)
+            return super.__getattr__(name)
             
     def renderOn(self, printer):
         try:

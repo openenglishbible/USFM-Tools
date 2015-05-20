@@ -33,11 +33,7 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.f.write(self.introTeXt)
         self.run(order)
         self.f.write(self.stopNarrower() + self.closeTeXt)
-        self.f.close()
-        
-    def writeLog(self, s):
-        print s.encode('ascii', 'ignore')
-        
+        self.f.close()        
     
     #
     #   Support
@@ -100,10 +96,9 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def startD(self):
         if self.printerState[u'd'] == False:
             self.printerState[u'd'] = True
-        return u'\par {\startalignment[center] \em '
+        return u'\par {\startalignment[middle] \em '
 
     def stopD(self):
-        self.stopM()
         if self.printerState[u'd'] == False:
             return u''
         else:
@@ -112,10 +107,8 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
             
     def startM(self):
         r = self.stopD() + self.stopLI() + self.stopNarrower()
-        r = r + self.newLine()
-        if self.printerState[u'm'] == False:
-            self.printerState[u'm'] = True
-        return r + u'{\startalignment[left] '
+        self.printerState[u'm'] = True
+        return r + ur'\par {\startalignment[flushleft] '
 
     def stopM(self):
         if self.printerState[u'm'] == False:
@@ -140,16 +133,16 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     #   Tokens
     #
 
-    def renderID(self, token):      self.f.write( self.stopNarrower() + ur"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
-    def renderH(self, token):       self.f.write( u'\n\n\RAHeader{' + token.value + u'}\n')
-    def renderMT(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MT{' + token.value + u'}\n')
-    def renderMT2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MTT{' + token.value + u'}\n')
+    def render_id(self, token):      self.f.write( self.stopNarrower() + ur"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
+    def render_h(self, token):       self.f.write( u'\n\n\RAHeader{' + token.value + u'}\n')
+    def render_mt(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MT{' + token.value + u'}\n')
+    def render_mt2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MTT{' + token.value + u'}\n')
     def renderMS(self, token):      self.markForSmallCaps() ; self.f.write(self.stopNarrower() + u'\n\MS{' + token.value + u'}\n') ; self.doNB = True
     def renderMS2(self, token):     self.doNB = True; self.markForSmallCaps() ; self.f.write( self.stopNarrower() + u'\n\MSS{' + token.value + '}' + self.newLine() )
-    def renderP(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + self.newLine() )
-    def renderB(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank \n' )
-    def renderS(self, token):       self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() +  u'\n\\blank[big] ' + u'\n\MSS{' + token.getValue() + '}' + self.newLine() ) ; self.doNB = True
-    def renderS2(self, token):      self.doNB = True; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\n\\blank[big] ' + u'\n\MSS{' + token.value + '}' + self.newLine() )
+    def render_p(self, token):       self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + self.newLine() )
+    def renderB(self, token):       self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank \n' )
+    def render_s1(self, token):       self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() +  u'\n\\blank[big] ' + u'\n\MSS{' + token.getValue() + '}' + self.newLine() ) ; self.doNB = True
+    def render_s2(self, token):      self.doNB = True; self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + u'\n\\blank[big] ' + u'\n\MSS{' + token.value + '}' + self.newLine() )
     def renderC(self, token):
         self.doChapterOrVerse = u'\C{' + token.value + u'}'
         self.f.write( u' ' )
@@ -179,10 +172,10 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
                 s = u' ' + s
             self.justDidLORD = False    
         self.f.write( s )
-    def renderQ(self, token):       self.renderQ1(token)
-    def renderQ1(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
-    def renderQ2(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(2) )
-    def renderQ3(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(3) )
+    def render_q(self, token):       self.render_q1(token)
+    def render_q1(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
+    def render_q2(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(2) )
+    def render_q3(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(3) )
     def renderNB(self, token):      self.doNB = True ; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + u'\\blank[medium] ' + self.newLine() )
     def renderFS(self, token):      self.f.write( u'\\footnote{' )
     def renderFE(self, token):      self.f.write( u'} ' )
@@ -190,8 +183,8 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def renderIE(self, token):      self.f.write( u'} ' )
     def renderADDS(self, token):    self.f.write( u'{\em ' )
     def renderADDE(self, token):    self.f.write( u'} ' )
-    def renderNDS(self, token):     self.f.write( u'{\sc ' )
-    def renderNDE(self, token):     self.justDidLORD = True; self.f.write( u'}' )
+    def render_nd_s(self, token):     self.f.write( u'{\sc ' )
+    def render_nd_e(self, token):     self.justDidLORD = True; self.f.write( u'}' )
     def renderLI(self, token):      self.f.write( self.startLI() )
     def renderD(self, token):       self.f.write( self.startD() )
     def renderSP(self, token):      self.f.write( self.startD() )
@@ -200,16 +193,16 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
     def renderFRE(self, token):     self.f.write( u' ' )
     def renderFK(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
     def renderFT(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
-    def renderPI(self, token):      self.renderQ(token)
+    def renderPI(self, token):      self.render_q(token)
     
-    def render_is1(self, token):    self.renderS(token)
-    def render_ip(self, token):     self.renderP(token)
-    def render_iot(self, token):    self.renderQ(token)
-    def render_io1(self, token):    self.renderQ2(token)
+    def render_is1(self, token):    self.render_s1(token)
+    def render_ip(self, token):     self.render_p(token)
+    def render_iot(self, token):    self.render_q(token)
+    def render_io1(self, token):    self.render_q2(token)
     
     def render_pb(self, token):     self.f.write(u'\page ')
     
-    def render_m(self, token):      self.f.write( self.startM() )
+    def render_m(self, token):      self.f.write( self.stopM() + self.startM() )
     
     def render_periph(self, token):
         if token.getValue() == u'Table of Contents':

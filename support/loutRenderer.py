@@ -64,9 +64,6 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
         self.run()
         self.f.close()
         
-    def writeLog(self, s):
-        print s
-        
     def write(self, unicodeString):
         self.f.write(unicodeString + '\n')
                 
@@ -197,23 +194,23 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
     #   TOKENS
     #
     #
-    def renderID(self, token): 
+    def render_id(self, token): 
         self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
         self.closeChapter()
-    def renderIDE(self, token):
+    def render_ide(self, token):
         pass
-    def renderH(self, token):   
+    def render_h(self, token):   
         self.close()    
         self.bookname = token.value
         self.write(u'\n@Chapter @Title { ' + self.escape(token.value) + u' } @RunningTitle { ' + self.bookname + u' } @Begin')
         self.inChapter = True
-    def renderMT(self, token): 
+    def render_mt(self, token): 
         self.write(u'\n@Display  { 21p } @Font { ' + self.escape(token.value, upper=True) + u'}')
         self.startTextType = 'drop'
-    def renderMT2(self, token): 
+    def render_mt2(self, token): 
         self.write(u'\n@Display  { 13p } @Font { ' + self.escape(token.value, upper=True) + u'}')
-    def renderMT3(self, token): 
+    def render_mt3(self, token): 
         self.write(u'\n@Display  { 13p } @Font { ' + self.escape(token.value, upper=True) + u'}')
     def renderMS(self, token):
         self.closeSection()
@@ -223,15 +220,15 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
         if self.startTextType == 'normal': self.startTextType = 'smallcaps'
     def renderMS2(self, token):
         self.write(u'\n@Display @Heading {' + self.escape(token.value) + u'}\n')
-    def renderP(self, token):
+    def render_p(self, token):
         self.newPara()
     def renderPI(self, token):
         self.newPara(outdent = True)
-    def renderS(self, token): 
+    def render_s1(self, token): 
         self.closePoetry();
         self.closeDropCap(); 
         self.write(u'\n@DP @CNP @Display @Heading {' + self.escape(token.value) + u'}\n') 
-    def renderS2(self, token):
+    def render_s2(self, token):
         self.closeDropCap(); 
         self.write(u'\n\n@DP\n')
     def renderC(self, token):
@@ -241,18 +238,18 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
         self.cv = token.value.zfill(3)
         if not self.cv == u'001':   self.registerForNextText = u' {@OuterNote { 8p @Font {' + token.value + u'}}}'
     def renderTEXT(self, token):    self.formatText(token.value)
-    def renderQ(self, token):       self.writeIndent(1)
-    def renderQ1(self, token):      self.writeIndent(1)
-    def renderQ2(self, token):      self.writeIndent(2)
-    def renderQ3(self, token):      self.writeIndent(3)
+    def render_q(self, token):       self.writeIndent(1)
+    def render_q1(self, token):      self.writeIndent(1)
+    def render_q2(self, token):      self.writeIndent(2)
+    def render_q3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.newPara(indent = False)
     def renderB(self, token):       self.newPara(indent = False); self.inPoetry = True
     def renderFS(self, token):      self.write(u'@FootNote { ')
     def renderFE(self, token):      self.write(u' }')
     def renderIS(self, token):      self.write(u'{@I {')
     def renderIE(self, token):      self.write(u'}}')
-    def renderNDS(self, token):     self.write(u'{@S {')
-    def renderNDE(self, token):     self.write(u'}}'); self.afterLord = True
+    def render_nd_s(self, token):     self.write(u'{@S {')
+    def render_nd_e(self, token):     self.write(u'}}'); self.afterLord = True
     def renderPBR(self, token):     self.write(u'@LLP ')
     def renderSCS(self, token):     self.write(u'{@B {')
     def renderSCE(self, token):     self.write(u'}}')

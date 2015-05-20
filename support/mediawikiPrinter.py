@@ -25,26 +25,26 @@ class MediaWikiPrinter(object):
     def write(self, unicodeString):
         self.f.write(unicodeString.encode('utf-8'))
 
-    def renderID(self, token):
+    def render_id(self, token):
         self.write(u'</p>')
         self.f.close()
         self.cb = books.bookKeyForIdValue(token.value)
         self.f = open(self.outputDir + u'/c' + self.cb + u'001.html', 'w')
         self.write(u'\n<!-- \\id ' + self.cb + u' -->')
         self.indentFlag = False
-    def renderIDE(self, token):     pass
+    def render_ide(self, token):     pass
     def renderTOC2(self, token):    self.write(u' Bible:' + token.value + u'_# ')
-    def renderH(self, token):       self.write(u'\n<!-- \\h ' + token.value + u' -->')
-    def renderMT(self, token):      self.write(u'\n<!-- \\mt1 ' + token.value + u' -->')
+    def render_h(self, token):       self.write(u'\n<!-- \\h ' + token.value + u' -->')
+    def render_mt(self, token):      self.write(u'\n<!-- \\mt1 ' + token.value + u' -->')
     def renderMS(self, token):      pass
     def renderMS2(self, token):     pass
-    def renderP(self, token):
+    def render_p(self, token):
         self.indentFlag = False
         self.write(u'\n\n')
-    def renderS(self, token):
+    def render_s1(self, token):
         self.indentFlag = False
         self.write(u'\n=== ' + token.value + u' === ')
-    def renderS2(self, token):
+    def render_s2(self, token):
         self.indentFlag = False
         pass
     def renderR(self, token):       self.write('\n<span class="srefs">' + token.value + '</span>')
@@ -68,10 +68,10 @@ class MediaWikiPrinter(object):
     def renderTEXT(self, token):
         if self.footnoteFlag:       self.footnoteFlag = False; self.write(u' -->')
         self.write(token.getValue())
-    def renderQ(self, token):       self.write(u'\n:')
-    def renderQ1(self, token):      self.write(u'\n::')
-    def renderQ2(self, token):      pass
-    def renderQ3(self, token):      pass
+    def render_q(self, token):       self.write(u'\n:')
+    def render_q1(self, token):      self.write(u'\n::')
+    def render_q2(self, token):      pass
+    def render_q3(self, token):      pass
     def renderNB(self, token):      pass
     def renderQTS(self, token):     pass
     def renderQTE(self, token):     pass
@@ -89,8 +89,8 @@ class MediaWikiPrinter(object):
     def renderADDE(self, token):    pass
     def renderLI(self, token):      self.write(u'\n:<!-- \li -->')
     def renderSP(self, token):      pass
-    def renderNDS(self, token):     pass
-    def renderNDE(self, token):     pass
+    def render_nd_s(self, token):     pass
+    def render_nd_e(self, token):     pass
     def renderPBR(self, token):     pass
     def renderFR(self, token):      pass
     def renderFRE(self, token):     pass
@@ -100,7 +100,7 @@ class MediaWikiPrinter(object):
     def renderXDCE(self, token):    pass
     def renderXO(self, token):      pass
     def renderXT(self, token):      pass
-    def renderM(self, token):       pass
+    def render_m(self, token):      pass
     def renderMI(self, token):      pass
     def renderTLS(self, token):     pass
     def renderTLE(self, token):     pass

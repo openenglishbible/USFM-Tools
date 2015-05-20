@@ -48,9 +48,6 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/index-dev.html', self.outputDir + u'/index.html')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/header.png', self.outputDir + u'/')
         
-    def writeLog(self, s):
-        print s
-        
     # File handling    
         
     def openFile(self, bookID):
@@ -102,28 +99,28 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'&nbsp;&nbsp;' * level)
         self.writeChapterMarker()
 
-    def renderID(self, token): 
+    def render_id(self, token): 
         self.write(footer)
         self.close()
         self.cb = books.bookKeyForIdValue(token.value)
         self.openFile(self.cb)
         self.write(header_dev)
         self.indentFlag = False
-    def renderMT(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
-    def renderMT2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
+    def render_mt(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
+    def render_mt2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
     def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p>')
     def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p>')
-    def renderP(self, token):
+    def render_p(self, token):
         self.indentFlag = False
         self.write(u'<br /><br />')
         self.writeChapterMarker()
-    def renderS(self, token):
+    def render_s1(self, token):
         self.indentFlag = False
         if token.value == u'~':
             self.write(u'<p>&nbsp;</p><p>')
         else:
             self.write(u'</p><h6>' + token.value + u'</h6><p>')
-    def renderS2(self, token):
+    def render_s2(self, token):
         self.indentFlag = False
         self.write(u'</p><h7>' + token.value + u'</h7><p>')
     def renderC(self, token):
@@ -139,14 +136,14 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderWJS(self, token):     self.write(u'<span class="woc">')
     def renderWJE(self, token):     self.write(u'</span>')
 
-    def renderNDS(self, token):     self.write(u'<span class="nd">')
-    def renderNDE(self, token):     self.write(u'</span>')
+    def render_nd_s(self, token):     self.write(u'<span class="nd">')
+    def render_nd_e(self, token):     self.write(u'</span>')
 
     def renderTEXT(self, token):    self.write(u" " + token.value + u" ")
-    def renderQ(self, token):       self.writeIndent(1)
-    def renderQ1(self, token):      self.writeIndent(1)
-    def renderQ2(self, token):      self.writeIndent(2)
-    def renderQ3(self, token):      self.writeIndent(3)
+    def render_q(self, token):       self.writeIndent(1)
+    def render_q1(self, token):      self.writeIndent(1)
+    def render_q2(self, token):      self.writeIndent(2)
+    def render_q3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.writeIndent(0)
     def renderB(self, token):       self.write(u'<br />')
     def renderIS(self, token):      self.write(u'<i>')
@@ -155,10 +152,10 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     
     def renderD(self, token):       self.writeChapterMarker()
 
-    def render_is1(self, token):    self.renderS(token)
-    def render_ip(self, token):     self.renderP(token)
-    def render_iot(self, token):    self.renderQ(token)
-    def render_io1(self, token):    self.renderQ2(token)
+    def render_is1(self, token):    self.render_s1(token)
+    def render_ip(self, token):     self.render_p(token)
+    def render_iot(self, token):    self.render_q(token)
+    def render_io1(self, token):    self.render_q2(token)
     
     def renderFS(self, token):      self.write(u'<span class="rightnotemarker">*</span><span class="rightnote">')
     def renderFE(self, token):      self.write(u'</span>')

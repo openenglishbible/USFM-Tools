@@ -40,9 +40,6 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.run()
         self.f.close()
         
-    def writeLog(self, s):
-        print s
-        
     # Support    
         
     def openFile(self, bookID):
@@ -65,24 +62,24 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'<br />')
         self.write(u'&nbsp;&nbsp;&nbsp;&nbsp;' * level)
 
-    def renderID(self, token): 
+    def render_id(self, token): 
         self.write(footer)
         self.close()
         self.cb = books.bookKeyForIdValue(token.value)
         self.openFile(self.cb)
         self.write(header)
         self.indentFlag = False
-    def renderMT(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
-    def renderMT2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
+    def render_mt(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
+    def render_mt2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
     def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p><br />')
     def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p><br />')
-    def renderP(self, token):
+    def render_p(self, token):
         self.indentFlag = False
         self.write(u'<br /><br />')
-    def renderS(self, token):
+    def render_s1(self, token):
         self.indentFlag = False
         self.write(u'</p><p align="center">_________________________</p><p>')
-    def renderS2(self, token):
+    def render_s2(self, token):
         self.indentFlag = False
         self.write(u'</p><p align="center">----</p><p>')
     def renderC(self, token):
@@ -97,10 +94,10 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
     def renderWJS(self, token):     self.write(u'<span class="woc">')
     def renderWJE(self, token):     self.write(u'</span>')
     def renderTEXT(self, token):    self.write(u" " + token.value + u" ")
-    def renderQ(self, token):       self.writeIndent(1)
-    def renderQ1(self, token):      self.writeIndent(1)
-    def renderQ2(self, token):      self.writeIndent(2)
-    def renderQ3(self, token):      self.writeIndent(3)
+    def render_q(self, token):       self.writeIndent(1)
+    def render_q1(self, token):      self.writeIndent(1)
+    def render_q2(self, token):      self.writeIndent(2)
+    def render_q3(self, token):      self.writeIndent(3)
     def renderNB(self, token):      self.writeIndent(0)
     def renderB(self, token):       self.write(u'<br /><br />')
     def renderIS(self, token):      self.write(u'<i>')

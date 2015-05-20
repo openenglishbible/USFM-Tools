@@ -9,7 +9,7 @@ class AbstractRenderer(object):
     booksUsfm = None
     
     def writeLog(self, s):
-        pass
+        print s.encode('ascii', 'ignore')
         
     def loadUSFM(self, usfmDir):
         self.booksUsfm = books.loadBooks(usfmDir)
@@ -30,28 +30,29 @@ class AbstractRenderer(object):
 
     def render_periph(self, token): pass
         
-    def renderID(self, token):      pass
-    def renderIDE(self, token):     pass
-    def renderH(self, token):       pass 
+    def render_id(self, token):     pass
+    def render_ide(self, token):    pass
+    def render_h(self, token):      pass 
 
-    def renderM(self, token):       pass
-    def renderMT(self, token):      pass
-    def renderMT1(self, token):     return self.renderMT(token)
-    def renderMT2(self, token):     pass
-    def renderMT3(self, token):     pass
+    def render_mt(self, token):     pass
+    def render_mt1(self, token):    return self.render_mt(token)
+    def render_mt2(self, token):    pass
+    def render_mt3(self, token):    pass
+
     def renderMS(self, token):      pass
     def renderMS1(self, token):     return self.renderST(token)
     def renderMS2(self, token):     pass
     def renderMR(self, token):      pass
     def renderMI(self, token):      pass
 
-    def renderP(self, token):       pass
+    def render_p(self, token):       pass
     def renderSP(self, token):      pass
+    def render_m(self, token):      pass
 
-    def renderS(self, token):       pass
-    def renderS1(self, token):      return self.renderS(token)
-    def renderS2(self, token):      pass
-    def renderS3(self, token):      pass
+    def render_s(self, token):      return self.render_s1(token)
+    def render_s1(self, token):     pass
+    def render_s2(self, token):     pass
+    def render_s3(self, token):     pass
 
     def renderC(self, token):       pass
     def renderV(self, token):       pass
@@ -62,10 +63,10 @@ class AbstractRenderer(object):
 
     def renderTEXT(self, token):    pass
 
-    def renderQ(self, token):       pass
-    def renderQ1(self, token):      pass
-    def renderQ2(self, token):      pass
-    def renderQ3(self, token):      pass
+    def render_q(self, token):      return self.render_q1(token)
+    def render_q1(self, token):     pass
+    def render_q2(self, token):     pass
+    def render_q3(self, token):     pass
 
     def renderNB(self, token):      pass
     def renderB(self, token):       pass
@@ -91,9 +92,9 @@ class AbstractRenderer(object):
     def renderIS(self, token):      pass
     def renderIE(self, token):      pass
 
-    def renderND(self, token):      return self.renderNDS(token)
-    def renderNDS(self, token):     pass
-    def renderNDE(self, token):     pass
+    def render_nd(self, token):      return self.render_nd_s(token)
+    def render_nd_s(self, token):     pass
+    def render_nd_e(self, token):     pass
 
     def renderPBR(self, token):     pass
     def renderD(self, token):       pass 
@@ -144,4 +145,4 @@ class AbstractRenderer(object):
     def render_pb(self, token):     pass
 
     # This is unknown!
-    def renderUnknown(self, token):  self.writeLog("WARNING: Unknown token '" + token.value + "'" )
+    def render_unknown(self, token):  self.writeLog("WARNING: Unknown token '" + token.value + "'" )
