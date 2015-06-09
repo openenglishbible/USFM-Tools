@@ -4,18 +4,20 @@
 import abstractRenderer
 import codecs
 import books
+import os
 
 #
 #   UTF-8 CVS file
 #
 
-class CSVRenderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputFilename):
+    def __init__(self, inputDir, outputDir, outputName):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
         # Unset
         self.f = None  # output file stream
         # IO
-        self.outputFilename = outputFilename
+        self.outputFilename = os.path.join(outputDir, outputName + '.csv.txt')
         self.inputDir = inputDir
         # Flags
         self.cb = u''    # Current Book

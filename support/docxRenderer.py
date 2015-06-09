@@ -6,18 +6,19 @@ import codecs
 import datetime
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
+import os
 
 #
 #   Renders to Word .docx
 #
 
-class WordRenderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputFilename):
+    def __init__(self, inputDir, outputDir, outputName):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
         self.document = Document()
-        self.currentParagraph = None
-        self.outputFilename = outputFilename
-        self.outputFilename = outputFilename
+        self.currentParagraph = self.document.add_paragraph()
+        self.outputFilename = os.path.join(outputDir, outputName + '.docx')
         self.inputDir = inputDir
         self.f = codecs.open('/dev/null', 'w', 'utf_8_sig')
         self.currentChapter = ''

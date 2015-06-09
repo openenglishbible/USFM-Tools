@@ -1,35 +1,31 @@
 import sys
 import os
 import importlib
+import subprocess
+import getopt
+
+# LOGGING
+import logging
+logger = logging.getLogger('USFM Tools')
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+ch.setFormatter(formatter)
+logger.addHandler(ch)    
 
 # Set Path for files in support/
 rootdiroftools = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(rootdiroftools,'support'))
 
-#from subprocess import Popen, PIPE, call
-import subprocess
-import getopt
-
+#IMPORT MODULES (TO BE DEPRECATED)
 import readerise
 import mediawikiPrinter
-
-import asciiRenderer
-import csvRenderer
-import mdRenderer
-import contextRenderer
-import singlehtmlRenderer
 import loutRenderer
 import htmlRenderer
-import wordRenderer
-
-def runscriptold(c, prefix=''):
-    print prefix + ':: ' + c
-    pp = Popen(c, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-    for ln in pp.stdout:
-        print prefix + ln[:-1]
 
 def runscript(c, prefix='', repeatFilter = ''):
-    print prefix + ':: ' + c
+    logging.debug(prefix + ':: ' + c)
     pp = subprocess.Popen([c], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     (result, stderrdata) = pp.communicate()
     print result
@@ -61,72 +57,12 @@ def buildLout(usfmDir, builtDir, buildName):
     print '     Copying into builtDir'
     runscript('cp "' + builtDir + '/working/lout/' + buildName + '.pdf" "' + builtDir + '/' + buildName + '.pdf" ', '       ')
 
-def buildConTeXt(usfmDir, builtDir, buildName, order):
-
-    print '#### Building PDF via ConTeXt...'
-
-    # Convert to ConTeXt
-    print '     Converting to ConTeXt...'
-    #c = texise.TransformToContext()
-    #c.setupAndRun(usfmDir, 'working/tex', buildName)
-    ensureOutputDir(builtDir + '/working/tex')
-    ensureOutputDir(builtDir + '/working/tex-working')
-    c = contextRenderer.ConTeXtRenderer(usfmDir, builtDir + '/working/tex/bible.tex')
-    c.render(order)
-
-    # Build PDF
-    print '     Building PDF..'
-    c = '. ./support/thirdparty/context/tex/setuptex ; cd "' + builtDir + '/working/tex-working"; rm * ; context ../tex/bible.tex; cp bible.pdf "../../' + buildName + '.pdf"'
-    runscript(c, '     ')
-
-def buildWeb(usfmDir, builtDir, buildName, oebFlag=False):
-    # Convert to HTML
-    print '#### Building HTML...'
-    ensureOutputDir(builtDir + '/' + buildName + '_html')
-    c = htmlRenderer.HTMLRenderer(usfmDir, builtDir + '/' + buildName + '_html', oebFlag)
-    c.render()
-
-def buildSingleHtml(usfmDir, builtDir, buildName, order="normal"):
-    # Convert to HTML
-    print '#### Building HTML...'
-    ensureOutputDir(builtDir)
-    c = singlehtmlRenderer.SingleHTMLRenderer(usfmDir, builtDir + '/' + buildName + '.html')
-    c.render(order)
-
-def buildWord(usfmDir, builtDir, buildName, order="normal"):
-    # Convert to HTML
-    print '#### Building Word...'
-    ensureOutputDir(builtDir)
-    c = wordRenderer.WordRenderer(usfmDir, builtDir + '/' + buildName + '.docx')
-    c.render(order)
-
-def buildCSV(usfmDir, builtDir, buildName):
-    # Convert to CSV
-    print '#### Building CSV...'
-    ensureOutputDir(builtDir)
-    c = csvRenderer.CSVRenderer(usfmDir, builtDir + '/' + buildName + '.csv.txt')
-    c.render()
-
 def buildReader(usfmDir, builtDir, buildName, order="normal"):
     # Convert to js for online reader
     print '#### Building for Reader...'
     ensureOutputDir(builtDir + 'en_oeb')
     c = readerise.ReaderRenderer(usfmDir, builtDir + '/' + buildName + '.js')
     c.render(order)
-
-def buildMarkdown(usfmDir, builtDir, buildName, order="normal"):
-    # Convert to Markdown for Pandoc
-    print '#### Building for Markdown...'
-    ensureOutputDir(builtDir)
-    c = mdRenderer.MarkdownRenderer(usfmDir, builtDir + '/' + buildName + '.md')
-    c.render(order)
-
-def buildASCII(usfmDir, builtDir, buildName):
-    # Convert to ASCII
-    print '#### Building for ASCII...'
-    ensureOutputDir(builtDir)
-    c = asciiRenderer.ASCIIRenderer(usfmDir, builtDir + '/' + buildName + '.txt')
-    c.render()
 
 def buildMediawiki(usfmDir, builtDir, buildName):
     # Convert to MediaWiki format for Door43
@@ -144,10 +80,11 @@ def saveCWD():    global savedCWD ; savedCWD = os.getcwd() ; os.chdir(rootdiroft
 def restoreCWD(): os.chdir(savedCWD)
     
 def main(argv):
+    # START
     saveCWD() 
     oebFlag = False  
     order="normal" 
-    print '#### Starting Build.'
+    logger.info('Starting Build.')
     try:
         opts, args = getopt.getopt(argv, "ht:u:b:n:or:", ["help", "target=", "usfmDir=", "builtDir=", "name=","oeb","order="])
     except getopt.GetoptError:
@@ -171,38 +108,24 @@ def main(argv):
         else:
             usage()
 
-    if targets == 'context':
-        buildConTeXt(usfmDir, buildDir, buildName, order)
-    elif targets == 'html':
-        buildWeb(usfmDir, buildDir, buildName, oebFlag)
-    elif targets == 'singlehtml':
-        buildSingleHtml(usfmDir, buildDir, buildName, order)
-    elif targets == 'md':
-        buildMarkdown(usfmDir, buildDir, buildName, order)
-    elif targets == 'reader':
+    if targets == 'reader':
         buildReader(usfmDir, buildDir, buildName)
     elif targets == 'mediawiki':
         buildMediawiki(usfmDir, buildDir, buildName)
     elif targets == 'lout':
         buildLout(usfmDir, buildDir, buildName)
-    elif targets == 'csv':
-        buildCSV(usfmDir, buildDir, buildName)
-    elif targets == 'ascii':
-        buildASCII(usfmDir, buildDir, buildName)
-    elif targets == 'csv':
-        buildCSV(usfmDir, buildDir, buildName)
-    elif targets == 'word':
-        buildWord(usfmDir, buildDir, buildName)
     else:
         try:
             m = importlib.import_module(targets + 'Renderer')
             ensureOutputDir(buildDir)
-            c = m.Renderer(usfmDir, buildDir + '/' + buildName + m.STANDARD_SUFFIX)
+            logger.info("\n  Building: " + usfmDir + "\n  into: " + buildDir + "\n  as: " + buildName)
+            c = m.Renderer(usfmDir, buildDir, buildName)
+            if oebFlag is True: c.setOEBFlag()
             c.render()
         except Exception as e:
-            print 'ERROR:', e
+            logger.exception('ERROR IN BUILD')
 
-    print '#### Finished.'
+    logger.info('Finished.')
     restoreCWD()
 
 def usage():
@@ -211,6 +134,14 @@ def usage():
         ----------
 
         Build script.  See source for details.
+        
+        In essense:
+        
+        python transform.py
+           --usfmDir=/dir/to/usfm
+           --builtDir=/dir/to/build/in 
+           --name=TranslationName
+           --target=rendererName (eg docx or csv)
                 
     """
 

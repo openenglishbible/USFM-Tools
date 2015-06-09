@@ -4,18 +4,33 @@
 import abstractRenderer
 import codecs
 import datetime
+import tempfile
+import subprocess
+import os
 
 #
 #   Renders to ConTeXt so we can make PDF. Main renderer for PDF of OEB
 #
 
-class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputFilename):
+    def runscript(self, c, prefix='', repeatFilter = ''):
+        print prefix + ':: ' + c
+        pp = subprocess.Popen([c], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        (result, stderrdata) = pp.communicate()
+        print result
+        print stderrdata
+        if not repeatFilter == '' and not stderrdata.find(repeatFilter) == -1:
+            runscript(c, prefix, repeatFilter)
+
+    def __init__(self, inputDir, outputDir, outputName):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
         # Unset
         self.f = None  # output file stream
         # IO
-        self.outputFilename = outputFilename
+        self.texFile = tempfile.NamedTemporaryFile()
+        self.texFileName = self.texFile.name
+        self.outputFilename = os.path.join(outputDir, outputName + '.pdf')
         self.inputDir = inputDir
         # Flags
         self.printerState = {u'li': False, u'd': False, u'm': False}
@@ -28,12 +43,18 @@ class ConTeXtRenderer(abstractRenderer.AbstractRenderer):
         self.smallcaps = False
 
     def render(self, order='normal'):
-        self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
+        # RENDER
+        self.f = codecs.open(self.texFileName, 'w', 'utf_8_sig')
         self.loadUSFM(self.inputDir)
         self.f.write(self.introTeXt)
         self.run(order)
         self.f.write(self.stopNarrower() + self.closeTeXt)
-        self.f.close()        
+        self.f.close()    
+        # GENERATE 
+        t = tempfile.mkdtemp()
+        c = '. ./support/thirdparty/context/tex/setuptex ; cd "' + t + '"; rm * ; context ' + self.texFileName + ' --result="' + self.outputFileName + '"'
+        self.runscript(c, '     ')
+        
     
     #
     #   Support

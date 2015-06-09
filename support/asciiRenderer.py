@@ -3,18 +3,20 @@
 
 import abstractRenderer
 import codecs
+import os
 
 #
 #   Simplest renderer. Ignores everything except ascii text.
 #
 
-class ASCIIRenderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputFilename):
+    def __init__(self, inputDir, outputDir, outputName):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
         # Unset
         self.f = None  # output file stream
         # IO
-        self.outputFilename = outputFilename
+        self.outputFilename = os.path.join(outputDir, outputName + '.txt')
         self.inputDir = inputDir
         # Flags
         self.d = False

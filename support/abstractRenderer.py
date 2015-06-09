@@ -3,14 +3,28 @@
 
 import books
 import parseUsfm
+import logging
 
 class AbstractRenderer(object):
+    
+    def __init__(self, inputDir, outputDir, outputName):
+        
+        # LOGGING
+        self.logger = logging.getLogger('Renderer')
+        self.logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        ch.setFormatter(formatter)
+        self.logger.addHandler(ch)    
 
+        self.oebFlag = False
+        
+    def setOEBFlag(self):
+        self.oebFlag = True
+        
     booksUsfm = None
     
-    def writeLog(self, s):
-        print s.encode('ascii', 'ignore')
-        
     def loadUSFM(self, usfmDir):
         self.booksUsfm = books.loadBooks(usfmDir)
 
@@ -26,7 +40,7 @@ class AbstractRenderer(object):
         if self.booksUsfm.has_key(bookName):
             tokens = parseUsfm.parseString(self.booksUsfm[bookName])
             for t in tokens: t.renderOn(self)
-            self.writeLog('     (' + bookName + ')')
+            self.logger.info('Rendered ' + bookName)
 
     def render_periph(self, token): pass
         
@@ -145,4 +159,4 @@ class AbstractRenderer(object):
     def render_pb(self, token):     pass
 
     # This is unknown!
-    def render_unknown(self, token):  self.writeLog("WARNING: Unknown token '" + token.value + "'" )
+    def render_unknown(self, token):  self.logger.warning("Unknown token '" + token.value + "'" )

@@ -17,9 +17,10 @@ class DummyFile(object):
     def write(self, str):
         pass
 
-class HTMLRenderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputDir, oebFlag=False):
+    def __init__(self, inputDir, outputDir, outputName):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
         # Unset
         self.f = DummyFile()  # output file stream
         self.ft = [] # array of text to write to file
@@ -35,8 +36,7 @@ class HTMLRenderer(abstractRenderer.AbstractRenderer):
         self.cv = u'001'    # Currrent Verse
         # Flags
         self.indentFlag = False
-        self.oebFlag = oebFlag
-        
+
     def render(self):
         # Write pages
         self.loadUSFM(self.inputDir)

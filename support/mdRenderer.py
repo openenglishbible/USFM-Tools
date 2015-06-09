@@ -4,6 +4,7 @@
 import abstractRenderer
 import codecs
 import StringIO
+import os
 
 IN = 1
 OUT = 2
@@ -13,14 +14,15 @@ JUSTOUT = 3
 #   Simplest renderer. Ignores everything except ascii text.
 #
 
-class MarkdownRenderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputFilename):
+    def __init__(self, inputDir, outputDir, outputName):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
         # Data
         self.stringStream = StringIO.StringIO()
         self.rendered = u''
         # IO
-        self.outputFilename = outputFilename
+        self.outputFilename = os.path.join(outputDir, outputName + '.md')
         self.inputDir = inputDir
         # Position
         self.currentC = 1
