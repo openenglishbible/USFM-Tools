@@ -18,10 +18,6 @@ clean-tmp ()
 	rm -r tmp	
 }
 
-OEBDIR=/Users/russellallen/Dropbox/oeb/Open-English-Bible/final-usfm
-#OEBDIR=/Users/russellallen/Documents/OEB/translations/usfm/web
-#OEBDIR=/Users/russellallen/Dropbox/oeb/Open-English-Bible/sources/tcnt/usfm
-
 ###############
 #
 #	Setup
@@ -32,7 +28,7 @@ rm -r built/*
 
 ###############
 #
-#	US NT
+#	NT
 #
 ###############
 
@@ -51,12 +47,6 @@ usnt() {
 	clean-tmp
 }
 
-###############
-#
-#	Cth NT
-#
-###############
-
 cthnt() {
 	make-tmp
 	cp $OEBDIR/cth/4* tmp
@@ -71,60 +61,9 @@ cthnt() {
 
 ###############
 #
-#    All US
+#    All
 #
 ###############
-
-simple-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=html       --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	python transform.py --target=singlehtml --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	python transform.py --target=md         --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
-
-pdf-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=context    --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
-
-html-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=html    --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
-
-csv-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=csv    --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
-
-md-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=md    --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
-
-reader-all-cth() {
-	make-tmp
-	cp $OEBDIR/cth/* tmp
-	python transform.py --target=reader --usfmDir=tmp/ --builtDir=$BUILTDIR --name=oeb-cth-dev --oeb
-	clean-tmp
-}
-
-word-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=word --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
 
 all-us() {
 	make-tmp
@@ -133,6 +72,12 @@ all-us() {
 	clean-tmp
 }
 
+all-cth() {
+	make-tmp
+	cp $OEBDIR/cth/* tmp
+	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-Cth --oeb
+	clean-tmp
+}
 
 ###############
 #
@@ -218,7 +163,9 @@ build-book ()
 #
 ###############
 
-BUILTDIR=/Users/russellallen/Dropbox/oeb/USFM-Tools/built/
+OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/development
+#OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/release
+BUILTDIR=/Users/russellallen/git/USFM-Tools/built/
 
 #usnt
 #cthnt
@@ -234,13 +181,13 @@ BUILTDIR=/Users/russellallen/Dropbox/oeb/USFM-Tools/built/
 #all-nt-psalms
 #all
 
-#BOOKFILE='38-Zechariah.usfm'
-#BOOKNAME=oeb-38-zechariah-2015-05-31
+#BOOKFILE='33-Micah.usfm'
+#BOOKNAME=oeb-33-michah-2015-12-14-released
 #TARGET=docx
 #build-book
 
-ID=2015-05-31
-TARGET=docx
-all-us
+ID=2015-12-07
+TARGET=context
+all-cth
 
 

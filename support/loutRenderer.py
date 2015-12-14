@@ -198,7 +198,7 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
         self.cb = books.bookKeyForIdValue(token.value)
         self.indentFlag = False
         self.closeChapter()
-    def render_ide(self, token):
+    def render_id_e(self, token):
         pass
     def render_h(self, token):   
         self.close()    
@@ -212,7 +212,7 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'\n@Display  { 13p } @Font { ' + self.escape(token.value, upper=True) + u'}')
     def render_mt3(self, token): 
         self.write(u'\n@Display  { 13p } @Font { ' + self.escape(token.value, upper=True) + u'}')
-    def renderMS(self, token):
+    def render_ms(self, token):
         self.closeSection()
         if not self.inSections: self.write(u'@BeginSections '); self.inSections = True
         self.write(u'\n@Section @Title {' + self.escape(token.value) + u'} @Begin @LP\n')
@@ -222,7 +222,7 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
         self.write(u'\n@Display @Heading {' + self.escape(token.value) + u'}\n')
     def render_p(self, token):
         self.newPara()
-    def renderPI(self, token):
+    def render_pi(self, token):
         self.newPara(outdent = True)
     def render_s1(self, token): 
         self.closePoetry();
@@ -231,29 +231,29 @@ class LoutRenderer(abstractRenderer.AbstractRenderer):
     def render_s2(self, token):
         self.closeDropCap(); 
         self.write(u'\n\n@DP\n')
-    def renderC(self, token):
+    def render_c(self, token):
         self.cc = token.value.zfill(3)
         self.registerForNextText = u' {@OuterNote { 10.5p @Font {@B ' + token.value + u'}}}'
-    def renderV(self, token):
+    def render_v(self, token):
         self.cv = token.value.zfill(3)
         if not self.cv == u'001':   self.registerForNextText = u' {@OuterNote { 8p @Font {' + token.value + u'}}}'
-    def renderTEXT(self, token):    self.formatText(token.value)
+    def render_text(self, token):    self.formatText(token.value)
     def render_q(self, token):       self.writeIndent(1)
     def render_q1(self, token):      self.writeIndent(1)
     def render_q2(self, token):      self.writeIndent(2)
     def render_q3(self, token):      self.writeIndent(3)
-    def renderNB(self, token):      self.newPara(indent = False)
-    def renderB(self, token):       self.newPara(indent = False); self.inPoetry = True
-    def renderFS(self, token):      self.write(u'@FootNote { ')
-    def renderFE(self, token):      self.write(u' }')
-    def renderIS(self, token):      self.write(u'{@I {')
-    def renderIE(self, token):      self.write(u'}}')
+    def render_nb(self, token):      self.newPara(indent = False)
+    def render_b(self, token):       self.newPara(indent = False); self.inPoetry = True
+    def render_f_s(self, token):      self.write(u'@FootNote { ')
+    def render_f_e(self, token):      self.write(u' }')
+    def render_i_s(self, token):      self.write(u'{@I {')
+    def render_i_e(self, token):      self.write(u'}}')
     def render_nd_s(self, token):     self.write(u'{@S {')
     def render_nd_e(self, token):     self.write(u'}}'); self.afterLord = True
-    def renderPBR(self, token):     self.write(u'@LLP ')
-    def renderSCS(self, token):     self.write(u'{@B {')
-    def renderSCE(self, token):     self.write(u'}}')
-    def renderD(self, token):       self.write(u'{@I {'); self.inD = True
+    def render_pbr(self, token):     self.write(u'@LLP ')
+    def render_sc_s(self, token):     self.write(u'{@B {')
+    def render_sc_e(self, token):     self.write(u'}}')
+    def render_d(self, token):       self.write(u'{@I {'); self.inD = True
 
 
    

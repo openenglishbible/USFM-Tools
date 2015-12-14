@@ -57,40 +57,40 @@ class ReaderRenderer(abstractRenderer.AbstractRenderer):
     def render_h(self, token):       pass 
     def render_mt(self, token):      pass
     def render_mt2(self, token):     pass
-    def renderMS(self, token):      pass
+    def render_ms(self, token):      pass
     def renderMS2(self, token):     pass
     def render_p(self, token):       pass
     def render_s1(self, token):       pass
     def render_s2(self, token):      pass
-    def renderC(self, token):
+    def render_c(self, token):
         if not token.value == '1':
             self.write(u"']]],")
         self.write("\n  [")
         self.preVFlag = True
         self.waitingForFirstVerse = True
-    def renderV(self, token):
+    def render_v(self, token):
         self.preVFlag = False
         if not self.waitingForFirstVerse:
             self.write(u"']], ")
         self.waitingForFirstVerse = False
         self.write("\n    [['")
-    def renderWJS(self, token):     pass
-    def renderWJE(self, token):     pass
-    def renderTEXT(self, token):
+    def render_wj_s(self, token):     pass
+    def render_wj_e(self, token):     pass
+    def render_text(self, token):
         if not self.preVFlag and not self.waitingForFirstVerse:
             self.write(self.escape(token.value) + ' ')
     def render_q(self, token):       pass
     def render_q1(self, token):      pass
     def render_q2(self, token):      pass
     def render_q3(self, token):      pass
-    def renderNB(self, token):      pass
-    def renderB(self, token):       pass
-    def renderIS(self, token):      pass
-    def renderIE(self, token):      pass
+    def render_nb(self, token):      pass
+    def render_b(self, token):       pass
+    def render_i_s(self, token):      pass
+    def render_i_e(self, token):      pass
     def render_nd_s(self, token):     pass
     def render_nd_e(self, token):     pass
-    def renderPBR(self, token):     pass
-    def renderSCS(self, token):     pass
-    def renderSCE(self, token):     pass
-    def renderFS(self, token):      pass
-    def renderFE(self, token):      pass
+    def render_pbr(self, token):     pass
+    def render_sc_s(self, token):     pass
+    def render_sc_e(self, token):     pass
+    def render_f_s(self, token):      pass
+    def render_f_e(self, token):      pass

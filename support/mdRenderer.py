@@ -61,19 +61,19 @@ class Renderer(abstractRenderer.AbstractRenderer):
         if self.ndStatus == JUSTOUT: self.ndStatus = OUT ; return ' ' + s if not s[0] == "'" else s
         return s
                     
-    def renderTEXT(self, token):    self.write(self.escape(token.value))
+    def render_text(self, token):    self.write(self.escape(token.value))
 
     def render_h(self, token):       self.book = token.getValue() ; self.write(u'\n\n\n\n')
     def render_mt(self, token):      self.write(u'\n\n' + token.value + u'\n' + (u'=' * len(token.value)) + u'\n')
     def render_mt2(self, token):     self.write(u'\n\n' + token.value + u'\n' + (u'-' * len(token.value)) + u'\n')
-    def renderMS(self, token):      self.write(u'\n\n### ' + token.value + u' ###\n')
+    def render_ms(self, token):      self.write(u'\n\n### ' + token.value + u' ###\n')
     def renderMS2(self, token):     self.write(u'\n\n#### ' + token.value + u' ####\n')
     def render_s1(self, token):       self.qStatus = OUT ; self.write(u'\n\n##### ' + token.value + u' #####\n\n')
     def render_s2(self, token):      self.qStatus = OUT ; self.write(u'\n\n###### ' + token.value + u' ######\n\n')
     def render_p(self, token):       self.qStatus = OUT ; self.write(u'\n\n')
-    def renderB(self, token):       self.write(u'\n\n')
-    def renderC(self, token):       self.currentC = token.value; self.write(u'\n\n [' + self.book + u' ' + self.currentC + u'] \n\n')
-    def renderV(self, token):       self.write(u' [' + self.currentC + u':' + token.value + u'] ')
+    def render_b(self, token):       self.write(u'\n\n')
+    def render_c(self, token):       self.currentC = token.value; self.write(u'\n\n [' + self.book + u' ' + self.currentC + u'] \n\n')
+    def render_v(self, token):       self.write(u' [' + self.currentC + u':' + token.value + u'] ')
     def render_q(self, token):
         if self.qStatus == OUT: 
             self.write(u'\n\n')
@@ -82,23 +82,23 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_q1(self, token):      self.render_q(token) 
     def render_q2(self, token):      self.write(u'\n|    ') 
     def render_q3(self, token):      self.write(u'\n|      ') 
-    def renderNB(self, token):      self.write(u'\n|  ') 
-    def renderLI(self, token):      self.write(u'* ')
-    def renderPBR(self, token):     self.write(u'\n')
+    def render_nb(self, token):      self.write(u'\n|  ') 
+    def render_li(self, token):      self.write(u'* ')
+    def render_pbr(self, token):     self.write(u'\n')
     
-    def renderFS(self,token):       self.write(u'^[')
-    def renderFE(self,token):       self.write(u']')
-    def renderFR(self, token):      self.write(self.escape(token.value))    
-    def renderFT(self, token):      self.write(self.escape(token.value))    
-    def renderFQ(self, token):      self.write(self.escape(token.value))    
+    def render_f_s(self,token):       self.write(u'^[')
+    def render_f_e(self,token):       self.write(u']')
+    def render_fr(self, token):      self.write(self.escape(token.value))    
+    def render_ft(self, token):      self.write(self.escape(token.value))    
+    def render_fq(self, token):      self.write(self.escape(token.value))    
 
-    def renderWJS(self,token):       self.write(u' ')
-    def renderWJE(self,token):       self.write(u' ')
+    def render_wj_s(self,token):       self.write(u' ')
+    def render_wj_e(self,token):       self.write(u' ')
 
-    def renderXS(self,token):       self.write(u'^[')
-    def renderXE(self,token):       self.write(u']')
-    def renderXO(self, token):      self.write(self.escape(token.value))
-    def renderXT(self, token):      self.write(self.escape(token.value))
+    def render_x_s(self,token):       self.write(u'^[')
+    def render_x_e(self,token):       self.write(u']')
+    def render_xo(self, token):      self.write(self.escape(token.value))
+    def render_xt(self, token):      self.write(self.escape(token.value))
     
     def render_nd_s(self,token):      self.ndStatus = IN
     def render_nd_e(self,token):      self.ndStatus = JUSTOUT

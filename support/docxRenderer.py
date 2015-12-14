@@ -59,29 +59,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def escapeText(self, s):
         return s.replace('&', '\\&').replace('%', '\\%')
- 
-    def markForSmallCaps(self):
-        if self.smallCapSections: 
-             self.smallcaps = True
-
-    def renderSmallCaps(self, s):
-        if self.smallcaps == True:
-            self.smallcaps = False
-            return self.smallCapText(s)
-        return s
-
-    def smallCapText(self, s):
-         i = 0
-         while i < len(s):
-             if i < 50:  #we are early, look for comma
-                 if s[i] == u',' or s[i] == u';' or s[i] == u'(' or s[i:i+3] == u'and':
-                     return u'{\sc ' + s[:i+1] + u'}' + s[i+1:]
-             else: # look for space
-                 if s[i] == ' ':
-                     return u'{\sc ' + s[:i] + u'}' + s[i:]
-             i = i + 1
-         return u'{\sc ' + s + u'}'
-         
+          
     def startLI(self):
         if self.printerState[u'li'] == False:
             self.printerState[u'li'] = True
@@ -148,17 +126,18 @@ class Renderer(abstractRenderer.AbstractRenderer):
     #
 
     def render_h(self, token):       self.document.add_page_break(); self.currentBook = token.getValue()
-    def render_mt(self, token):      self.document.add_heading(self.clean(token), level=0)
+    def render_mt1(self, token):     self.document.add_heading(self.clean(token), level=0)
     def render_mt2(self, token):     self.document.add_heading(self.clean(token), level=1)
-    def renderMS(self, token):       self.document.add_heading(self.clean(token), level=2)
-    def renderMS2(self, token):      self.document.add_heading(self.clean(token), level=3)
+    def render_ms1(self, token):     self.document.add_heading(self.clean(token), level=2)
+    def render_ms2(self, token):     self.document.add_heading(self.clean(token), level=3)
     def render_p(self, token):       self.newPara(); 
+    def render_pi(self, token):      self.newPara(); self.currentParagraph.left_indent = Inches(1)
 
     def render_s1(self, token):      self.document.add_heading(self.clean(token), level=4)
     def render_s2(self, token):      self.document.add_heading(self.clean(token), level=5)
 
-    def renderC(self, token):        self.currentChapter = token.getValue()
-    def renderV(self, token):
+    def render_c(self, token):        self.currentChapter = token.getValue()
+    def render_v(self, token):
         if token.getValue() == '1':
             run = self.currentParagraph.add_run(self.currentBook + ' ' + self.currentChapter + ' ')
             run.font.color.rgb = RGBColor(255, 0, 0)
@@ -167,7 +146,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
             run.font.color.rgb = RGBColor(0, 140, 0)
         run.font.superscript = True
             
-    def renderTEXT(self, token):
+    def render_text(self, token):
         run = self.currentParagraph.add_run(self.clean(token) + ' ')
         if self.in_nd: 
             run.font.small_caps = True
@@ -179,34 +158,40 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_q1(self, token):     self.newPara(); self.currentParagraph.paragraph_format.space_after = Pt(0)
     def render_q2(self, token):     self.newPara(); self.currentParagraph.paragraph_format.space_after = Pt(0); self.currentParagraph.add_run('\t')
     def render_q3(self, token):     self.newPara(); self.currentParagraph.paragraph_format.space_after = Pt(0); self.currentParagraph.add_run('\t\t')
-    def renderNB(self, token):      self.newPara(); self.currentParagraph.left_indent = Inches(0)
-    def renderB(self, token):       self.newPara(); self.currentParagraph.paragraph_format.space_after = Pt(0)
+    def render_nb(self, token):     self.newPara(); self.currentParagraph.left_indent = Inches(0)
+    def render_b(self, token):      self.newPara(); self.currentParagraph.paragraph_format.space_after = Pt(0)
 
-    def renderFS(self, token):
+    def render_d(self, token):      self.newPara(); self.currentParagraph.paragraph_format.space_after = Pt(0)
+
+    def render_f_s(self, token):
         run = self.currentParagraph.add_run(' [[ ')
         run.font.color.rgb = RGBColor(0, 0, 140)
         self.in_footnote = True
-    def renderFE(self, token):
+    def render_f_e(self, token):
         run = self.currentParagraph.add_run(' ]] ')
         run.font.color.rgb = RGBColor(0, 0, 140)
         self.in_footnote = False
     
-    def renderIS(self, token):      self.f.write( u'{\em ' )
-    def renderIE(self, token):      self.f.write( u'} ' )
-    def renderADDS(self, token):    self.f.write( u'{\em ' )
-    def renderADDE(self, token):    self.f.write( u'} ' )
+    def render_nd_s(self, token): pass
+    def render_nd_e(self, token):
+        run = self.currentParagraph.runs[-1]
+        run.font.small_caps = True
 
-    def render_nd_s(self, token):   self.in_nd = True
-    def render_nd_e(self, token):   self.in_nd = False
-    def renderLI(self, token):      self.f.write( self.startLI() )
-    def renderD(self, token):       self.f.write( self.startD() )
-    def renderSP(self, token):      self.f.write( self.startD() )
-    def renderPBR(self, token):     self.f.write( u' \\\\ ' )
-    def renderFR(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
-    def renderFRE(self, token):     self.f.write( u' ' )
-    def renderFK(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
-    def renderFT(self, token):      self.f.write( u' ' + token.getValue() + u' ' )
-    def renderPI(self, token):      self.render_q(token)
+    def render_em_s(self, token): pass
+    def render_em_e(self, token):
+        run = self.currentParagraph.runs[-1]
+        run.italic = True
+
+    # SELAH
+    def render_qs_s(self, token): pass
+    def render_qs_e(self, token):
+        run = self.currentParagraph.runs[-1]
+        run.italic = True
+
+    def render_wj_s(self, token): pass
+    def render_wj_e(self, token):
+        run = self.currentParagraph.runs[-1]
+        run.font.color.rgb = RGBColor(140, 0, 0)
     
     def render_is1(self, token):    self.render_s1(token)
     def render_ip(self, token):     self.render_p(token)
@@ -215,7 +200,6 @@ class Renderer(abstractRenderer.AbstractRenderer):
     
     def render_pb(self, token):     self.document.add_page_break()
     def render_m(self, token):      self.render_p(token)
-    def render_periph(self, token): pass
     
     #
     #   Introductory codes

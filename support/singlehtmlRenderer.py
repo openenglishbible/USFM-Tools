@@ -135,7 +135,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_h(self, token):       self.bookname = token.value 
     def render_mt(self, token):      self.write(u'\n\n<h1>' + token.value + u'</h1>')
     def render_mt2(self, token):     self.write(u'\n\n<h2>' + token.value + u'</h2>')
-    def renderMS(self, token):      self.write(u'\n\n<h3>' + token.value + u'</h3>')
+    def render_ms(self, token):      self.write(u'\n\n<h3>' + token.value + u'</h3>')
     def renderMS2(self, token):     self.write(u'\n\n<h4>' + token.value + u'</h4>')
     def render_p(self, token):
         self.indentFlag = False
@@ -146,27 +146,27 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_s2(self, token):
         self.indentFlag = False
         self.write(u'\n\n<p align="center">----</p>')
-    def renderC(self, token):
+    def render_c(self, token):
         self.cc = token.value.zfill(3)
         self.write(u'\n\n<p class="c-num">[' + self.bookname + u' ' + token.value + u']</p>')
-    def renderV(self, token):
+    def render_v(self, token):
         self.cv = token.value.zfill(3)
         self.write(u' <span class="v-num">[' + token.value + u']</span> ')
-    def renderWJS(self, token):     self.write(u'<span class="woc">')
-    def renderWJE(self, token):     self.write(u'</span>')
-    def renderTEXT(self, token):    self.write(u" " + self.escape(token.value) + u" ")
+    def render_wj_s(self, token):     self.write(u'<span class="woc">')
+    def render_wj_e(self, token):     self.write(u'</span>')
+    def render_text(self, token):    self.write(u" " + self.escape(token.value) + u" ")
     def render_q(self, token):       self.writeIndent(1)
     def render_q1(self, token):      self.writeIndent(1)
     def render_q2(self, token):      self.writeIndent(2)
     def render_q3(self, token):      self.writeIndent(3)
-    def renderNB(self, token):      self.writeIndent(0)
-    def renderB(self, token):       self.write(u'\n\n<p class="indent-0">&nbsp;</p>')
-    def renderIS(self, token):      self.write(u'<i>')
-    def renderIE(self, token):      self.write(u'</i>')
+    def render_nb(self, token):      self.writeIndent(0)
+    def render_b(self, token):       self.write(u'\n\n<p class="indent-0">&nbsp;</p>')
+    def render_i_s(self, token):      self.write(u'<i>')
+    def render_i_e(self, token):      self.write(u'</i>')
     def render_nd_s(self, token):     self.write(u'<span class="tetragrammaton">')
     def render_nd_e(self, token):     self.write(u'</span>')
-    def renderPBR(self, token):     self.write(u'<br />')
-    def renderSCS(self, token):     self.write(u'<b>')
-    def renderSCE(self, token):     self.write(u'</b>')
-    def renderFS(self, token):     self.write(u'[Note: ')
-    def renderFE(self, token):     self.write(u' ]')
+    def render_pbr(self, token):     self.write(u'<br />')
+    def render_sc_s(self, token):     self.write(u'<b>')
+    def render_sc_e(self, token):     self.write(u'</b>')
+    def render_f_s(self, token):     self.write(u'[Note: ')
+    def render_f_e(self, token):     self.write(u' ]')

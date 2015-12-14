@@ -168,11 +168,11 @@ class ReaderPrinter(object):
         self.writeHeader()
         self.indentFlag = False
 
-    def render_ide(self, token):     pass
+    def render_id_e(self, token):     pass
     def render_h(self, token):       self.write(u'\n<h1 class="book-name">' + token.value + u'</h1>')
     def render_mt(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
     def render_mt2(self, token):      self.write(u'\n<h3>' + token.value + u'</h3>')
-    def renderMS(self, token):
+    def render_ms(self, token):
         if self.inSpanFlag:
                 self.inSpanFlag = False
                 self.write(u'</span>')
@@ -195,7 +195,7 @@ class ReaderPrinter(object):
         self.indentFlag = False
     def render_s2(self, token):
         self.indentFlag = False
-    def renderC(self, token):
+    def render_c(self, token):
         if token.value.zfill(3) == u'001':
             self.incrementChapter(token.value.zfill(3))
             self.write(u'\n<h2 class="chapter-num">' + token.value + u'</h2>\n<p>')
@@ -215,7 +215,7 @@ class ReaderPrinter(object):
             self.openNextFile()
             self.writeHeader(token.value)
             self.inParaFlag = True  
-    def renderV(self, token):
+    def render_v(self, token):
         if u'-' in token.value: # Complex, eg 42-43
             self.cv = token.value[:token.value.index(u'-')].zfill(3)
         else:
@@ -233,31 +233,31 @@ class ReaderPrinter(object):
             self.inSpanFlag = True
             self.write(u'\n<span class="verse ' + books.readerName(self.cb) + u"_" + str(int(self.cc)) + u"_" + str(int(self.cv)) + u'" data-osis="' + books.readerName(self.cb) + u'.' + str(int(self.cc)) + u"." + str(int(self.cv)) + u'"><span class="verse-num v-' + str(int(self.cv)) + u'">' + token.value + u'&nbsp;</span>')
  
-    def renderWJS(self, token):     self.write(u'<span class="woc">')
-    def renderWJE(self, token):     self.write(u'</span>')
-    def renderTEXT(self, token):    self.write(token.value)
+    def render_wj_s(self, token):     self.write(u'<span class="woc">')
+    def render_wj_e(self, token):     self.write(u'</span>')
+    def render_text(self, token):    self.write(token.value)
     def render_q(self, token):       self.writeIndent(1)
     def render_q1(self, token):      self.writeIndent(1)
     def render_q2(self, token):      self.writeIndent(2)
     def render_q3(self, token):      self.writeIndent(3)
-    def renderNB(self, token):      self.writeIndent(0)
-    def renderQTS(self, token):     pass
-    def renderQTE(self, token):     pass
-    def renderFS(self, token):      self.write(u'{')
-    def renderFE(self, token):      self.write(u'}')
-    def renderIS(self, token):      self.write(u'<i>')
-    def renderIE(self, token):      self.write(u'</i>')
-    def renderB(self, token):       self.write(u'<p />')
-    def renderD(self, token):       self.write(u'<p />')
-    def renderADDS(self, token):    self.write(u'<i>')
-    def renderADDE(self, token):    self.write(u'</i>')
-    def renderLI(self, token):      self.write(u'<p />')
-    def renderSP(self, token):      self.write(u'<p />')
+    def render_nb(self, token):      self.writeIndent(0)
+    def render_qt_s(self, token):     pass
+    def render_qt_e(self, token):     pass
+    def render_f_s(self, token):      self.write(u'{')
+    def render_f_e(self, token):      self.write(u'}')
+    def render_i_s(self, token):      self.write(u'<i>')
+    def render_i_e(self, token):      self.write(u'</i>')
+    def render_b(self, token):       self.write(u'<p />')
+    def render_d(self, token):       self.write(u'<p />')
+    def render_add_s(self, token):    self.write(u'<i>')
+    def render_add_e(self, token):    self.write(u'</i>')
+    def render_li(self, token):      self.write(u'<p />')
+    def render_sp(self, token):      self.write(u'<p />')
     def render_nd_s(self, token):     self.write(u' ')
     def render_nd_e(self, token):     self.write(u' ')
-    def renderPBR(self, token):     self.write(u'<br />')
-    def renderD(self, token):       pass # For now
-    def renderREM(self, token):     pass # This is for comments in the USFM
+    def render_pbr(self, token):     self.write(u'<br />')
+    def render_d(self, token):       pass # For now
+    def render_rem(self, token):     pass # This is for comments in the USFM
     
     
 class TransformForReader(object):

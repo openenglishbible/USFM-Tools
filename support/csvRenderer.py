@@ -41,13 +41,13 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def render_id(self, token): 
         self.cb = books.bookKeyForIdValue(token.value)
-    def renderC(self, token):
+    def render_c(self, token):
         self.cc = token.value.zfill(3)
-    def renderV(self, token):
+    def render_v(self, token):
         self.cv = token.value.zfill(3)
         if not self.verseHadContent: self.f.write(u' ~')
         self.verseHadContent = False
         self.f.write(u'\n' + books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + str(int(self.cv.split('-')[0]))   + ' ') # str(int(self.cb))
-    def renderTEXT(self, token):    self.verseHadContent = True ; self.f.write(self.escape(token.value) + ' ')
-    def renderFS(self, token):      self.infootnote = True
-    def renderFE(self, token):      self.infootnote = False
+    def render_text(self, token):    self.verseHadContent = True ; self.f.write(self.escape(token.value) + ' ')
+    def render_f_s(self, token):      self.infootnote = True
+    def render_f_e(self, token):      self.infootnote = False

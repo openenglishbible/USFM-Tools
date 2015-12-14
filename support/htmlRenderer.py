@@ -108,7 +108,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.indentFlag = False
     def render_mt(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
     def render_mt2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
-    def renderMS(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p>')
+    def render_ms(self, token):      self.write(u'</p><h4>' + token.value + u'</h4><p>')
     def renderMS2(self, token):     self.write(u'</p><h5>' + token.value + u'</h5><p>')
     def render_p(self, token):
         self.indentFlag = False
@@ -123,42 +123,42 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_s2(self, token):
         self.indentFlag = False
         self.write(u'</p><h7>' + token.value + u'</h7><p>')
-    def renderC(self, token):
+    def render_c(self, token):
         self.cc = token.value.zfill(3)
         self.cachedChapterMarker = u'<span class="chapter" id="' + self.cc + u'001">' + token.value + u'</span>'
         # if self.cb==u'019': self.write(u'<p><em>Psalm ' + token.value + u'</em></p>')
-    def renderV(self, token):
+    def render_v(self, token):
         self.cv = token.value.zfill(3)
         if self.cv == u'001':
             self.writeChapterMarker()
         else:
             self.write(u'\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + u'" id="' + self.cc + self.cv + u'" >' + token.value + u'</span>\n')
-    def renderWJS(self, token):     self.write(u'<span class="woc">')
-    def renderWJE(self, token):     self.write(u'</span>')
+    def render_wj_s(self, token):     self.write(u'<span class="woc">')
+    def render_wj_e(self, token):     self.write(u'</span>')
 
     def render_nd_s(self, token):     self.write(u'<span class="nd">')
     def render_nd_e(self, token):     self.write(u'</span>')
 
-    def renderTEXT(self, token):    self.write(u" " + token.value + u" ")
+    def render_text(self, token):    self.write(u" " + token.value + u" ")
     def render_q(self, token):       self.writeIndent(1)
     def render_q1(self, token):      self.writeIndent(1)
     def render_q2(self, token):      self.writeIndent(2)
     def render_q3(self, token):      self.writeIndent(3)
-    def renderNB(self, token):      self.writeIndent(0)
-    def renderB(self, token):       self.write(u'<br />')
-    def renderIS(self, token):      self.write(u'<i>')
-    def renderIE(self, token):      self.write(u'</i>')
-    def renderPBR(self, token):     self.write(u'<br />')
+    def render_nb(self, token):      self.writeIndent(0)
+    def render_b(self, token):       self.write(u'<br />')
+    def render_i_s(self, token):      self.write(u'<i>')
+    def render_i_e(self, token):      self.write(u'</i>')
+    def render_pbr(self, token):     self.write(u'<br />')
     
-    def renderD(self, token):       self.writeChapterMarker()
+    def render_d(self, token):       self.writeChapterMarker()
 
     def render_is1(self, token):    self.render_s1(token)
     def render_ip(self, token):     self.render_p(token)
     def render_iot(self, token):    self.render_q(token)
     def render_io1(self, token):    self.render_q2(token)
     
-    def renderFS(self, token):      self.write(u'<span class="rightnotemarker">*</span><span class="rightnote">')
-    def renderFE(self, token):      self.write(u'</span>')
+    def render_f_s(self, token):      self.write(u'<span class="rightnotemarker">*</span><span class="rightnote">')
+    def render_f_e(self, token):      self.write(u'</span>')
     
 
 #

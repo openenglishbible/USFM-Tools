@@ -65,26 +65,26 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_h(self, token):       self.f.write(u'\n\n\n### ' + token.value + u' ###\n\n\n')
     def renderMS2(self, token):     self.f.write(u'\n\n[' + token.value + u']\n\n')
     def render_p(self, token):       self.f.write(self.stopD() + self.stopNarrower() + u'\n\n    ')
-    def renderB(self, token):       self.f.write(self.stopD() + self.stopNarrower() + u'\n\n    ')
+    def render_b(self, token):       self.f.write(self.stopD() + self.stopNarrower() + u'\n\n    ')
     def render_s1(self, token):       self.f.write(self.stopD() + self.stopNarrower() + u'\n\n    ')
     def render_s2(self, token):      self.f.write(self.stopD() + self.stopNarrower() + u'\n\n    ')
-    def renderC(self, token):       self.f.write(u' ' )
-    def renderV(self, token):       self.f.write(u' ' )
-    def renderTEXT(self, token):    self.f.write(self.escape(token.value))
+    def render_c(self, token):       self.f.write(u' ' )
+    def render_v(self, token):       self.f.write(u' ' )
+    def render_text(self, token):    self.f.write(self.escape(token.value))
     def render_q(self, token):       self.f.write(self.stopD() + self.startNarrower(1))
     def render_q1(self, token):      self.f.write(self.stopD() + self.startNarrower(1))
     def render_q2(self, token):      self.f.write(self.stopD() + self.startNarrower(2))
     def render_q3(self, token):      self.f.write(self.stopD() + self.startNarrower(3))
-    def renderNB(self, token):      self.f.write(self.stopD() + self.stopNarrower() + u"\n\n")
-    def renderLI(self, token):      self.f.write(u' ')
-    def renderD(self, token):       self.f.write(self.startD())
-    def renderSP(self, token):      self.f.write(self.startD())
+    def render_nb(self, token):      self.f.write(self.stopD() + self.stopNarrower() + u"\n\n")
+    def render_li(self, token):      self.f.write(u' ')
+    def render_d(self, token):       self.f.write(self.startD())
+    def render_sp(self, token):      self.f.write(self.startD())
     def render_nd_e(self, token):     self.f.write(u' ')
-    def renderPBR(self, token):     self.f.write(u'\n')
+    def render_pbr(self, token):     self.f.write(u'\n')
     
     # Ignore...
-    def renderXS(self,token):       self.inX = True
-    def renderXE(self,token):       self.inX = False
-    def renderFS(self,token):       self.inFootnote = True
-    def renderFE(self,token):       self.inFootnote = False
+    def render_x_s(self,token):       self.inX = True
+    def render_x_e(self,token):       self.inX = False
+    def render_f_s(self,token):       self.inFootnote = True
+    def render_f_e(self,token):       self.inFootnote = False
             

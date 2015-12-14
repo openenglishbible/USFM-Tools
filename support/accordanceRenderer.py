@@ -32,6 +32,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.atStart = True
         self.ndStatus = OUT
         self.beforeFirstVerse = True
+        self.inD = False
         
     def render(self):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8') # 'utf_8_sig macroman
@@ -56,9 +57,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def render_id(self, token): 
         self.cb = books.bookKeyForIdValue(token.value)
-    def renderC(self, token):
+    def render_c(self, token):
         self.cc = token.value.zfill(3)
-    def renderV(self, token):
+    def render_v(self, token):
         self.cv = token.value.zfill(3)
         if not self.verseHadContent: self.write(u' ~')
         self.verseHadContent = False
@@ -67,13 +68,46 @@ class Renderer(abstractRenderer.AbstractRenderer):
         else:
             self.f.write(u'\n')
         self.f.write(books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + str(int(self.cv.split('-')[0]))   + ' ') # str(int(self.cb))
-    def renderTEXT(self, token):    self.verseHadContent = True ; self.write(self.escape(token.value + ' '))
-    def renderFS(self, token):      self.infootnote = True
-    def renderFE(self, token):      self.infootnote = False
-    def renderP(self, token):       self.write(u' ¶ ')
-    def render_nd_s(self,token):    self.ndStatus = IN; self.write(u'<c>')
-    def render_nd_e(self,token):    self.ndStatus = JUSTOUT; self.write(u'</c>')
-    def render_q1(self, token):     self.write(u'<br>\t')
-    def render_q2(self, token):     self.write(u'<br>\t\t') 
-    def render_q3(self, token):     self.write(u'<br>\t\t\t') 
+    def render_text(self, token):
+        self.verseHadContent = True
+        self.write(self.escape(token.value + ' '))
+        if self.inD:
+            self.inD = False
+            self.write('</i>')
+    def render_f_s(self, token):     self.write(u'<sup>[')
+    def render_f_e(self, token):     self.write(u']</sup>')
+    def render_p(self, token):       self.write(u' ¶ ')
+    def render_pi(self, token):      self.write(u' ¶ ')
+    def render_m(self, token):       self.write(u' ¶ ')
+    def render_nb(self, token):      self.write(u' ¶ ')
+    def render_nd_s(self,token):     self.ndStatus = IN; self.write(u'<c>')
+    def render_nd_e(self,token):     self.ndStatus = JUSTOUT; self.write(u'</c>')
+    def render_q1(self, token):      self.write(u'<br>\t')
+    def render_q2(self, token):      self.write(u'<br>\t\t') 
+    def render_q3(self, token):      self.write(u'<br>\t\t\t') 
+    def render_b(self, token):       self.write(u'<br>') 
+    def render_qs_s(self, token):    self.write(u'<i>') 
+    def render_qs_e(self, token):    self.write(u'</i>') 
+    def render_em_s(self, token):    self.write(u'<i>') 
+    def render_em_e(self, token):    self.write(u'</i>') 
     
+    def render_d(self, token):
+        """ Accordance """
+        self.inD = True
+        # Accordance requries Psalms to have :0 verse
+        if books.accordanceNameForBookKey(self.cb) == 'Psa':
+            self.f.write(                         u'\n' +
+                books.accordanceNameForBookKey(self.cb) + 
+                                                    ' ' + 
+                                      str(int(self.cc)) + 
+                                            u':0 ¶ <i>' )
+    
+    # Ignored
+    def render_h(self, token):      pass
+    def render_mt(self, token):     pass
+    def render_mt2(self, token):    pass
+    def render_ms(self, token):     pass
+    def render_ms2(self, token):    pass
+    def render_s(self, token):      pass
+    def render_wj_s(self, token):   pass
+    def render_wj_e(self, token):   pass

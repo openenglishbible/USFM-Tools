@@ -42,121 +42,133 @@ class AbstractRenderer(object):
             for t in tokens: t.renderOn(self)
             self.logger.info('Rendered ' + bookName)
 
-    def render_periph(self, token): pass
+    def render_periph(self, token): return self.render_unhandled(token)
         
     def render_id(self, token):     pass
     def render_ide(self, token):    pass
-    def render_h(self, token):      pass 
+    def render_h(self, token):      return self.render_unhandled(token) 
 
-    def render_mt(self, token):     pass
-    def render_mt1(self, token):    return self.render_mt(token)
-    def render_mt2(self, token):    pass
-    def render_mt3(self, token):    pass
+    def render_mt(self, token):     return self.render_mt1(token)
+    def render_mt1(self, token):    return self.render_unhandled(token)
+    def render_mt2(self, token):    return self.render_unhandled(token)
+    def render_mt3(self, token):    return self.render_unhandled(token)
 
-    def renderMS(self, token):      pass
-    def renderMS1(self, token):     return self.renderST(token)
-    def renderMS2(self, token):     pass
-    def renderMR(self, token):      pass
-    def renderMI(self, token):      pass
+    def render_ms(self, token):      return self.render_ms1(token)
+    def render_ms1(self, token):     return self.render_unhandled(token)
+    def render_ms2(self, token):     return self.render_unhandled(token)
+    def render_mr(self, token):      return self.render_unhandled(token)
+    def render_mi(self, token):      return self.render_unhandled(token)
 
-    def render_p(self, token):       pass
-    def renderSP(self, token):      pass
-    def render_m(self, token):      pass
+    def render_p(self, token):      return self.render_unhandled(token)
+    def render_sp(self, token):     return self.render_unhandled(token)
+    def render_m(self, token):      return self.render_unhandled(token)
 
     def render_s(self, token):      return self.render_s1(token)
-    def render_s1(self, token):     pass
-    def render_s2(self, token):     pass
-    def render_s3(self, token):     pass
+    def render_s1(self, token):     return self.render_unhandled(token)
+    def render_s2(self, token):     return self.render_unhandled(token)
+    def render_s3(self, token):     return self.render_unhandled(token)
 
-    def renderC(self, token):       pass
-    def renderV(self, token):       pass
+    def render_c(self, token):       return self.render_unhandled(token)
+    def render_v(self, token):       return self.render_unhandled(token)
 
-    def renderWJ(self, token):      return self.renderWJS(token)
-    def renderWJS(self, token):     pass
-    def renderWJE(self, token):     pass
+    def render_wj(self, token):      return self.render_wj_s(token)
+    def render_wj_s(self, token):     return self.render_unhandled(token)
+    def render_wj_e(self, token):     return self.render_unhandled(token)
 
-    def renderTEXT(self, token):    pass
+    def render_text(self, token):    return self.render_unhandled(token)
 
     def render_q(self, token):      return self.render_q1(token)
-    def render_q1(self, token):     pass
-    def render_q2(self, token):     pass
-    def render_q3(self, token):     pass
+    def render_q1(self, token):     return self.render_unhandled(token)
+    def render_q2(self, token):     return self.render_unhandled(token)
+    def render_q3(self, token):     return self.render_unhandled(token)
 
-    def renderNB(self, token):      pass
-    def renderB(self, token):       pass
+    def render_nb(self, token):      return self.render_unhandled(token)
+    def render_b(self, token):       return self.render_unhandled(token)
 
-    def renderQT(self, token):      return self.renderQTS(token)
-    def renderQTS(self, token):     pass
-    def renderQTE(self, token):     pass
+    def render_qt(self, token):      return self.render_qt_s(token)
+    def render_qt_s(self, token):     return self.render_unhandled(token)
+    def render_qt_e(self, token):     return self.render_unhandled(token)
 
-    def renderR(self, token):       pass
+    def render_r(self, token):       return self.render_unhandled(token)
 
-    def renderF(self, token):       return self.renderFS(token)
-    def renderFS(self, token):      pass
-    def renderFE(self, token):      pass
-    def renderFR(self, token):      pass    
-    def renderFRE(self, token):     pass    
-    def renderFK(self, token):      pass    
-    def renderFT(self, token):      pass    
-    def renderFQ(self, token):      pass    
+    def render_f(self, token):       return self.render_f_s(token)
+    def render_f_s(self, token):      return self.render_unhandled(token)
+    def render_f_e(self, token):      return self.render_unhandled(token)
+    def render_fr(self, token):      return self.render_unhandled(token)    
+    def render_fr_e(self, token):     return self.render_unhandled(token)    
+    def render_fk(self, token):      return self.render_unhandled(token)    
+    def render_ft(self, token):      return self.render_unhandled(token)    
+    def render_fq(self, token):      return self.render_unhandled(token)    
 
-    # HACK!
-    def renderIT(self, token):      return self.renderIS(token)
-    def renderITE(self, token):     return self.renderIE(token)
-    def renderIS(self, token):      pass
-    def renderIE(self, token):      pass
+    def render_it(self, token):      return self.render_it_s(token)
+    def render_it_s(self, token):      return self.render_unhandled(token)
+    def render_it_e(self, token):      return self.render_unhandled(token)
+    def render_em(self, token):      return self.render_em_s(token)
+    def render_em_s(self, token):      return self.render_unhandled(token)
+    def render_em_e(self, token):      return self.render_unhandled(token)
 
-    def render_nd(self, token):      return self.render_nd_s(token)
-    def render_nd_s(self, token):     pass
-    def render_nd_e(self, token):     pass
+    def render_qs(self, token):      return self.render_qs_s(token)
+    def render_qs_s(self, token):      return self.render_unhandled(token)
+    def render_qs_e(self, token):      return self.render_unhandled(token)
 
-    def renderPBR(self, token):     pass
-    def renderD(self, token):       pass 
-    def renderREM(self, token):     pass 
-    def renderPI(self, token):      pass
-    def renderLI(self, token):      pass
+    def render_nd(self, token):       return self.render_nd_s(token)
+    def render_nd_s(self, token):     return self.render_unhandled(token)
+    def render_nd_e(self, token):     return self.render_unhandled(token)
 
-    def renderX(self, token):       return self.renderXS(token)
-    def renderXS(self, token):      pass
-    def renderXE(self, token):      pass
-    def renderXO(self, token):      pass
-    def renderXT(self, token):      pass
+    def render_pbr(self, token):     return self.render_unhandled(token)
+    def render_d(self, token):       return self.render_unhandled(token) 
+    def render_rem(self, token):     pass
+    def render_pi(self, token):      return self.render_unhandled(token)
+    def render_li(self, token):      return self.render_unhandled(token)
 
-    def renderXDC(self, token):     return self.renderXDCS(token)
-    def renderXDCS(self, token):    pass
-    def renderXDCE(self, token):    pass
+    def render_x(self, token):       return self.render_x_s(token)
+    def render_x_s(self, token):      return self.render_unhandled(token)
+    def render_x_e(self, token):      return self.render_unhandled(token)
+    def render_xo(self, token):      return self.render_unhandled(token)
+    def render_xt(self, token):      return self.render_unhandled(token)
 
-    def renderTL(self, token):      return self.renderTLS(token)
-    def renderTLS(self, token):     pass
-    def renderTLE(self, token):     pass
+    def render_xdc(self, token):     return self.render_xdc_s(token)
+    def render_xdc_s(self, token):    return self.render_unhandled(token)
+    def render_xdc_e(self, token):    return self.render_unhandled(token)
 
-    def renderADD(self, token):     return self.renderADDS(token)
-    def renderADDS(self, token):    pass
-    def renderADDE(self, token):    pass
+    def render_tl(self, token):      return self.render_tl_s(token)
+    def render_tl_s(self, token):     return self.render_unhandled(token)
+    def render_tl_e(self, token):     return self.render_unhandled(token)
+
+    def render_add(self, token):     return self.render_add_s(token)
+    def render_add_s(self, token):    return self.render_unhandled(token)
+    def render_add_e(self, token):    return self.render_unhandled(token)
     
-    def render_toc1(self, token):   pass
-    def render_toc2(self, token):   pass
-    def render_toc3(self, token):   pass
+    def render_toc1(self, token):   return self.render_unhandled(token)
+    def render_toc2(self, token):   return self.render_unhandled(token)
+    def render_toc3(self, token):   return self.render_unhandled(token)
 
-    def render_is1(self, token):    pass
-    def render_ip(self, token):     pass
-    def render_iot(self, token):    pass
-    def render_io1(self, token):    pass
-    def render_io2(self, token):    pass
+    def render_is1(self, token):    return self.render_unhandled(token)
+    def render_ip(self, token):     return self.render_unhandled(token)
+    def render_iot(self, token):    return self.render_unhandled(token)
+    def render_io1(self, token):    return self.render_unhandled(token)
+    def render_io2(self, token):    return self.render_unhandled(token)
 
     def render_ior(self, token):    return self.render_ior_s(token)
-    def render_ior_s(self, token):  pass
-    def render_ior_e(self, token):  pass
+    def render_ior_s(self, token):  return self.render_unhandled(token)
+    def render_ior_e(self, token):  return self.render_unhandled(token)
     
     def render_bk(self, token):     return self.render_bk_s(token)
-    def render_bk_s(self, token):   pass
-    def render_bk_e(self, token):   pass
+    def render_bk_s(self, token):   return self.render_unhandled(token)
+    def render_bk_e(self, token):   return self.render_unhandled(token)
 
-    def renderSC(self, token):      return self.renderSCS(token)
-    def renderSCS(self, token):     pass
-    def renderSCE(self, token):     pass
+    def render_sc(self, token):      return self.render_sc_s(token)
+    def render_sc_s(self, token):     return self.render_unhandled(token)
+    def render_sc_e(self, token):     return self.render_unhandled(token)
 
-    def render_pb(self, token):     pass
+    def render_q_s(self, token):    return self.render_qs_s(token)
+    def render_qs_s(self, token):  return self.render_unhandled(token)
+    def render_qs_e(self, token):  return self.render_unhandled(token)
+
+    def render_pb(self, token):     return self.render_unhandled(token)
 
     # This is unknown!
-    def render_unknown(self, token):  self.logger.warning("Unknown token '" + token.value + "'" )
+    def render_unknown(self, token):  self.logger.warning("Unknown token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
+
+    # We do not handle this!
+    def render_unhandled(self, token):  self.logger.warning("Unhandled token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
