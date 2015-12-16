@@ -38,9 +38,10 @@ class AbstractRenderer(object):
             
     def renderBook(self, bookName):
         if self.booksUsfm.has_key(bookName):
+            self.logger.info('Rendering ' + bookName)
             tokens = parseUsfm.parseString(self.booksUsfm[bookName])
             for t in tokens: t.renderOn(self)
-            self.logger.info('Rendered ' + bookName)
+            self.logger.info('Rendered  ' + bookName)
 
     def render_periph(self, token): return self.render_unhandled(token)
         

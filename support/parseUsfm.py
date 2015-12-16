@@ -19,7 +19,7 @@ def usfmParagraphTokenPart(key):        return Or([StringStart(), LineStart()]) 
 
 def usfmParagraphToken(key):            return Group(Suppress(backslash) + Literal(key) + Suppress(Or([space, LineEnd()])))
 def usfmParagraphTokenEmpty(key):       return Group(Suppress(backslash) + Literal(key) + Suppress(LineEnd()))
-def usfmParagraphTokenWord(key):        return Group(usfmParagraphTokenPart(key) + singleword)
+def usfmParagraphTokenWord(key):        return Group(usfmParagraphTokenPart(key) + singleword + Or([Suppress(space), FollowedBy(LineEnd())]))
 def usfmParagraphTokenLine(key):        return Group(usfmParagraphTokenPart(key) + line)
 
 def usfmCharacterToken(key):            return Group(usfmTokenPart(key))
@@ -137,8 +137,8 @@ buildTokenSimpleNumbered(['th', 'thr', 'tc', 'trc'], knownTokens)
 buildPairTokensPlus(['f', 'fe', 'fv', 'fdc'], knownTokens)
 # inside
 knownTokens.append(usfmCharacterTokenWord('fr'))
-buildTokenSimple(['fk', 'fq', 'fqa', 'fl', 'fp', 'ft'], knownTokens)
-buildPairTokens(['fm'], knownTokens)
+knownTokens.append(usfmCharacterToken('fr*'))
+buildPairTokens(['fm', 'fk', 'fq', 'fqa', 'fl', 'fp', 'ft'], knownTokens)
 
 #
 #   CROSS REFERENCES
@@ -199,14 +199,17 @@ def parseString( unicodeString ):
         print 'AT COL ' + str(e.col)
         print e
         sys.exit()
-    return [createToken(t) for t in tokens]
+    return [createToken(t) for t in tokens] # if isNotBlank(t)]
 
 def clean( unicodeString ):
     # We need to clean the input a bit. For a start, until
     # we work out what to do, non breaking spaces will be ignored
     # ie 0xa0
-    unicodeString = unicodeString.replace(u'\r\n', u'\n')
-    return unicodeString.replace(u'\xa0', u' ')
+    # multiple spaces = one space, easier than doing it in parser
+    u = unicodeString.replace(u'\r\n', u'\n')
+    u = u.replace(u'\xa0', u' ')
+    u = ' '.join(u.split(' '))
+    return u
     
 def createToken(t):
     if len(t) == 1:

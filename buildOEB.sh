@@ -79,6 +79,13 @@ all-cth() {
 	clean-tmp
 }
 
+all() {
+	make-tmp
+	cp $OEBDIR/* tmp
+	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=$ID
+	clean-tmp
+}
+
 ###############
 #
 #	Full Release 
@@ -163,8 +170,9 @@ build-book ()
 #
 ###############
 
-OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/development
-#OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/release
+#OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/development
+OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/release/us
+#OEBDIR=/Users/russellallen/Dropbox/oeb/translations/usfm/TSI
 BUILTDIR=/Users/russellallen/git/USFM-Tools/built/
 
 #usnt
@@ -181,13 +189,13 @@ BUILTDIR=/Users/russellallen/git/USFM-Tools/built/
 #all-nt-psalms
 #all
 
-#BOOKFILE='33-Micah.usfm'
-#BOOKNAME=oeb-33-michah-2015-12-14-released
-#TARGET=docx
+#BOOKFILE='01-Genesis.usfm'
+#BOOKNAME=oeb-01-genesis-2015-12-14-released
+#TARGET=rtf
 #build-book
 
-ID=2015-12-07
-TARGET=context
-all-cth
+ID=TSI-2015-12-07
+TARGET=rtf
+all
 
 
