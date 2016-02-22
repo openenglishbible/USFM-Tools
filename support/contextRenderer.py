@@ -7,6 +7,9 @@ import datetime
 import tempfile
 import subprocess
 import os
+import shutil
+import platform
+import sys
 
 #
 #   Renders to ConTeXt so we can make PDF. Main renderer for PDF of OEB
@@ -23,8 +26,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
         if not repeatFilter == '' and not stderrdata.find(repeatFilter) == -1:
             runscript(c, prefix, repeatFilter)
 
-    def __init__(self, inputDir, outputDir, outputName):
-        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
+    def __init__(self, inputDir, outputDir, outputName, config):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = None  # output file stream
         # IO
@@ -41,18 +44,52 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.narrower = False
         self.doChapterOrVerse = u''
         self.smallcaps = False
-
+        
+    def introTeXt(self):
+        tex = self.rawIntroTeXt
+        # Layout
+        if self.config.get('Context','layout') == 'singlesided':
+             tex = tex.replace('{{{layout}}}', 'singlesided')
+             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [location=middle]')         
+        else:
+             tex = tex.replace('{{{layout}}}', 'doublesided')
+             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [location=middle, rightmargin=1in, width=90mm, marking=on]')
+        tex = tex.replace('{{{layout}}}', self.config.get('Context','layout'))
+        # Font
+        tex = tex.replace('{{{bodyFont}}}', self.config.get('Context','bodyFont'))
+        tex = tex.replace('{{{bodyFontSize}}}', self.config.get('Context','bodyFontSize'))
+        # Cover
+        if self.config.get('Context','coverPage') == '/path/to/cover.pdf':
+            tex = tex.replace('{{{coverPage}}}', '')
+        else:
+            tex = tex.replace('{{{coverPage}}}', '\externalfigure[' + self.config.get('Context','coverPage') + ']\page[right]')
+        return tex
+        
     def render(self, order='normal'):
         # RENDER
         self.f = codecs.open(self.texFileName, 'w', 'utf_8_sig')
         self.loadUSFM(self.inputDir)
-        self.f.write(self.introTeXt)
+        self.f.write(self.introTeXt())
         self.run(order)
         self.f.write(self.stopNarrower() + self.closeTeXt)
-        self.f.close()    
+        self.f.close()   
+        # OPTIONALLY SAVE TEX FILE
+        if self.config.get("Context",'saveTeX'):  shutil.copy(self.texFileName, self.outputFileName[:-4] + '.tex')
         # GENERATE 
         t = tempfile.mkdtemp()
-        c = '. ./support/thirdparty/context/tex/setuptex ; cd "' + t + '"; rm * ; context ' + self.texFileName + ' --result="' + self.outputFileName + '"'
+        c = '. ./support/thirdparty/context/tex/setuptex ; '
+        if platform.system() == 'Darwin':
+            c = c + 'export OSFONTDIR="/Library/Fonts//;/System/Library/Fonts;$HOME/Library/Fonts" ; '
+        elif platform.system() == 'Windows':
+            print " TODO: make this work on Windows "
+            sys.exit(1)
+        elif platform.system() == 'Linux':
+            c = c + 'export OSFONTDIR="/usr/share/fonts//;$HOME/.fonts" ; '        
+        else:
+            print ' No idea what platform I\'m on...'
+            sys.exit(1)
+        c = c + 'mtxrun --script fonts --reload ; '
+        c = c + 'cd "' + t + '"; rm * ; context ' + self.texFileName + ' --result="' + self.outputFileName + '"'
         self.runscript(c, '     ')
         
     
@@ -156,8 +193,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def render_id(self, token):      self.f.write( self.stopNarrower() + ur"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
     def render_h(self, token):       self.f.write( u'\n\n\RAHeader{' + token.value + u'}\n')
-    def render_mt(self, token):      self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MT{' + token.value + u'}\n')
+    def render_mt1(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MT{' + token.value + u'}\n')
     def render_mt2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MTT{' + token.value + u'}\n')
+    def render_mt3(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + u'\n\MTTT{' + token.value + u'}\n')
     def render_ms(self, token):      self.markForSmallCaps() ; self.f.write(self.stopNarrower() + u'\n\MS{' + token.value + u'}\n') ; self.doNB = True
     def render_ms2(self, token):     self.doNB = True; self.markForSmallCaps() ; self.f.write( self.stopNarrower() + u'\n\MSS{' + token.value + '}' + self.newLine() )
     def render_p(self, token):       self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + self.newLine() )
@@ -165,11 +203,11 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_s1(self, token):      self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() +  u'\n\\blank[big] ' + u'\n\MSS{' + token.getValue() + '}' + self.newLine() ) ; self.doNB = True
     def render_s2(self, token):      self.doNB = True; self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + u'\n\\blank[big] ' + u'\n\MSS{' + token.value + '}' + self.newLine() )
     def render_c(self, token):
-        self.doChapterOrVerse = u'\C{' + token.value + u'}'
+        self.doChapterOrVerse = u'\C{' + token.value + u'} '
         self.f.write( u' ' )
     def render_v(self, token):
         if not token.value == u'1':
-            self.doChapterOrVerse =  u'\V{' + token.value + u'}'
+            self.doChapterOrVerse =  u'\V{' + token.value + u'} '
         self.f.write( ' ' )
     def render_wj_s(self, token):     self.f.write( u" " )
     def render_wj_e(self, token):     self.f.write( u" " )
@@ -189,8 +227,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         elif self.smallcaps:
             s = self.renderSmallCaps(s)
         if self.justDidLORD:
-            if s[0].isalpha():
-                s = u' ' + s
+            if s[0].isalpha(): s = u' ' + s
             self.justDidLORD = False    
         self.f.write( s )
     def render_q(self, token):       self.render_q1(token)
@@ -234,7 +271,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
             self.f.write(u"""
             \page[right]
             \par ~
-            {\midaligned {\tfd{\WORD{Table of Contents}}}}
+            {\midaligned {\WORD{Table of Contents}}}
             \par ~
             \placelist[chapter]    
             """)
@@ -242,7 +279,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     #   Introductory codes
     #
     
-    introTeXt = unicode(r"""
+    rawIntroTeXt = ur"""
     \definemarking[RAChapter]
     \definemarking[RABook]
     \definemarking[RASection]
@@ -254,19 +291,18 @@ class Renderer(abstractRenderer.AbstractRenderer):
     %\setuppapersize [Trade][TwoTrade]
     %\setuparranging [2UP] % page numbering doesn't work this way
  
- 
-    \setuppagenumbering [alternative=doublesided]
-    \setuplayout [location=middle, 
-        rightmargin=20mm,
-        width=90mm,
-        marking=on]
+    \setuppagenumbering [alternative={{{layout}}}]
+   
+    {{{setuplayout}}}
 
-    \usetypescript[pagella]
-    \setupbodyfont [pagella, 9pt]
-
-    %\setupalign[normal,hanging,hz,tolerant,hyphenated]
-    \setupalign[hanging]
-
+    \definefontfamily [myfamily] [serif] [{{{bodyFont}}}]
+    \definefontfeature
+      [default]
+      [default]
+      [protrusion=quality,expansion=quality]
+    \setupalign[hz,hanging]
+    \setupbodyfont [myfamily, {{{bodyFontSize}}}]
+    
     \setupbodyfontenvironment[default][em=italic]
 
     \setuppagenumbering[location=]
@@ -288,14 +324,15 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     \setupnote[footnote][way=bypage]
 
-    \define[1]\V{\setupinmargin[style=small,stack=yes] \inouter{#1} }
-    \define[1]\C{\setupinmargin[style=bold,stack=yes] \inouter{#1} \marking[RAChapter]{#1} }
+    \define[1]\V{\setupinmargin[style=small,stack=yes]\inouter{#1}}
+    \define[1]\C{\setupinmargin[style=bold,stack=yes]\inouter{#1}\marking[RAChapter]{#1}}
     \define[1]\S{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
     \define[1]\MS{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
     \define[1]\MSS{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
     \define[1]\SS{\blank{\midaligned{\em #1}}\blank}
     \define[1]\MT{  {\midaligned{\tfd{\WORD{#1}}}}\blank ~ } 
     \define[1]\MTT{ {\midaligned{\tfd{\WORD{#1}}}}\blank ~ }
+    \define[1]\MTTT{ {\midaligned{\tfd{#1}}}\blank ~ }
     \define[1]\RAHeader{\page[right] \chapter{#1} \marking[RABook]{#1} }
     \define[2]\Q{\startnarrower[#1*left,1*right] #2\stopnarrower }
     
@@ -307,7 +344,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
        after=\stopnarrower]
 
     \starttext
-    """)
+    {{{coverPage}}}
+    """
     
     closeTeXt = ur"""
     \stoptext

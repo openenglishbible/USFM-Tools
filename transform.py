@@ -23,6 +23,7 @@ import readerise
 import mediawikiPrinter
 import loutRenderer
 import htmlRenderer
+import rendererConfig
 
 def runscript(c, prefix='', repeatFilter = ''):
     logging.debug(prefix + ':: ' + c)
@@ -85,8 +86,10 @@ def main(argv):
     oebFlag = False  
     order="normal" 
     logger.info('Starting Build.')
+    # Default config if not overriden later
+    config = rendererConfig.RendererConfig(os.path.join(rootdiroftools,'default.config'))
     try:
-        opts, args = getopt.getopt(argv, "ht:u:b:n:or:", ["help", "target=", "usfmDir=", "builtDir=", "name=","oeb","order="])
+        opts, args = getopt.getopt(argv, "ht:u:b:n:or:c:", ["help", "target=", "usfmDir=", "builtDir=", "name=","oeb","order=","config="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -105,6 +108,8 @@ def main(argv):
             order = arg
         elif opt in ("-o", "--oeb"):
             oebFlag = True
+        elif opt in ("-c", "--config"):
+            config = rendererConfig.RendererConfig(arg, os.path.join(rootdiroftools,'default.config'))
         else:
             usage()
 
@@ -119,7 +124,7 @@ def main(argv):
             m = importlib.import_module(targets + 'Renderer')
             ensureOutputDir(buildDir)
             logger.info("\n  Building: " + usfmDir + "\n  into: " + buildDir + "\n  as: " + buildName)
-            c = m.Renderer(usfmDir, buildDir, buildName)
+            c = m.Renderer(usfmDir, buildDir, buildName, config)
             if oebFlag is True: c.setOEBFlag()
             c.render()
         except Exception as e:
@@ -140,8 +145,9 @@ def usage():
         python transform.py
            --usfmDir=/dir/to/usfm
            --builtDir=/dir/to/build/in 
-           --name=TranslationName
-           --target=rendererName (eg docx or csv)
+           --name=TranslationFileName (for determining output file names)
+           --target=rendererName (eg rtf or csv)
+           --config=myConfig.config (or default.config by default)
                 
     """
 

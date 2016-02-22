@@ -7,7 +7,7 @@ import logging
 
 class AbstractRenderer(object):
     
-    def __init__(self, inputDir, outputDir, outputName):
+    def __init__(self, inputDir, outputDir, outputName, config):
         
         # LOGGING
         self.logger = logging.getLogger('Renderer')
@@ -19,6 +19,8 @@ class AbstractRenderer(object):
         self.logger.addHandler(ch)    
 
         self.oebFlag = False
+        
+        self.config = config
         
     def setOEBFlag(self):
         self.oebFlag = True

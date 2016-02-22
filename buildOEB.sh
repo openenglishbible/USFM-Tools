@@ -65,24 +65,10 @@ cthnt() {
 #
 ###############
 
-all-us() {
-	make-tmp
-	cp $OEBDIR/us/* tmp
-	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-US --oeb
-	clean-tmp
-}
-
-all-cth() {
-	make-tmp
-	cp $OEBDIR/cth/* tmp
-	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=OEB-All-$ID-Cth --oeb
-	clean-tmp
-}
-
 all() {
 	make-tmp
 	cp $OEBDIR/* tmp
-	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=$ID
+	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=$ID --oeb
 	clean-tmp
 }
 
@@ -157,7 +143,7 @@ release() {
 build-book () 
 {
 	make-tmp
-	cp "$OEBDIR/us/$BOOKFILE" tmp
+	cp "$OEBDIR/$BOOKFILE" tmp
 	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=$BOOKNAME --oeb
 	clean-tmp
 }
@@ -173,15 +159,11 @@ build-book ()
 #OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/development
 OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/release/us
 #OEBDIR=/Users/russellallen/Dropbox/oeb/translations/usfm/TSI
-BUILTDIR=/Users/russellallen/git/USFM-Tools/built/
+BUILTDIR=/Users/russellallen/git/USFM-Tools/built
 
-#usnt
-#cthnt
-#buildbooks
-#simple-all-us
-#csv-all-us
-#word-all-us
-#pdf-all-us
+ID=oeb-current
+TARGET=context
+all
 
 #ID=2014.11
 #release
@@ -189,13 +171,13 @@ BUILTDIR=/Users/russellallen/git/USFM-Tools/built/
 #all-nt-psalms
 #all
 
-#BOOKFILE='01-Genesis.usfm'
-#BOOKNAME=oeb-01-genesis-2015-12-14-released
+#BOOKFILE='08-Ruth.usfm'
+#BOOKNAME=ruth
 #TARGET=rtf
 #build-book
 
-ID=TSI-2015-12-07
-TARGET=rtf
-all
+#ID=TSI-2015-12-07
+#TARGET=rtf
+#all
 
 
