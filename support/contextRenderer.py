@@ -50,9 +50,11 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # Layout
         if self.config.get('Context','layout') == 'singlesided':
              tex = tex.replace('{{{layout}}}', 'singlesided')
-             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [location=middle]')         
+             tex = tex.replace('{{{position}}}', '\inleft')
+             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [leftedge=0.25in,leftmargin=0.75in,width=4in,rightmargin=0.5in,rightedge=0.5in]')         
         else:
              tex = tex.replace('{{{layout}}}', 'doublesided')
+             tex = tex.replace('{{{position}}}', '\inouter')
              tex = tex.replace('{{{setuplayout}}}', '\setuplayout [location=middle, rightmargin=1in, width=90mm, marking=on]')
         tex = tex.replace('{{{layout}}}', self.config.get('Context','layout'))
         # Font
@@ -86,7 +88,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         elif platform.system() == 'Linux':
             c = c + 'export OSFONTDIR="/usr/share/fonts//;$HOME/.fonts" ; '        
         else:
-            print ' No idea what platform I\'m on...'
+            print " No idea what platform I'm on..."
             sys.exit(1)
         c = c + 'mtxrun --script fonts --reload ; '
         c = c + 'cd "' + t + '"; rm * ; context ' + self.texFileName + ' --result="' + self.outputFileName + '"'
@@ -324,8 +326,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     \setupnote[footnote][way=bypage]
 
-    \define[1]\V{\setupinmargin[style=small,stack=yes]\inouter{#1}}
-    \define[1]\C{\setupinmargin[style=bold,stack=yes]\inouter{#1}\marking[RAChapter]{#1}}
+    \define[1]\V{\setupinmargin[style=small,stack=yes]{{{position}}}{#1}}
+    \define[1]\C{\setupinmargin[style=bold,stack=yes]{{{position}}}{#1}\marking[RAChapter]{#1}}
     \define[1]\S{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
     \define[1]\MS{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
     \define[1]\MSS{\par ~ \par \section{#1} \marking[RASection]{#1} \par }
@@ -343,7 +345,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
       [before={\startnarrower[left]\setupindenting[-\leftskip,yes]},
        after=\stopnarrower]
 
+    \showframe
     \starttext
+    \showlayout
     {{{coverPage}}}
     """
     

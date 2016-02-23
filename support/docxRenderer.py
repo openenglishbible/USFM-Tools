@@ -12,10 +12,10 @@ import os
 #   Renders to Word .docx
 #
 
-class Renderer(abstractRenderer.AbstractRenderer):
+class Renderer(abstractRenderer.AbstractRenderer, config):
     
     def __init__(self, inputDir, outputDir, outputName):
-        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         self.document = Document()
         self.currentParagraph = self.document.add_paragraph()
         self.outputFilename = os.path.join(outputDir, outputName + '.docx')

@@ -19,8 +19,8 @@ class DummyFile(object):
 
 class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputDir, outputName):
-        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
+    def __init__(self, inputDir, outputDir, outputName, config):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = DummyFile()  # output file stream
         self.ft = [] # array of text to write to file
@@ -38,18 +38,36 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.indentFlag = False
 
     def render(self):
-        # Write pages
+        # Load
         self.loadUSFM(self.inputDir)
+        # Write pages
         self.run()
         self.close()
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/normalize.css', self.outputDir + u'/')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/style.css', self.outputDir + u'/')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/jump.js', self.outputDir + u'/')
-        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/index-dev.html', self.outputDir + u'/index.html')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/header.png', self.outputDir + u'/')
+        self.generateIndexFile()
         
     # File handling    
-        
+    
+    def generateIndexFile(self):
+        with open(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/index.html') as f:
+            c = f.read()
+        c = c.replace('{{{ot}}}', self.bookList(1, 39))
+        c = c.replace('{{{nt}}}', self.bookList(40, 66))
+        with open(self.outputDir + u'/index.html', 'w') as f:
+            f.write(c)
+
+    def bookList(self, s, f):
+        h = ''
+        for b in range(s, f):
+            if self.booksUsfm.has_key(books.silNames[b]):
+                h = h + '\n<a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b-1].replace(' ', '&nbsp;') + '</a></br>'
+            else:
+                h = h + '\n' + books.bookNames[b-1] + '</br>'
+        return h
+                
     def openFile(self, bookID):
         self.f = open(self.outputDir + u'/b' + bookID + u'.html', 'w')
         self.ft = []
@@ -74,14 +92,33 @@ class Renderer(abstractRenderer.AbstractRenderer):
         c = c.replace(ur'<span class="nd"> Lord </span> ?', ur'<span class="nd"> Lord</span>?')
         c = c.replace(u'<span class="nd"> Lord </span> \'', u'<span class="nd"> Lord</span>\'')
         if self.oebFlag:
-            c = c.replace(ur'%navmarker%', u'OEB')
-            c = c.replace(ur'%linkToWebsite%',u'<tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>')
+            c = c.replace(ur'{{{navmarker}}}', u'Go to...')
+            c = c.replace(ur'{{{linkToWebsite}}}',u'<a href="http://openenglishbible.org">OpenEnglishBible.org</a>')
         else:
-            c = c.replace(ur'%navmarker%', u'<div style="font-size:200%;color:green;">✝</div>')
-            c = c.replace(ur'%linkToWebsite%',u'')
+            c = c.replace(ur'{{{navmarker}}}', u'<div style="font-size:200%;color:green;">✝</div>')
+            c = c.replace(ur'{{{linkToWebsite}}}',u'Go to...')
         return c
         
     # Support
+    
+    def header(self):
+        h = header_header
+        h = h + '<tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr><tr>'
+        for b in range(1, 39):
+            if self.booksUsfm.has_key(books.silNames[b]):
+                h = h + '\n<td><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b-1].replace(' ', '&nbsp;') + '</a></td>'
+            else:
+                h = h + '\n<td>' + books.bookNames[b-1] + '</td>'
+            if b % 5 == 0: h = h + '</tr><tr>'
+        h = h + '\n</tr><tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>New Testament</td></tr><tr>'
+        for b in range(40, 66):
+            if self.booksUsfm.has_key(books.silNames[b]):
+                h = h + '\n<td><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b-1].replace(' ', '&nbsp;') + '</a></td>'
+            else:
+                h = h + '\n<td>' + books.bookNames[b-1] + '</td>'
+            if b % 5 == 4: h = h + '</tr><tr>'
+        h = h + '\n</tr><tr><td colspan = "2">{{{linkToWebsite}}}</td></tr></table></div></div>'
+        return h
         
     def writeChapterMarker(self):
         self.write(self.cachedChapterMarker)
@@ -104,7 +141,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.close()
         self.cb = books.bookKeyForIdValue(token.value)
         self.openFile(self.cb)
-        self.write(header_dev)
+        self.write(self.header())
         self.indentFlag = False
     def render_mt(self, token):      self.write(u'</p><h1>' + token.value + u'</h1><p>')
     def render_mt2(self, token):      self.write(u'</p><h2>' + token.value + u'</h2><p>')
@@ -178,7 +215,7 @@ header_header = ur"""<!DOCTYPE html>
 
     <body>
     <div id="navbar">
-        <p id="navoeb">OEB</p>
+        <p id="navoeb">{{{navmarker}}}</p>
         <div id="navtable">
         <table>
         <tr><td colspan = "5" style="font-size:100%;">
@@ -188,123 +225,7 @@ header_header = ur"""<!DOCTYPE html>
         </td></tr>
 """
 
-header_nt = ur"""
-    <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>New Testament</td></tr>
-        <tr><td>
-            <a href="b040.html">Matthew</a>&nbsp;<br>
-            <a href="b041.html">Mark</a>&nbsp;<br>
-            <a href="b042.html">Luke</a>&nbsp;<br>
-            <a href="b043.html">John</a>&nbsp;<br>
-            <a href="b044.html">Acts</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b045.html">Romans</a>
-            <a href="b046.html">1&nbsp;Corinthians</a>&nbsp;<br>
-            <a href="b047.html">2&nbsp;Corinthians</a>&nbsp;<br>
-            <a href="b048.html">Galatians</a>&nbsp;<br>
-            <a href="b049.html">Ephesians</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b050.html">Philippians</a>&nbsp;<br>
-            <a href="b051.html">Colossians</a>
-            <a href="b052.html">1&nbsp;Thessalonians</a>&nbsp;<br>
-            <a href="b053.html">2&nbsp;Thessalonians</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b054.html">1&nbsp;Timothy</a>&nbsp;<br>
-            <a href="b055.html">2&nbsp;Timothy</a>&nbsp;<br>
-            <a href="b056.html">Titus</a>&nbsp;<br>
-            <a href="b057.html">Philemon</a>
-            <a href="b058.html">Hebrews</a>&nbsp;<br>
-            <a href="b059.html">James</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b060.html">1&nbsp;Peter</a>&nbsp;<br>
-            <a href="b061.html">2&nbsp;Peter</a>&nbsp;<br>
-            <a href="b062.html">1&nbsp;John</a>&nbsp;<br>
-            <a href="b063.html">2&nbsp;John</a>
-            <a href="b064.html">3&nbsp;John</a>&nbsp;<br>
-        </td>
-        <td>
-            <a href="b065.html">Jude</a>&nbsp;<br>
-            <a href="b066.html">Revelation</a>
-        </td></tr>
-        <tr><td colspan = "2"><a href="http://openenglishbible.org">OpenEnglishBible.org</a></td></tr>
-    </table>
-    </div>
-    </div>
-"""
-
-header_release = header_header + ur"""
-        <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr>
-        <tr>
-            <td>
-            <a href="b008.html">Ruth</a>&nbsp;<br>
-            <a href="b017.html">Esther</a>&nbsp;<br>
-            <a href="b019.html">Psalms</a>
-            </td>
-        </tr>
-""" + header_nt
-
-header_dev = header_header + ur"""
-        <tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr>
-            <td>
-            <a href="b001.html">Genesis</a>&nbsp;<br>
-            Exodus&nbsp;<br>
-            Leviticu&nbsp;<br>
-            Numbers&nbsp;<br>
-            Deuteronomy&nbsp;<br>
-            Joshua&nbsp;<br>
-            Judges
-            </td>
-            <td>
-            <a href="b008.html">Ruth</a>&nbsp;<br>
-            1&nbsp;Samuel&nbsp;<br>
-            2&nbsp;Samuel&nbsp;<br>
-            1&nbsp;Kings&nbsp;<br>
-            2&nbsp;Kings<br>
-            1&nbsp;Chronicles&nbsp;<br>
-            2&nbsp;Chronicles&nbsp;
-            </td>
-            <td>
-            Ezra&nbsp;<br>
-            Nehemiah&nbsp;<br>
-            <a href="b017.html">Esther</a>&nbsp;<br>
-            Job&nbsp;<br>
-            <a href="b019.html">Psalms</a>&nbsp;<br>
-            <a href="b020.html">Proverbs</a>&nbsp;<br>
-            Ecclesiastes&nbsp;<br>
-            </td>
-            <td>
-            Song&nbsp;of&nbsp;Solomon&nbsp;<br>
-            Isaiah&nbsp;<br>
-            Jeremiah<br>
-            Lamentations&nbsp;<br>
-            Ezekiel&nbsp;<br>
-            <a href="b027.html">Daniel</a>&nbsp;<br>
-            Hosea&nbsp;<br>
-            </td>
-            <td>
-            <a href="b029.html">Joel</a>&nbsp;<br>
-            <a href="b030.html">Amos</a>
-            <a href="b031.html">Obadiah</a>&nbsp;<br>
-            <a href="b032.html">Jonah</a>&nbsp;<br>
-            <a href="b033.html">Micah</a>&nbsp;<br>
-            <a href="b034.html">Nahum</a>&nbsp;<br>
-            <a href="b035.html">Habakkuk</a>&nbsp;<br>
-            </td>
-            <td>
-            <a href="b036.html">Zephaniah</a>
-            <a href="b037.html">Haggai</a>&nbsp;<br>
-            <a href="b038.html">Zechariah</a>&nbsp;<br>
-            <a href="b039.html">Malachi</a>
-            </td>
-        </tr>
-""" + header_nt
-
 footer = ur"""
         </p></body>   
         """
-
-indexPage = header_dev + ur"""<h1>Open English Bible</h1>""" + footer
 

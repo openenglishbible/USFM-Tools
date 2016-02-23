@@ -14,8 +14,8 @@ STANDARD_SUFFIX = '.html'
 
 class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputDir, outputName):
-        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName)
+    def __init__(self, inputDir, outputDir, outputName, config):
+        abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = None  # output file stream
         # IO
