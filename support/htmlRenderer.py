@@ -56,6 +56,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
             c = f.read()
         c = c.replace('{{{ot}}}', self.bookList(1, 39))
         c = c.replace('{{{nt}}}', self.bookList(40, 66))
+        c = c.replace(ur'{{{translationname}}}',self.config.get('General','name'))
+        c = c.replace(ur'{{{pathtologo}}}',self.config.get('HTML','frontlogo'))
         with open(self.outputDir + u'/index.html', 'w') as f:
             f.write(c)
 
@@ -91,33 +93,33 @@ class Renderer(abstractRenderer.AbstractRenderer):
         c = c.replace(ur'<span class="nd"> Lord </span> !', ur'<span class="nd"> Lord</span>!')
         c = c.replace(ur'<span class="nd"> Lord </span> ?', ur'<span class="nd"> Lord</span>?')
         c = c.replace(u'<span class="nd"> Lord </span> \'', u'<span class="nd"> Lord</span>\'')
-        if self.oebFlag:
-            c = c.replace(ur'{{{navmarker}}}', u'Go to...')
-            c = c.replace(ur'{{{linkToWebsite}}}',u'<a href="http://openenglishbible.org">OpenEnglishBible.org</a>')
-        else:
-            c = c.replace(ur'{{{navmarker}}}', u'<div style="font-size:200%;color:green;">✝</div>')
-            c = c.replace(ur'{{{linkToWebsite}}}',u'Go to...')
+        
+        c = c.replace(ur'{{{navmarker}}}', u'Go to...')
+        c = c.replace('{{{translationname}}}', self.config.get('General','name'))
+        c = c.replace(ur'{{{websiteURL}}}',self.config.get('HTML','websiteURL'))
+        c = c.replace(ur'{{{websiteName}}}',self.config.get('HTML','websiteName'))
+
         return c
         
     # Support
     
     def header(self):
         h = header_header
-        h = h + '<tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>Old Testament</td></tr><tr>'
+        h = h + '<tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/><b>Old Testament</b></td></tr><tr>'
         for b in range(1, 39):
             if self.booksUsfm.has_key(books.silNames[b]):
                 h = h + '\n<td><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b-1].replace(' ', '&nbsp;') + '</a></td>'
             else:
                 h = h + '\n<td>' + books.bookNames[b-1] + '</td>'
             if b % 5 == 0: h = h + '</tr><tr>'
-        h = h + '\n</tr><tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/>New Testament</td></tr><tr>'
+        h = h + '\n</tr><tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/><b>New Testament</b></td></tr><tr>'
         for b in range(40, 66):
             if self.booksUsfm.has_key(books.silNames[b]):
                 h = h + '\n<td><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b-1].replace(' ', '&nbsp;') + '</a></td>'
             else:
                 h = h + '\n<td>' + books.bookNames[b-1] + '</td>'
             if b % 5 == 4: h = h + '</tr><tr>'
-        h = h + '\n</tr><tr><td colspan = "2">{{{linkToWebsite}}}</td></tr></table></div></div>'
+        h = h + '\n</tr><tr><td colspan = "2"><br><a href="{{{websiteURL}}}">{{{websiteName}}}</a></td></tr></table></div></div>'
         return h
         
     def writeChapterMarker(self):
@@ -205,7 +207,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
 header_header = ur"""<!DOCTYPE html>
     <html lang="en">
     <head>
-    <title>Open English Bible</title>
+    <title>{{{translationname}}} | Read</title>
     <meta charset='utf-8'>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css" rel="stylesheet">
