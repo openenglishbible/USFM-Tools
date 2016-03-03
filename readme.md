@@ -16,6 +16,9 @@ It is primarily used for the Open English Bible, and may need adjustment if used
     
     Install Calibre for ePub output:
     http://calibre-ebook.com
+    
+    Install Crosswire tools for OSIS and Sword Module output:
+    brew install sword    (on OS X)
 
 # Get code
 

@@ -29,10 +29,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.cv = u'001'    # Currrent Verse  
         self.infootnote = False
         self.verseHadContent = True
-        self.atStart = True
         self.ndStatus = OUT
         self.beforeFirstVerse = True
-        self.inD = False
         
     def render(self):
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8') # 'utf_8_sig macroman
@@ -48,9 +46,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         return u'' if self.infootnote else s
         
     def write(self, s):
-        if self.beforeFirstVerse:
-            self.beforeFirstVerse = False
-        else:
+        if not self.beforeFirstVerse:
             self.f.write(s)
             
     #   TOKENS
@@ -63,17 +59,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.cv = token.value.zfill(3)
         if not self.verseHadContent: self.write(u' ~')
         self.verseHadContent = False
-        if self.atStart:
-            self.atStart = False
+        if self.beforeFirstVerse:
+            self.beforeFirstVerse = False
         else:
             self.f.write(u'\n')
         self.f.write(books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + str(int(self.cv.split('-')[0]))   + ' ') # str(int(self.cb))
     def render_text(self, token):
         self.verseHadContent = True
         self.write(self.escape(token.value + ' '))
-        if self.inD:
-            self.inD = False
-            self.write('</i>')
     def render_f_s(self, token):     self.write(u'<sup>[')
     def render_f_e(self, token):     self.write(u']</sup>')
     def render_p(self, token):       self.write(u' ¶ ')
@@ -93,14 +86,15 @@ class Renderer(abstractRenderer.AbstractRenderer):
     
     def render_d(self, token):
         """ Accordance """
-        self.inD = True
         # Accordance requries Psalms to have :0 verse
         if books.accordanceNameForBookKey(self.cb) == 'Psa':
             self.f.write(                         u'\n' +
                 books.accordanceNameForBookKey(self.cb) + 
                                                     ' ' + 
                                       str(int(self.cc)) + 
-                                            u':0 ¶ <i>' )
+                                            u':0 ¶ <i>' + 
+                                            token.value + 
+                                                u' </i>')
     
     # Ignored
     def render_h(self, token):      pass
@@ -109,5 +103,6 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_ms(self, token):     pass
     def render_ms2(self, token):    pass
     def render_s(self, token):      pass
+    def render_s2(self, token):     pass
     def render_wj_s(self, token):   pass
     def render_wj_e(self, token):   pass

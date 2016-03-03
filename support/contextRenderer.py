@@ -345,9 +345,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
       [before={\startnarrower[left]\setupindenting[-\leftskip,yes]},
        after=\stopnarrower]
 
-    \showframe
+    % \showframe
     \starttext
-    \showlayout
+    % \showlayout
     {{{coverPage}}}
     """
     

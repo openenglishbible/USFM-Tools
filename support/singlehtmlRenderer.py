@@ -29,8 +29,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.bookName = u''
         
     def render(self, order="normal"):
+        self.loadUSFM(self.inputDir)
         self.f = codecs.open(self.outputFilename, 'w', 'utf_8_sig')
-        self.f.write(u"""
+        h = u"""
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
@@ -72,44 +73,28 @@ class Renderer(abstractRenderer.AbstractRenderer):
         <body>
         <h1>Table of Contents</h1>
         <p><b>Old Testament</b></p>
-        <p class="indent-1"><a href="#008">Ruth</a></p>
-        <p class="indent-1"><a href="#017">Esther</a></p>
-        <p class="indent-1"><a href="#019">Psalms</a></p>
+        {{{otlinks}}}
         <p><b>New Testament</b></p>
         <p class="indent-1"><a href="#040">Matthew</a></p>
-        <p class="indent-1"><a href="#041">Mark</a></p>
-        <p class="indent-1"><a href="#042">Luke</a></p>
-        <p class="indent-1"><a href="#043">John</a></p>
-        <p class="indent-1"><a href="#044">Acts</a></p>
-        <p class="indent-1"><a href="#045">Romans</a></p>
-        <p class="indent-1"><a href="#046">1 Corinthians</a></p>
-        <p class="indent-1"><a href="#047">2 Corinthians</a></p>
-        <p class="indent-1"><a href="#048">Galatians</a></p>
-        <p class="indent-1"><a href="#049">Ephesians</a></p>
-        <p class="indent-1"><a href="#050">Philippians</a></p>
-        <p class="indent-1"><a href="#051">Colossians</a></p>
-        <p class="indent-1"><a href="#052">1 Thessalonians</a></p>
-        <p class="indent-1"><a href="#053">2 Thessalonians</a></p>
-        <p class="indent-1"><a href="#054">1 Timothy</a></p>
-        <p class="indent-1"><a href="#055">2 Timothy</a></p>
-        <p class="indent-1"><a href="#056">Titus</a></p>
-        <p class="indent-1"><a href="#057">Philemon</a></p>
-        <p class="indent-1"><a href="#058">Hebrews</a></p>
-        <p class="indent-1"><a href="#059">James</a></p>
-        <p class="indent-1"><a href="#060">1 Peter</a></p>
-        <p class="indent-1"><a href="#061">2 Peter</a></p>
-        <p class="indent-1"><a href="#062">1 John</a></p>
-        <p class="indent-1"><a href="#063">2 John</a></p>
-        <p class="indent-1"><a href="#064">3 John</a></p>
-        <p class="indent-1"><a href="#065">Jude</a></p>
-        <p class="indent-1"><a href="#066">Revelation</a></p>
+        {{{ntlinks}}}
         
-        """.encode('utf-8'))
+        """
+        h = h.replace('{{{otlinks}}}', self.bookList(1, 39))
+        h = h.replace('{{{ntlinks}}}', self.bookList(40, 66))
+        self.f.write(h.encode('utf-8'))
         self.f.write('<p>Draft built ' + datetime.date.today().strftime("%A, %d %B %Y") + '</p>\n\n')
-        self.loadUSFM(self.inputDir)
         self.run(order)
         self.f.write('</body></html>')
         self.f.close()
+        
+    def bookList(self, s, f):
+        h = ''
+        for b in range(s, f):
+            if self.booksUsfm.has_key(books.silNames[b]):
+                h = h + '\n<p class="indent-1"><a href="#' + str(b).zfill(3) + '">' + books.bookNames[b-1].replace(' ', '&nbsp;') + '</a></p>'
+            else:
+                h = h + '\n' + books.bookNames[b-1] + '<p class="indent-1">'
+        return h
         
     def escape(self, s):
         return s.replace(u'~',u'&nbsp;')
@@ -133,11 +118,18 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.indentFlag = False
         self.write(u'\n\n<h1 id="' + self.cb + u'"></h1>\n')
     def render_h(self, token):       self.bookname = token.value 
-    def render_mt(self, token):      self.write(u'\n\n<h1>' + token.value + u'</h1>')
+    def render_mt1(self, token):      self.write(u'\n\n<h1>' + token.value + u'</h1>')
     def render_mt2(self, token):     self.write(u'\n\n<h2>' + token.value + u'</h2>')
-    def render_ms(self, token):      self.write(u'\n\n<h3>' + token.value + u'</h3>')
-    def renderMS2(self, token):     self.write(u'\n\n<h4>' + token.value + u'</h4>')
+    def render_mt3(self, token):     self.write(u'\n\n<h2>' + token.value + u'</h2>')
+    def render_ms1(self, token):      self.write(u'\n\n<h3>' + token.value + u'</h3>')
+    def render_ms2(self, token):     self.write(u'\n\n<h4>' + token.value + u'</h4>')
     def render_p(self, token):
+        self.indentFlag = False
+        self.write(u'\n\n<p>')
+    def render_pi(self, token):
+        self.indentFlag = False
+        self.write(u'\n\n<p class"indent-2">')
+    def render_m(self, token):
         self.indentFlag = False
         self.write(u'\n\n<p>')
     def render_s1(self, token):
@@ -170,3 +162,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_sc_e(self, token):     self.write(u'</b>')
     def render_f_s(self, token):     self.write(u'[Note: ')
     def render_f_e(self, token):     self.write(u' ]')
+    def render_qs_s(self, token):     self.write(u'<i>')
+    def render_qs_e(self, token):     self.write(u'</i>')
+    def render_em_s(self, token):     self.write(u'<i>')
+    def render_em_e(self, token):     self.write(u'</i>')
+    def render_d(self, token):
+        self.indentFlag = False
+        self.write(u'\n\n<p>' + token.value + '</p>')
+        
+    def render_pb(self, token):     pass
+    def render_periph(self, token):  pass
+        

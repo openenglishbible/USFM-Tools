@@ -28,14 +28,18 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.inND = False
         
     def render(self):
-        self.f = StringIO.StringIO() # codecs.open(self.outputFilename, 'w', 'ascii')
+        self.f = StringIO.StringIO()
         self.loadUSFM(self.inputDir)
         self.run()
         v = self.f.getvalue()
         self.f.close()
-        self.logger.info('Wrapping')
-        v = self.clean(self.wrap(v))
-        o = codecs.open(self.outputFilename, 'w', 'ascii')
+        if self.config.get('Plain Text','encoding') == 'ascii':
+            self.logger.info('Converting to ascii')
+            v = self.clean(v)
+        if self.config.get('Plain Text','wrap'):
+            self.logger.info('Wrapping')
+            v = self.wrap(v)
+        o = codecs.open(self.outputFilename, 'w', self.config.get('Plain Text','encoding'))
         o.write(v)
         o.close()
         
