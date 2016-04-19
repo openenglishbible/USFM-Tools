@@ -68,7 +68,7 @@ cthnt() {
 all() {
 	make-tmp
 	cp $OEBDIR/* tmp
-	pypy transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=$ID --oeb
+	python transform.py --target=$TARGET --usfmDir=tmp/ --builtDir=$BUILTDIR --name=$ID --oeb
 	clean-tmp
 }
 
@@ -162,7 +162,7 @@ OEBDIR=/Users/russellallen/git/Open-English-Bible/usfm/release/us
 BUILTDIR=/Users/russellallen/git/USFM-Tools/built
 
 ID=oeb-current
-TARGET=rtf
+TARGET=epub
 all
 
 #ID=2014.11

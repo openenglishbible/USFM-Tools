@@ -461,3 +461,103 @@ def orderFor(booksDict):
         if booksDict.has_key(bookName):
             a.append(booksDict[bookName])
     return a
+    
+    
+#
+#   NEW SYSTEM
+#
+class Book(object):
+  def __init__(self, number, sil, full, chapters):
+    self.number = number
+    self.sil = sil
+    self.full = full
+    self.chapters = chapters
+    
+  def fileName(self):
+    return self.number + '-' + self.full + '.usfm'
+    
+class Books(object):
+  def __init__(self):
+    self.books = [
+        Book('01', 'GEN', 'Genesis', 50         ),
+        Book('02', 'EXO', 'Exodus', 40          ),
+        Book('03', 'LEV', 'Leviticus', 27       ),
+        Book('04', 'NUM', 'Numbers', 36         ),
+        Book('05', 'DEU', 'Deuteronomy', 34     ),
+
+        Book('06', 'JOS', 'Joshua', 24          ),
+        Book('07', 'JUD', 'Judges', 21          ),
+        Book('08', 'RUT', 'Ruth', 4             ),
+        Book('09', '1SA', '1 Samuel', 31        ),
+        Book('10', '2SA', '2 Samuel', 24        ),
+        Book('11', '1KI', '1 Kings', 22         ),
+        Book('12', '2KI', '2 Kings', 25         ),
+        Book('13', '1CH', '1 Chronicles', 29    ),
+        Book('14', '2CH', '2 Chronicles', 36    ),
+        Book('15', 'EZR', 'Ezra', 10            ),
+        Book('16', 'NEH', 'Nehemiah', 13        ),
+        Book('17', 'EST', 'Esther', 10          ),
+
+        Book('18', 'JOB', 'Job', 42             ),
+        Book('19', 'PSA', 'Psalms', 150         ),
+        Book('20', 'PRO', 'Proverbs', 31        ),
+        Book('21', 'ECC', 'Ecclesiastes', 12    ),
+        Book('22', 'SNG', 'Song of Solomon', 8  ),
+
+        Book('23', 'ISA', 'Isaiah', 66          ),
+        Book('24', 'JER', 'Jeremiah', 52        ),
+        Book('25', 'LAM', 'Lamentations', 5     ),
+        Book('26', 'EZK', 'Ezekiel', 48         ),
+        Book('27', 'DAN', 'Daniel', 12          ),
+
+        Book('28', 'HOS', 'Hosea', 14           ),
+        Book('29', 'JOL', 'Joel', 3             ),
+        Book('30', 'AMO', 'Amos', 9             ),
+        Book('31', 'OBA', 'Obadiah', 1          ),
+        Book('32', 'JON', 'Jonah', 4            ),
+        Book('33', 'MIC', 'Micah', 7            ),
+        Book('34', 'NAM', 'Nahum', 3            ),
+        Book('35', 'HAB', 'Habakkuk', 3         ),
+        Book('36', 'ZEP', 'Zephaniah', 3        ),
+        Book('37', 'HAG', 'Haggai', 2           ),
+        Book('38', 'ZEC', 'Zechariah', 14       ),
+        Book('39', 'MAL', 'Malachi', 4          ),
+
+        Book('40', 'MAT', 'Matthew', 28         ),
+        Book('41', 'MRK', 'Mark', 16            ),
+        Book('42', 'LUK', 'Luke', 24            ),
+        Book('43', 'JON', 'John', 21            ),
+        Book('44', 'ACT', 'Acts', 28            ),
+
+        Book('45', 'ROM', 'Romans', 16          ),
+        Book('46', '1CO', '1 Corinthians', 16   ),
+        Book('47', '2CO', '2 Corinthians', 13   ),
+        Book('48', 'GAL', 'Galatians', 6        ),
+        Book('49', 'EPH', 'Ephesians', 6        ),
+        Book('50', 'PHP', 'Philippians', 4      ),
+        Book('51', 'COL', 'Colossians', 4       ),
+        Book('52', '1TH', '1 Thessalonians', 5  ),
+        Book('53', '2TH', '2 Thessalonians', 3  ),
+        Book('54', '1TI', '1 Timothy', 6        ),
+        Book('55', '2TI', '2 Timothy', 4        ),
+        Book('56', 'TIT', 'Titus', 3            ),
+        Book('57', 'PHL', 'Philemon', 1         ),
+    
+        Book('58', 'HEB', 'Hebrews', 13         ),
+        Book('59', 'JAS', 'James', 5            ),
+        Book('60', '1PE', '1 Peter', 5          ),
+        Book('61', '2PE', '2 Peter', 3          ),
+        Book('62', '1JN', '1 John', 5           ),
+        Book('63', '2JN', '2 John', 1           ),
+        Book('64', '3JN', '3 John', 1           ),
+        Book('65', 'JUD', 'Jude', 1             ),
+
+        Book('66', 'REV', 'Revelation', 22      )
+    ]
+    
+  def bookForNumber(self, number):
+    for b in self.books:
+      if b.number == str(int(number)).zfill(2):
+        return b
+    raise error 
+
