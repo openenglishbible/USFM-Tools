@@ -169,6 +169,12 @@ class AbstractRenderer(object):
     def render_qs_e(self, token):  return self.render_unhandled(token)
 
     def render_pb(self, token):     return self.render_unhandled(token)
+    
+    # Nested
+    def render_nd_nested(self, token):       return self.render_nd_s_nested(token)
+    def render_nd_s_nested(self, token):     return self.render_nd_s(token)
+    def render_nd_e_nested(self, token):     return self.render_nd_e(token)
+    
 
     # This is unknown!
     def render_unknown(self, token):  self.logger.warning("Unknown token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )

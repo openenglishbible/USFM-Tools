@@ -165,6 +165,10 @@ buildTokenEmpty(['pb'], knownTokens)
 # special features
 buildPairTokens(['fig', 'ndx', 'pro', 'w', 'wg', 'wh'], knownTokens)
 
+# nested text
+buildPairTokens(['+nd'], knownTokens)
+
+
 #
 #   PERIPHERALS
 #
@@ -231,14 +235,14 @@ class UsfmToken(object):
     # Handler for 'is' style calls
     def __getattr__(self, name):
         if name[:3] == 'is_':
-            return name[3:] == self.getType().lower().replace('*', '_e')
+            return name[3:] == self.getType().lower().replace('*', '_e').replace('+', '_nested')
         else:
             return super.__getattr__(name)
             
     def renderOn(self, printer):
         
         try:
-            m = getattr(printer, 'render_' + self.getType().lower().replace('*', '_e'))
+            m = getattr(printer, 'render_' + self.getType().lower().replace('*', '_e').replace('+', '_nested'))
         except:
             m = getattr(printer, 'render_unhandled')
         return m(self)
