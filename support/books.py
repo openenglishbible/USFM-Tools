@@ -479,6 +479,7 @@ class Book(object):
 class Books(object):
   def __init__(self):
     self.books = [
+        Book('00', 'FRT', 'Front Material', 0   ),
         Book('01', 'GEN', 'Genesis', 50         ),
         Book('02', 'EXO', 'Exodus', 40          ),
         Book('03', 'LEV', 'Leviticus', 27       ),
@@ -559,5 +560,6 @@ class Books(object):
     for b in self.books:
       if b.number == str(int(number)).zfill(2):
         return b
-    raise error 
+    logger.error("Cant find book: " + str(int(number)).zfill(2)) 
+    sys.exit(1)
 
