@@ -22,7 +22,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # Unset
         self.f = None  # output file stream
         # IO
-        self.outputFilename = os.path.join(outputDir, outputName + STANDARD_SUFFIX)
+        self.outputFilename = os.path.join(outputDir, outputName)
         self.inputDir = inputDir
         # Position
         self.cb = u''    # Current Book
@@ -38,7 +38,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render(self, order="normal"):
         self.loadUSFM(self.inputDir)
         self.f =  tempfile.NamedTemporaryFile(suffix=".html")
-        self.fName = '/Users/russellallen/Desktop/oeb.html' #self.f.name
+        self.fName = self.f.name
         self.f.close()
         self.f = codecs.open(self.fName, 'w', 'utf_8_sig')
         h = u"""
@@ -145,10 +145,17 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.f.write('</body></html>')
         self.f.close()
         
-        calibre = os.path.join(self.config.get('ePub','calibre'),'ebook-convert')
-        self.logger.info('Converting to epub using: ' + calibre)
+        self.convert()
         
-        run = calibre + ' "' + self.fName + '" "' + self.outputFilename + '"'
+    def suffix(self):
+        return STANDARD_SUFFIX
+                
+    def convert(self):
+        suffix = self.suffix()
+        calibre = os.path.join(self.config.get('ePub','calibre'),'ebook-convert')
+        self.logger.info('Converting to ' + suffix + ' using: ' + calibre)
+        
+        run = calibre + ' "' + self.fName + '" "' + self.outputFilename + suffix + '" --cover="' + self.config.get('ePub', 'cover') + '" --title="' + self.config.get('ePub', 'title') + '" --authors="' + self.config.get('ePub', 'authors') + '"'
         subprocess.call(run, shell=True)
         
         
