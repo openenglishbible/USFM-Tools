@@ -12,9 +12,9 @@ import os
 #   Renders to Word .docx
 #
 
-class Renderer(abstractRenderer.AbstractRenderer, config):
+class Renderer(abstractRenderer.AbstractRenderer):
     
-    def __init__(self, inputDir, outputDir, outputName):
+    def __init__(self, inputDir, outputDir, outputName, config):
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         self.document = Document()
         self.currentParagraph = self.document.add_paragraph()
