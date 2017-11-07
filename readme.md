@@ -1,31 +1,20 @@
-This project comprises a framework for transforming .usfm files into specified targets.
+# USFM Tools
 
-It is primarily used for the Open English Bible, and may need adjustment if used for other purposes.
+## About
 
-# Installation
+This is a respository of useful tools for working with USFM.
 
-# Prerequisites
+The tools are written in Python 3.
 
-    pip install pyparsing
-    
-    For Word output:
-    pip install python-docx
-    
-    Install copies of ConTeXt for PDF output:
-    http://wiki.contextgarden.net/ConTeXt_Standalone
-    
-    Install Calibre for ePub output:
-    http://calibre-ebook.com
-    
-    Install Crosswire tools for OSIS and Sword Module output:
-    brew install sword    (on OS X)
+So far there is:
 
-# Get code
+* *check* - a linter to check for common errors in USFM coding
+* *tranform* - a system to render USFM to a number of other formats such as PDF, markdown and docx.
 
-    git clone https://github.com/openenglishbible/USFM-Tools.git
-    cd USFM-Tools
+The tools are under the MIT licence.
 
-# Run
+Documentation is currently, um, somwhat limited... (sorry)
 
-    python transform.py --target=singlehtml --usfmDir=/path/to/usfmfiles/ --builtDir=built/ --name=MyTranslation
+## Status
 
+* **2017-11-08** - First pass updating to python3, some things are temporarily broken.
