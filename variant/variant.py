@@ -200,7 +200,7 @@ def stage(src, to, tags, booklist, swap):
             # Now deal with contractions and possessives
             s = s.replace('\'', '’')
 
-            f = open(os.path.join(to, fn), 'w')
+            f = open(os.path.join(to, fn[:-3]), 'w')
             f.write(s)
             f.close()
             log('DEBUG', 'Wrote ' + fn)
