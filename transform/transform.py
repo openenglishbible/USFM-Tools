@@ -1,22 +1,15 @@
 import getopt
 import importlib
-# LOGGING
-import logging
 import os
 import subprocess
 import sys
 
-logger = logging.getLogger('USFM Tools')
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-ch.setFormatter(formatter)
-logger.addHandler(ch)    
-
 # Set Path for files in support/
 rootdiroftools = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(rootdiroftools,'support'))
+
+# LOGGING
+import sharedLogger
 
 #IMPORT MODULES (TO BE DEPRECATED)
 import readerise
@@ -29,7 +22,8 @@ def runscript(c, prefix='', repeatFilter = ''):
     pp = subprocess.Popen([c], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     (result, stderrdata) = pp.communicate()
     print(result)
-    print(stderrdata)
+    if not len(stderrdata) == 0:
+        print(stderrdata)
     if not repeatFilter == '' and not stderrdata.find(repeatFilter) == -1:
         runscript(c, prefix, repeatFilter)
 
@@ -83,8 +77,7 @@ def main(argv):
     # START
     saveCWD() 
     oebFlag = False  
-    order="normal" 
-    logger.info('Starting Build.')
+    order="normal"
     # Default config if not overriden later
     config = rendererConfig.RendererConfig(os.path.join(rootdiroftools, 'default.config'))
     try:
@@ -112,6 +105,8 @@ def main(argv):
         else:
             usage()
 
+    logger = sharedLogger.initLogger(config.get("General", "logLevel"))
+
     if targets == 'reader':
         buildReader(usfmDir, buildDir, buildName)
     elif targets == 'mediawiki':
@@ -122,14 +117,13 @@ def main(argv):
         try:
             m = importlib.import_module(targets + 'Renderer')
             ensureOutputDir(buildDir)
-            logger.info("\n  Building: " + usfmDir + "\n  into: " + buildDir + "\n  as: " + buildName)
             c = m.Renderer(usfmDir, buildDir, buildName, config)
             if oebFlag is True: c.setOEBFlag()
             c.render()
         except Exception as e:
             logger.exception('ERROR IN BUILD')
 
-    logger.info('Finished.')
+    logger.debug('Finished.')
     restoreCWD()
 
 def usage():

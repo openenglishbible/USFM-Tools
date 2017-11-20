@@ -21,12 +21,16 @@ class DummyFile(object):
 class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
+        self.identity = 'html renderer'
+        self.outputDescription = os.path.join(outputDir, outputName + '.epub')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = DummyFile()  # output file stream
         self.ft = [] # array of text to write to file
         # IO
-        self.outputDir = outputDir
+        self.outputDir = os.path.join(outputDir, outputName + '_html')
+        if not os.path.exists(self.outputDir):
+            os.makedirs(self.outputDir)
         self.inputDir = inputDir
         # Caches
         self.cachedChapterMarker = ''
@@ -44,6 +48,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # Write pages
         self.run()
         self.close()
+        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/jquery-3.2.1.min.js', self.outputDir + '/')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/normalize.css', self.outputDir + '/')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/style.css', self.outputDir + '/')
         shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/jump.js', self.outputDir + '/')
@@ -210,8 +215,8 @@ header_header = r"""<!DOCTYPE html>
     <head>
     <title>{{{translationname}}} | Read</title>
     <meta charset='utf-8'>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css" rel="stylesheet">
+    <script src="jquery-3.2.1.min.js"></script>
+    <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
     <script src="jump.js"></script>
     </head>

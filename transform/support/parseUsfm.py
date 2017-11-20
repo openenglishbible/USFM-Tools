@@ -4,6 +4,8 @@
 import sys
 
 from pyparsing import *
+import sharedLogger
+
 
 #
 # Setup
@@ -194,14 +196,15 @@ usfm = OneOrMore( MatchFirst(knownTokens) )
 #
 
 def parseString( unicodeString ):
+    logger = sharedLogger.currentLogger
     try:
         s = clean(unicodeString)
         tokens = usfm.parseString(s, parseAll=True )
     except Exception as e:
-        print('PARSE ERROR IN LINE')
-        print('   ' + e.line)
-        print('AT COL ' + str(e.col))
-        print(e)
+        logger.error('\nParse error in book ' + unicodeString.split('\n')[0] +
+                     '\n    in line reading <' + e.line + '>' +
+                     '\n             at col ' + str(e.col) +
+                     '\n              error ' + str(e))
         sys.exit()
     return [createToken(t) for t in tokens] # if isNotBlank(t)]
 
@@ -242,7 +245,7 @@ class UsfmToken(object):
     def renderOn(self, printer):
         
         try:
-            m = getattr(printer, 'render_' + self.getType().lower().replace('*', '_e').replace('+', '_nested'))
+            m = getattr(printer, 'render_' + self.getType().lower().replace('*', '_e').replace('+', 'nested_'))
         except:
             m = getattr(printer, 'render_unhandled')
         return m(self)

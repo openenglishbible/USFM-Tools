@@ -2,19 +2,10 @@
 #
 
 import os
-import codecs
 import sys
 
 # LOGGING
-import logging
-logger = logging.getLogger('Books')
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-ch.setFormatter(formatter)
-logger.addHandler(ch)    
-
+import sharedLogger
 
 bookKeys = {
 'FRT': '000',
@@ -433,22 +424,23 @@ def accordanceNameForBookKey(bk):
     return accordanceNames[int(bk) - 1]
     
 def loadBooks(path):
+    logger = sharedLogger.currentLogger
     books = {}
     dirList=os.listdir(path)
-    logger.info('Loading USFM files from ' + path)
+    logger.debug('Loading USFM files from ' + path)
     for fname in dirList:
       try:
           f = open(path + '/' + fname,'U') # U handles line endings
           usfm = f.read()
           if usfm[:4] == r'\id ' and usfm[4:7] in silNames:
-              logger.info('Loaded ' + fname + ' as ' + usfm[4:7])
+              logger.debug('Loaded ' + fname + ' as ' + usfm[4:7])
               books[bookID(usfm)] = usfm
               f.close()
           else:
-              logger.warning('Ignored ' + fname)
+              logger.warning('Ignored ' + fname + ' - maybe ' + usfm[4:7] + ' ? ')
       except:
           logger.error('     Couldn\'t open ' + fname)
-    logger.info('Finished loading')
+    logger.debug('Loaded USFM files from ' + path)
     return books
 
 def orderFor(booksDict):
@@ -557,6 +549,7 @@ class Books(object):
     ]
     
   def bookForNumber(self, number):
+    logger = sharedLogger.currentLogger
     for b in self.books:
       if b.number == str(int(number)).zfill(2):
         return b

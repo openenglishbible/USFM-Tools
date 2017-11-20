@@ -16,7 +16,7 @@ class Checker(object):
     def loadBooks(self, path):
         books = {}
         dirList = os.listdir(path)
-        print('     Checking ' + path)
+        print('Checking ' + path)
         for fname in dirList:
             try:
                 f = open(path + '/' + fname, 'rt')
@@ -24,7 +24,7 @@ class Checker(object):
                 books[fname] = usfm
                 f.close()
             except:
-                if not fname == '.DS_Store':
+                if not fname[0] == '.':  # Ignore hidden files
                     print('     - Couldn\'t open ' + fname)
         return books
 
@@ -164,7 +164,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         rx = re.compile(r'[^\s]–')
         if not rx.search(u) == None:
             print('n-dash without prior space in: ' + b)
-        rx = re.compile(r'–[^\s]')
+        rx = re.compile(r'–[^\\\s]') # OK if we have token directly after
         if not rx.search(u) == None:
             print('n-dash without subsequent space in: ' + b)
 

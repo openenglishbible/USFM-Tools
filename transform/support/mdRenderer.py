@@ -12,12 +12,14 @@ OUT = 2
 JUSTOUT = 3
 
 #
-#   Simplest renderer. Ignores everything except ascii text.
+#   Markdown renderer. Renders markdown in UTF8
 #
 
 class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
+        self.identity = 'markdown renderer'
+        self.outputDescription = os.path.join(outputDir, outputName + '.md')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Data
         self.stringStream = io.StringIO()
@@ -26,7 +28,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.outputFilename = os.path.join(outputDir, outputName + '.md')
         self.inputDir = inputDir
         # Position
-        self.currentC = 1
+        self.currentC = '1'
         self.book = ''
         # Flags
         self.ndStatus = OUT
@@ -53,7 +55,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.rendered = self.rendered.replace('LORD \'', 'LORD\'')
     
     def writeHeader(self):
-        self.rendered = self.rendered + r'% Open English Bible\n\n'
+        self.rendered = self.rendered + r'% ' + self.config.get('General', 'name') + '\n\n'
         
     # Support    
         
@@ -65,16 +67,19 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_text(self, token):    self.write(self.escape(token.value))
 
     def render_h(self, token):       self.book = token.getValue() ; self.write('\n\n\n\n')
-    def render_mt(self, token):      self.write('\n\n' + token.value + '\n' + ('=' * len(token.value)) + '\n')
+    def render_mt1(self, token):     self.write('\n\n' + token.value + '\n' + ('=' * len(token.value)) + '\n')
     def render_mt2(self, token):     self.write('\n\n' + token.value + '\n' + ('-' * len(token.value)) + '\n')
+    def render_mt3(self, token):     self.write('\n\n### ' + token.value + ' ###\n')
     def render_ms(self, token):      self.write('\n\n### ' + token.value + ' ###\n')
-    def renderMS2(self, token):     self.write('\n\n#### ' + token.value + ' ####\n')
-    def render_s1(self, token):       self.qStatus = OUT ; self.write('\n\n##### ' + token.value + ' #####\n\n')
+    def render_ms2(self, token):     self.write('\n\n#### ' + token.value + ' ####\n')
+    def render_s1(self, token):      self.qStatus = OUT ; self.write('\n\n##### ' + token.value + ' #####\n\n')
     def render_s2(self, token):      self.qStatus = OUT ; self.write('\n\n###### ' + token.value + ' ######\n\n')
     def render_p(self, token):       self.qStatus = OUT ; self.write('\n\n')
+    def render_pi(self, token):      self.qStatus = OUT ; self.write('\n\n  ')
+    def render_m(self, token):       self.qStatus = OUT; self.write('\n\n')
     def render_b(self, token):       self.write('\n\n')
     def render_c(self, token):       self.currentC = token.value; self.write('\n\n [' + self.book + ' ' + self.currentC + '] \n\n')
-    def render_v(self, token):       self.write(' [' + self.currentC + ':' + token.value + '] ')
+    def render_v(self, token):       self.write('[' + self.currentC + ':' + token.value + '] ')
     def render_q(self, token):
         if self.qStatus == OUT: 
             self.write('\n\n')
@@ -103,4 +108,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
     
     def render_nd_s(self,token):      self.ndStatus = IN
     def render_nd_e(self,token):      self.ndStatus = JUSTOUT
-            
+
+    def render_em_s(self, token):     self.write('*')
+    def render_em_e(self, token):     self.write('*')
+
+    def render_d(self, token):        self.write('\n' + token.value + '\n')
+
+    def render_qs_s(self, token):     self.write('*')
+    def render_qs_e(self, token):     self.write('*')
+
+    def render_periph(self, token):   pass
+    def render_pb(self, token):       pass

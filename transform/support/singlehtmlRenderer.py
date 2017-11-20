@@ -16,6 +16,8 @@ STANDARD_SUFFIX = '.html'
 class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
+        self.identity = 'single page html renderer'
+        self.outputDescription = os.path.join(outputDir, outputName + '.html')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = None  # output file stream
@@ -76,14 +78,13 @@ class Renderer(abstractRenderer.AbstractRenderer):
         <p><b>Old Testament</b></p>
         {{{otlinks}}}
         <p><b>New Testament</b></p>
-        <p class="indent-1"><a href="#040">Matthew</a></p>
         {{{ntlinks}}}
         
         """
         h = h.replace('{{{otlinks}}}', self.bookList(1, 39))
         h = h.replace('{{{ntlinks}}}', self.bookList(40, 66))
         self.f.write(h)
-        self.f.write('<p>Draft built ' + datetime.date.today().strftime("%A, %d %B %Y") + '</p>\n\n')
+        self.f.write('<p>Document rendered ' + datetime.date.today().strftime("%A, %d %B %Y") + '</p>\n\n')
         self.run(order)
         self.f.write('</body></html>')
         self.f.close()

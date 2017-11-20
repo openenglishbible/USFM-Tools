@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-import logging
+import sharedLogger
 
 import books
 import parseUsfm
@@ -10,20 +10,15 @@ import parseUsfm
 class AbstractRenderer(object):
     
     def __init__(self, inputDir, outputDir, outputName, config):
-        
-        # LOGGING
-        self.logger = logging.getLogger('Renderer')
-        self.logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        ch.setFormatter(formatter)
-        self.logger.addHandler(ch)    
-
+        self.identity = 'abstract renderer' if not self.identity else self.identity
+        self.outputDescription = outputName if not self.outputDescription else self.outputDescription
+        self.logger = sharedLogger.currentLogger
+        self.logger.info("\n  Building: " + inputDir +
+                         "\n  as: " + self.outputDescription +
+                         "\n  using: " + self.identity)
         self.oebFlag = False
-        
         self.config = config
-        
+
     def setOEBFlag(self):
         self.oebFlag = True
         
@@ -42,10 +37,10 @@ class AbstractRenderer(object):
             
     def renderBook(self, bookName):
         if bookName in self.booksUsfm:
-            self.logger.info('Rendering ' + bookName)
+            self.logger.debug('Rendering ' + bookName)
             tokens = parseUsfm.parseString(self.booksUsfm[bookName])
             for t in tokens: t.renderOn(self)
-            self.logger.info('Rendered  ' + bookName)
+            self.logger.debug('Rendered  ' + bookName)
 
     def render_periph(self, token): return self.render_unhandled(token)
         
@@ -173,13 +168,15 @@ class AbstractRenderer(object):
     def render_pb(self, token):     return self.render_unhandled(token)
     
     # Nested
-    def render_nd_nested(self, token):       return self.render_nd_s_nested(token)
-    def render_nd_s_nested(self, token):     return self.render_nd_s(token)
-    def render_nd_e_nested(self, token):     return self.render_nd_e(token)
+    def render_nested_nd(self, token):       return self.render_nested_nd_s(token)
+    def render_nested_nd_s(self, token):     return self.render_nd_s(token)
+    def render_nested_nd_e(self, token):     return self.render_nd_e(token)
     
 
     # This is unknown!
-    def render_unknown(self, token):  self.logger.warning("Unknown token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
+    def render_unknown(self, token):
+        self.logger.warning("Unknown token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
 
-    # We do not handle this!
-    def render_unhandled(self, token):  self.logger.warning("Unhandled token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
+    # We do not specifically handle this!
+    def render_unhandled(self, token):
+        self.logger.debug("Unhandled token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )

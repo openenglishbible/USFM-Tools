@@ -18,5 +18,5 @@ Documentation is currently, um, somwhat limited... (sorry)
 
 ## Status
 
-* **2017-11-14** - Added variant tool
+* **2017-11-20** - Added variant tool and check tool
 * **2017-11-08** - First pass updating to python3, some things are temporarily broken.

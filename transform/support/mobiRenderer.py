@@ -8,5 +8,7 @@ import epubRenderer
 #
 
 class Renderer(epubRenderer.Renderer):
-    def suffix(self):
-        return '.mobi'
+
+    suffix = '.mobi'
+    identity = 'renderer for kindle (.mobi)'
+

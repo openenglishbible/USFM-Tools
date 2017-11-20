@@ -17,24 +17,24 @@ import abstractRenderer
 #
 
 class Renderer(abstractRenderer.AbstractRenderer):
-    
-    def runscript(self, c, prefix='', repeatFilter = ''):
-        print(prefix + ':: ' + c)
+    def runscript(self, c, prefix='', repeatFilter=''):
         pp = subprocess.Popen([c], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         (result, stderrdata) = pp.communicate()
-        print(result)
-        print(stderrdata)
-        if not repeatFilter == '' and not stderrdata.find(repeatFilter) == -1:
-            runscript(c, prefix, repeatFilter)
+        self.logger.debug(result)
+        if not len(stderrdata) == 0:
+            self.logger.warning(stderrdata)
 
     def __init__(self, inputDir, outputDir, outputName, config):
+        self.identity = 'pdf renderer (via context)'
+        self.outputDescription = os.path.join(outputDir, outputName + '.pdf')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = None  # output file stream
         # IO
-        self.texFile = tempfile.NamedTemporaryFile()
-        self.texFileName = self.texFile.name
-        self.outputFileName = os.path.join(outputDir, outputName + '.pdf')
+        self.outputDir = outputDir
+        self.tempDir = tempfile.mkdtemp()
+        self.texFileName = os.path.join(self.tempDir, 'bible.tex')
+        self.outputFileName = os.path.join(self.outputDir, outputName + '.pdf')
         self.inputDir = inputDir
         # Flags
         self.printerState = {'li': False, 'd': False, 'm': False}
@@ -45,14 +45,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.narrower = False
         self.doChapterOrVerse = ''
         self.smallcaps = False
-        
+
     def introTeXt(self):
         tex = self.rawIntroTeXt
         # Layout
         if self.config.get('Context','layout') == 'singlesided':
              tex = tex.replace('{{{layout}}}', 'singlesided')
              tex = tex.replace('{{{position}}}', '\inleft')
-             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [leftedge=0.25in,leftmargin=0.75in,width=4in,rightmargin=0.5in,rightedge=0.5in]')         
+             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [leftedge=0.25in,leftmargin=0.75in,width=4in,rightmargin=0.5in,rightedge=0.5in]')
         else:
              tex = tex.replace('{{{layout}}}', 'doublesided')
              tex = tex.replace('{{{position}}}', '\inouter')
@@ -67,7 +67,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         else:
             tex = tex.replace('{{{coverPage}}}', '\externalfigure[' + self.config.get('Context','coverPage') + ']\page[right]')
         return tex
-        
+
     def render(self, order='normal'):
         # RENDER
         self.f = open(self.texFileName, 'w')
@@ -75,27 +75,27 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.f.write(self.introTeXt())
         self.run(order)
         self.f.write(self.stopNarrower() + self.closeTeXt)
-        self.f.close()   
+        self.f.close()
         # OPTIONALLY SAVE TEX FILE
-        if self.config.get("Context",'saveTeX'):  shutil.copy(self.texFileName, self.outputFileName[:-4] + '.tex')
-        # GENERATE 
-        t = tempfile.mkdtemp()
-        c = '. ./support/thirdparty/context/tex/setuptex ; '
+        if self.config.get("Context",'saveTeX') == 'true':  shutil.copy(self.texFileName, self.outputFileName[:-4] + '.tex')
+
+        c = '. ' + os.path.dirname(os.path.realpath(__file__)) + '/thirdparty/context/tex/setuptex && '
         if platform.system() == 'Darwin':
-            c = c + 'export OSFONTDIR="/Library/Fonts//;/System/Library/Fonts;$HOME/Library/Fonts" ; '
+            c = c + 'export OSFONTDIR="/Library/Fonts//;/System/Library/Fonts;$HOME/Library/Fonts" && '
         elif platform.system() == 'Windows':
             print(" TODO: make this work on Windows ")
             sys.exit(1)
         elif platform.system() == 'Linux':
-            c = c + 'export OSFONTDIR="/usr/share/fonts//;$HOME/.fonts" ; '        
+            c = c + 'export OSFONTDIR="/usr/share/fonts//;$HOME/.fonts" && '
         else:
             print(" No idea what platform I'm on...")
             sys.exit(1)
-        c = c + 'mtxrun --script fonts --reload ; '
-        c = c + 'cd "' + t + '"; rm * ; context ' + self.texFileName + ' --result="' + self.outputFileName + '"'
-        self.runscript(c, '     ')
-        
-    
+        c = c + 'mtxrun --script fonts --reload && '
+        c = c + 'pushd "' + self.tempDir + '" && context bible.tex && cp bible.pdf "' + self.outputFileName + '" && popd'
+        self.logger.debug(c)
+        self.runscript(c, '    ')
+
+
     #
     #   Support
     #
@@ -114,9 +114,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def escapeText(self, s):
         return s.replace('&', '\\&').replace('%', '\\%')
- 
+
     def markForSmallCaps(self):
-        if self.smallCapSections: 
+        if self.smallCapSections:
              self.smallcaps = True
 
     def renderSmallCaps(self, s):
@@ -136,7 +136,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
                      return '{\sc ' + s[:i] + '}' + s[i:]
              i = i + 1
          return '{\sc ' + s + '}'
-         
+
     def startLI(self):
         if self.printerState['li'] == False:
             self.printerState['li'] = True
@@ -145,7 +145,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         else:
             #return u'\item '
             return r'\par '
-        
+
     def stopLI(self):
         if self.printerState['li'] == False:
             return ''
@@ -165,7 +165,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         else:
             self.printerState['d'] = False
             return '\stopalignment }'
-            
+
     def startM(self):
         r = self.stopD() + self.stopLI() + self.stopNarrower()
         self.printerState['m'] = True
@@ -188,7 +188,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
             self.justDidNB = False
             s = s + r'\indentation '
         return s
-                    
+
 
     #
     #   Tokens
@@ -221,17 +221,17 @@ class Renderer(abstractRenderer.AbstractRenderer):
             s = self.doChapterOrVerse + s
             self.doChapterOrVerse = ''
         elif not self.doChapterOrVerse == '':
-            i = s.find(' ')   
-            if i == -1: 
+            i = s.find(' ')
+            if i == -1:
                 # No space found - try end
-                i = len(s)       
+                i = len(s)
             s = s[:i] + self.doChapterOrVerse + s[i+1:]
             self.doChapterOrVerse = ''
         elif self.smallcaps:
             s = self.renderSmallCaps(s)
         if self.justDidLORD:
             if s[0].isalpha(): s = ' ' + s
-            self.justDidLORD = False    
+            self.justDidLORD = False
         self.f.write( s )
     def render_q(self, token):       self.render_q1(token)
     def render_q1(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
@@ -255,20 +255,20 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_fk(self, token):      self.f.write( ' ' + token.getValue() + ' ' )
     def render_ft(self, token):      self.f.write( ' ' + token.getValue() + ' ' )
     def render_pi(self, token):      self.render_q(token)
-    
+
     def render_is1(self, token):    self.render_s1(token)
     def render_ip(self, token):     self.render_p(token)
     def render_iot(self, token):    self.render_q(token)
     def render_io1(self, token):    self.render_q2(token)
-    
+
     def render_qs_s(self, token):   self.f.write( '{\em ' )
     def render_qs_e(self, token):   self.f.write( '} ' )
 
 
     def render_pb(self, token):     self.f.write('\page ')
-    
+
     def render_m(self, token):      self.f.write( self.stopM() + self.startM() )
-    
+
     def render_periph(self, token):
         if token.getValue() == 'Table of Contents':
             self.f.write("""
@@ -281,7 +281,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     #
     #   Introductory codes
     #
-    
+
     rawIntroTeXt = r"""
     \definemarking[RAChapter]
     \definemarking[RABook]
@@ -351,7 +351,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     % \showlayout
     {{{coverPage}}}
     """
-    
+
     closeTeXt = r"""
     \stoptext
     """

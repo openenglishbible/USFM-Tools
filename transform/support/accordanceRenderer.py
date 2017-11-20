@@ -18,6 +18,8 @@ JUSTOUT = 3
 class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
+        self.identity = 'renderer for accordance bible software'
+        self.outputDescription = os.path.join(outputDir, outputName + '.accordance.txt')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = None  # output file stream

@@ -15,6 +15,8 @@ STANDARD_SUFFIX = '.rtf'
 class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
+        self.identity = 'rtf renderer'
+        self.outputDescription = os.path.join(outputDir, outputName + '.rtf')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = None  # output file stream
@@ -28,7 +30,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.cc =  ''
         
     def render(self, order="normal"):
-        self.f = codecs.open(self.outputFilename, 'w', 'cp1252') # ie ansi
+        self.f = open(self.outputFilename, 'w', encoding='cp1252') # ie ansi
         self.f.write(r"""{\rtf1\ansi\ansicpg1252\deff0 
 {\fonttbl{\f0\fswiss Verdana;}}\fs24 
 {\colortbl
@@ -39,7 +41,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
 \red0\green0\blue0;
 }
 \hyphauto\ftnbj
-""".encode('utf-8'))
+""")
         self.loadUSFM(self.inputDir)
         self.run(order)
         self.end_par()
@@ -54,7 +56,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
                 n.append('\\uc1\\u' + str(ord(c)) + '*')
             else:
                 n.append(c)
-        u = string.join(n, '')
+        u = ''.join(n)
         u = u.replace('\n', "\r\n")
         return u
         
