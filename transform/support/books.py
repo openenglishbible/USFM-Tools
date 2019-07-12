@@ -445,7 +445,8 @@ def loadBooks(path):
 
 def orderFor(booksDict):
     order = silNames
-    if "PSA" in booksDict and "GEN" not in booksDict and "MAT" in booksDict:
+    if "PSA" in booksDict and \
+            "GEN" not in booksDict and "MAT" in booksDict:
         # This is a big hack. When doing Psalms + NT, put Psalms last
         order = silNamesNTPsalms       
     a = []

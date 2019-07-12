@@ -22,7 +22,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
         self.identity = 'html renderer'
-        self.outputDescription = os.path.join(outputDir, outputName + '.epub')
+        self.outputDescription = os.path.join(outputDir, outputName + '_html')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
         self.f = DummyFile()  # output file stream
@@ -32,6 +32,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
         if not os.path.exists(self.outputDir):
             os.makedirs(self.outputDir)
         self.inputDir = inputDir
+        # Reset
+        self.resetBookStart()
+
+    def resetBookStart(self):
         # Caches
         self.cachedChapterMarker = ''
         self.cachedBookname = ''
@@ -41,6 +45,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.cv = '001'    # Currrent Verse
         # Flags
         self.indentFlag = False
+        self.firstParagraphInBook = True
+        self.afterHeader = False
 
     def render(self):
         # Load
@@ -61,7 +67,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         with open(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/index.html') as f:
             c = f.read()
         c = c.replace('{{{ot}}}', self.bookList(1, 39))
-        c = c.replace('{{{nt}}}', self.bookList(40, 66))
+        c = c.replace('{{{nt}}}', self.bookList(40, 67))
         c = c.replace(r'{{{translationname}}}',self.config.get('General','name'))
         c = c.replace(r'{{{pathtologo}}}',self.config.get('HTML','frontlogo'))
         with open(self.outputDir + '/index.html', 'w') as f:
@@ -90,7 +96,6 @@ class Renderer(abstractRenderer.AbstractRenderer):
         
     def cleanHTML(self, t):
         c = t
-        c = t.replace('<p><br /><br />', '<p>')
         c = c.replace(r'~', '&nbsp;')
         c = c.replace(r'<span class="nd"> Lord </span> ,', r'<span class="nd"> Lord</span>,')
         c = c.replace(r'<span class="nd"> Lord </span> ;', r'<span class="nd"> Lord</span>;')
@@ -108,94 +113,124 @@ class Renderer(abstractRenderer.AbstractRenderer):
         return c
         
     # Support
-    
-    def header(self):
-        h = header_header
-        h = h + '<tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/><b>Old Testament</b></td></tr><tr>'
-        for b in range(1, 39):
+
+    def headerGroup(self, start, finish):
+        h = ''
+        for b in range(start, finish + 1):
             if books.silNames[b] in self.booksUsfm:
-                h = h + '\n<td><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b - 1].replace(' ', '&nbsp;') + '</a></td>'
+                h = h + '\n<li class="label3"><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b - 1].replace(' ', '&nbsp;') + '</a></li>'
             else:
-                h = h + '\n<td>' + books.bookNames[b - 1] + '</td>'
-            if b % 5 == 0: h = h + '</tr><tr>'
-        h = h + '\n</tr><tr><td colspan = "5" style="font-size:100%;">&nbsp;<br/><b>New Testament</b></td></tr><tr>'
-        for b in range(40, 66):
-            if books.silNames[b] in self.booksUsfm:
-                h = h + '\n<td><a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b - 1].replace(' ', '&nbsp;') + '</a></td>'
-            else:
-                h = h + '\n<td>' + books.bookNames[b - 1] + '</td>'
-            if b % 5 == 4: h = h + '</tr><tr>'
-        h = h + '\n</tr><tr><td colspan = "2"><br><a href="{{{websiteURL}}}">{{{websiteName}}}</a></td></tr></table></div></div>'
+                h = h + '\n<li class="label3">' + books.bookNames[b - 1] + '</li>'
         return h
-        
+
+    def header(self):
+        h = '\n<ul>'
+        h = h + '\n<li class="label1">Old Testament</li>'
+        h = h + '\n<li class="label2">The Law</li>'
+        h = h + self.headerGroup(1, 5)
+        h = h + '\n<li class="label2">Histories</li>'
+        h = h + self.headerGroup(6, 17)
+        h = h + '\n<li class="label2">Wisdom</li>'
+        h = h + self.headerGroup(18, 22)
+        h = h + '\n<li class="label2">Major Prophets</li>'
+        h = h + self.headerGroup(23, 27)
+        h = h + '\n<li class="label2">Minor Prophets</li>'
+        h = h + self.headerGroup(28, 39)
+        h = h + '\n<li class="label1">New Testament</li>'
+        h = h + '\n<li class="label2">Gospels</li>'
+        h = h + self.headerGroup(40, 43)
+        h = h + '\n<li class="label2">History</li>'
+        h = h + self.headerGroup(44, 44)
+        h = h + '\n<li class="label2">Pauline Epistles</li>'
+        h = h + self.headerGroup(45, 58)
+        h = h + '\n<li class="label2">Other Epistles</li>'
+        h = h + self.headerGroup(59, 65)
+        h = h + '\n<li class="label2">Revelation</li>'
+        h = h + self.headerGroup(66, 66)
+        h = h + '\n</ul>'
+        #h = h + '\n</tr><tr><td colspan = "2"><br><a href="{{{websiteURL}}}">{{{websiteName}}}</a></td></tr></table></div></div>'
+        h = header_header.replace(r'{{{ book list }}}', h)
+        h = h.replace(r'{{{ book name }}}', books.fullName(int(self.cb)))
+        return h
+
     def writeChapterMarker(self):
         self.write(self.cachedChapterMarker)
         self.cachedChapterMarker = ''
 
     def writeIndent(self, level):
-        if level == 0:
-            self.indentFlag = False
-            self.write('<br /><br />')
-            return 
-        if not self.indentFlag:
-            self.indentFlag = True
-            self.write('<br />')
-        self.write('<br />')
-        self.write('&nbsp;&nbsp;' * level)
+        self.write('\n<p class="indent' + str(level) + '">')
         self.writeChapterMarker()
+
+    def writeHeader(self, level, token):
+        self.afterHeader = True
+        self.write('\n<h' + str(level) + '>' + token.value + '</h' + str(level) + '>')
 
     def render_id(self, token): 
         self.write(footer)
         self.close()
+        self.resetBookStart()
         self.cb = books.bookKeyForIdValue(token.value)
         self.openFile(self.cb)
         self.write(self.header())
         self.indentFlag = False
-    def render_mt(self, token):      self.write('</p><h1>' + token.value + '</h1><p>')
-    def render_mt2(self, token):      self.write('</p><h2>' + token.value + '</h2><p>')
-    def render_ms(self, token):      self.write('</p><h4>' + token.value + '</h4><p>')
-    def renderMS2(self, token):     self.write('</p><h5>' + token.value + '</h5><p>')
+    def render_mt(self, token):     self.writeHeader(1, token)
+    def render_mt2(self, token):    self.writeHeader(2, token)
+    def render_ms(self, token):     self.writeHeader(4, token)
+    def render_ms2(self, token):    self.writeHeader(5, token)
     def render_p(self, token):
+        self.write('\n<!-- ' + self.cc + ' ' + self.cv + ' -->\n')
         self.indentFlag = False
-        self.write('<br /><br />')
+        if self.cc == '001' and self.cv == '001' and self.firstParagraphInBook:
+            self.write('\n\n<p class="smallcappara">')
+        else:
+            self.write('\n\n<p>')
         self.writeChapterMarker()
     def render_s1(self, token):
         self.indentFlag = False
         if token.value == '~':
-            self.write('<p>&nbsp;</p><p>')
+            self.write('<p>&nbsp;<p>')
         else:
-            self.write('</p><h6>' + token.value + '</h6><p>')
+            self.writeHeader(6, token)
     def render_s2(self, token):
         self.indentFlag = False
-        self.write('</p><h7>' + token.value + '</h7><p>')
+        self.writeHeader(7, token)
     def render_c(self, token):
         self.cc = token.value.zfill(3)
         self.cachedChapterMarker = '<span class="chapter" id="' + self.cc + '001">' + token.value + '</span>'
-        # if self.cb==u'019': self.write(u'<p><em>Psalm ' + token.value + u'</em></p>')
     def render_v(self, token):
         self.cv = token.value.zfill(3)
         if self.cv == '001':
             self.writeChapterMarker()
         else:
-            self.write('\n<span class="verse" rel="v' + self.cb + self.cc + self.cv + '" id="' + self.cc + self.cv + '" >' + token.value + '</span>\n')
+            self.write('<span class="verse" rel="v' + self.cb + self.cc + self.cv + '" id="' + self.cc + self.cv + '" >' + token.value + '</span>\n')
     def render_wj_s(self, token):     self.write('<span class="woc">')
     def render_wj_e(self, token):     self.write('</span>')
 
     def render_nd_s(self, token):     self.write('<span class="nd">')
     def render_nd_e(self, token):     self.write('</span>')
 
-    def render_text(self, token):    self.write(" " + token.value + " ")
+    def render_text(self, token):
+        if self.firstParagraphInBook:
+            self.write('<span class="dropcap">' + token.value[0] + '</span>' + token.value[1:] + ' ')
+        else:
+            self.write(" " + token.value + " ")
+        self.firstParagraphInBook = False
+
+    def render_m(self, token):       self.render_p(token)
     def render_q(self, token):       self.writeIndent(1)
     def render_q1(self, token):      self.writeIndent(1)
     def render_q2(self, token):      self.writeIndent(2)
     def render_q3(self, token):      self.writeIndent(3)
     def render_nb(self, token):      self.writeIndent(0)
-    def render_b(self, token):       self.write('<br />')
+    def render_b(self, token):       self.write('<p>')
     def render_i_s(self, token):      self.write('<i>')
     def render_i_e(self, token):      self.write('</i>')
     def render_pbr(self, token):     self.write('<br />')
     
-    def render_d(self, token):       self.writeChapterMarker()
+    def render_d(self, token):
+        self.write('\n<p>')
+        self.writeChapterMarker()
+        self.write('<em>' + token.value + '</em>')
 
     def render_is1(self, token):    self.render_s1(token)
     def render_ip(self, token):     self.render_p(token)
@@ -213,24 +248,29 @@ class Renderer(abstractRenderer.AbstractRenderer):
 header_header = r"""<!DOCTYPE html>
     <html lang="en">
     <head>
-    <title>{{{translationname}}} | Read</title>
+    <title>{{{translationname}}} | {{{ book name }}}</title>
     <meta charset='utf-8'>
     <script src="jquery-3.2.1.min.js"></script>
     <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
+    <link rel="stylesheet" href="fonts/crimsonpro/stylesheet.css" type="text/css" charset="utf-8" />
     <script src="jump.js"></script>
     </head>
 
     <body>
-    <div id="navbar">
-        <p id="navoeb">{{{navmarker}}}</p>
-        <div id="navtable">
-        <table>
-        <tr><td colspan = "5" style="font-size:100%;">
-            <form id="navform">
-                <input type="text" style="font-size: 140%;" id="txtSearch"/> (eg Ps 23)
-            </form>
-        </td></tr>
+<div id="nav-menu">
+    <input id="menubar" type="checkbox" name="menu" class="label" />
+    <label for="menubar">{{{translationname}}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{{ book name }}} &#9660;</label>
+    <div class="submenu">
+        <form id="navform">
+            <small><label for="txtSearch">Enter Reference (eg Ps 23)</label></small>
+            <input type="text" id="txtSearch"/>
+        </form>
+        {{{ book list }}}
+    </div>
+</div>
+
+<p>&nbsp;</p>
 """
 
 footer = r"""

@@ -137,7 +137,7 @@
                 if (/[1234]+/.test(spt[0])) { spt[0] = spt[0] + spt[1] ; spt[1] = spt[2] ; spt[2] = spt[3]};
                 // set chapter verse offset
                 var offset = "001".substring(0, 3 - spt[1].length) + spt[1] + "001".substring(0, 3 - spt[2].length) + spt[2];
-                var book = '040' // Matthew
+                var book = '040'; // Matthew
                 // lookup book number
                 for (var key in bookNames) {
                     if (key.substring(0,spt[0].length).toLowerCase() === spt[0].toLowerCase()) {
@@ -148,8 +148,9 @@
                 // Hide popup
                 $("table").css( "left", "-99999px" ); 
                 // Jump to new position
-                var newPosition = "b" + book + ".html#" + offset;
+                newPosition = "b" + book + ".html#" + offset;
                 window.location.href = newPosition;
+                window.scrollBy(0,-100);
                 //window.open(newPosition);
                 return false;
         });

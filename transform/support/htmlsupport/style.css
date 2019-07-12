@@ -92,7 +92,7 @@
         	-ms-hyphens: auto;
         	-o-hyphens: auto;
         	hyphens: auto;
-        	font-family: 'Verdana', sans-serif;
+        	font-family: 'Georgia', 'Verdana', sans-serif;
         	color: #202020;
             -moz-font-feature-settings: "liga=1, dlig=1", "onum=1";
             -ms-font-feature-settings: "liga", "dlig","onum";
