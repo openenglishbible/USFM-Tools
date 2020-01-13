@@ -34,9 +34,11 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.verseHadContent = True
         self.ndStatus = OUT
         self.beforeFirstVerse = True
+        self.needsParagraph = True
+        self.inEmphasis = False
         
     def render(self):
-        self.f = open(self.outputFilename, 'w') # 'utf_8_sig macroman
+        self.f = open(self.outputFilename, 'w', encoding='macroman') # 'utf_8_sig macroman
         self.loadUSFM(self.inputDir)
         self.run()
         self.f.close()
@@ -62,30 +64,43 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.cv = token.value.zfill(3)
         if not self.verseHadContent: self.write(' ~')
         self.verseHadContent = False
-        if self.beforeFirstVerse:
-            self.beforeFirstVerse = False
+        if self.cv.isdigit():
+            if self.beforeFirstVerse:
+                # No \n on first line
+                self.beforeFirstVerse = False
+            else:
+                self.f.write('\n')
+            self.f.write(books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + str(int(self.cv.split('-')[0])) + ' ') # str(int(self.cb))
         else:
-            self.f.write('\n')
-        self.f.write(books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + str(int(self.cv.split('-')[0])) + ' ') # str(int(self.cb))
+            # This shouldn't happen in release, but will happen in development
+            # eg \v 23a
+            self.logger.warning('Ignoring ' + books.accordanceNameForBookKey(self.cb) + ' ' + str(int(self.cc)) + ':' + self.cv)
+        if self.needsParagraph:
+            self.needsParagraph = False
+            self.write(' ¶ ')
     def render_text(self, token):
         self.verseHadContent = True
+        if self.inEmphasis:
+            self.write('<i>')
         self.write(self.escape(token.value + ' '))
+        if self.inEmphasis:
+            self.write('</i>')
     def render_f_s(self, token):     self.write('<sup>[')
     def render_f_e(self, token):     self.write(']</sup>')
-    def render_p(self, token):       self.write(' ¶ ')
-    def render_pi(self, token):      self.write(' ¶ ')
-    def render_m(self, token):       self.write(' ¶ ')
-    def render_nb(self, token):      self.write(' ¶ ')
+    def render_p(self, token):       self.needsParagraph = True
+    def render_pi(self, token):      self.needsParagraph = True
+    def render_m(self, token):       self.needsParagraph = True
+    def render_nb(self, token):      self.needsParagraph = True
     def render_nd_s(self,token):     self.ndStatus = IN; self.write('<c>')
     def render_nd_e(self,token):     self.ndStatus = JUSTOUT; self.write('</c>')
     def render_q1(self, token):      self.write('<br>\t')
     def render_q2(self, token):      self.write('<br>\t\t') 
     def render_q3(self, token):      self.write('<br>\t\t\t') 
     def render_b(self, token):       self.write('<br>') 
-    def render_qs_s(self, token):    self.write('<i>') 
-    def render_qs_e(self, token):    self.write('</i>') 
-    def render_em_s(self, token):    self.write('<i>') 
-    def render_em_e(self, token):    self.write('</i>') 
+    def render_qs_s(self, token):    self.inEmphasis = True
+    def render_qs_e(self, token):    self.inEmphasis = False
+    def render_em_s(self, token):    self.inEmphasis = True 
+    def render_em_e(self, token):    self.inEmphasis = False
     
     def render_d(self, token):
         """ Accordance """

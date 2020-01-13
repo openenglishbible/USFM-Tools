@@ -95,7 +95,7 @@ def buildPairTokensPlus(pairTokens, knownTokens):
 #   IDENTIFICATION
 #
 buildTokenLineNumbered(['h'], knownTokens)
-buildTokenLine(['id', 'ide', 'sts', 'rem', 'toc1', 'toc2', 'toc3'], knownTokens)
+buildTokenLine(['usfm', 'id', 'ide', 'sts', 'rem', 'toc1', 'toc2', 'toc3'], knownTokens)
 
 #
 #   TITLES, HEADINGS AND LABELS

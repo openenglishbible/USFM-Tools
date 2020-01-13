@@ -25,6 +25,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.inputDir = inputDir
         # Position
         self.in_p = False
+        self.needsEnd = False
         self.h = ''
         self.cv = ''
         self.cc =  ''
@@ -32,7 +33,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render(self, order="normal"):
         self.f = open(self.outputFilename, 'w', encoding='cp1252') # ie ansi
         self.f.write(r"""{\rtf1\ansi\ansicpg1252\deff0 
-{\fonttbl{\f0\fswiss Verdana;}}\fs24 
+{\fonttbl{
+\f0\froman Georgia;
+\f1\fswiss Verdana;
+}}\fs24 
 {\colortbl
 ;
 \red255\green0\blue0;
@@ -67,9 +71,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
     #   END PAR
     #
     def end_par(self):
-        if self.in_p:
+        if self.needsEnd:
             self.write('\n\\par}\n')
-        self.in_p = True
+        self.needsEnd = True
                     
     def set_header(self):
         self.write('\sectd\sect{\\header \\pard\\qr\\plain\\f0\\fs16 ' + self.h + ' (Page \\chpgn) \\par}')
@@ -89,6 +93,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_heading_template(self, token, size):
         self.end_par()
         self.write('\n{\\pard\\sb360\\sa360\\fs' + str(size) + ' ' + token.getValue() + '\n')
+        self.in_p = False
     def render_mt1(self, token):   self.render_heading_template(token, 72)
     def render_mt2(self, token):   self.render_heading_template(token, 60)
     def render_ms1(self, token):   self.render_heading_template(token, 48)
@@ -100,22 +105,40 @@ class Renderer(abstractRenderer.AbstractRenderer):
     # Chapter and verse markers are a little different. We don't want them where they
     # are marked but at the start of the relevant text.
     # However, they act as whitespace so we need to allow for that.
-    def render_c(self, token):  self.write(' '); self.cc = token.getValue()
-    def render_v(self, token):  self.write(' '); self.cv = token.getValue()
+    # (removed self.write(' '); )
+    def render_c(self, token):  self.cc = token.getValue()
+    def render_v(self, token):  self.cv = token.getValue()
         
     def render_p(self, token):
         self.end_par()
-        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi720 \n')        
+        if not self.in_p:
+            self.write('\n{\\pard\n\\par}')
+        self.write('\n{\\pard\sl280\slmult1\\fs24')  
+        if self.in_p:
+            self.write('\\fi360')
+        self.write(' \n')
+        self.in_p = True      
     def render_pi(self, token):
         self.end_par()
-        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi0\\li720 \n')        
+        if not self.in_p:
+            self.write('\n{\\pard\n\\par}\n')
+        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi0\\li360') 
+        if self.in_p:
+            self.write('\\fi360')
+        self.in_p = True       
     def render_m(self, token):
         self.end_par()
-        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi0 \n')        
+        if not self.in_p:
+            self.write('\n{\\pard\n\\par}')
+        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi0 \n') 
+        self.in_p = True       
     
     def render_q_template(self, level, token):
         self.end_par()
-        self.write('\n{\\pard\\fi' + str((360 * level) - 2800) + '\\li2800\n')
+        if self.in_p:
+            self.write('\n{\\pard\n\\par}\n')
+        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi' + str((360 * level) - 2800) + '\\li2800\n')
+        self.in_p = False
     def render_q1(self, token):      self.render_q_template(1, token)
     def render_q2(self, token):      self.render_q_template(2, token)
     def render_q3(self, token):      self.render_q_template(3, token)
@@ -145,10 +168,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def render_text(self, token):
         if not self.cc == '':
-            self.write(r'{\cf1 ' + self.cc + r'}')
+            self.write(r'{\cf1\f1\fs22 ' + self.cc + r'}')
             self.cc = ''
-        elif not self.cv == '':
+        elif not self.cv == '' and not self.cv == '1':
             # elif because when we have a chapter number to write we don't need a verse number
-            self.write(r'{\super\cf2\fs24 ' + self.cv + r'}')
+            self.write(r'{\super\f1\cf2\fs24 ' + self.cv + r'}')
             self.cv = ''
         self.write(token.getValue())
