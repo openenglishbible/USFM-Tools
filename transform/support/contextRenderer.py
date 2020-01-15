@@ -194,7 +194,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     #   Tokens
     #
 
-    def render_id(self, token):      self.f.write( self.stopNarrower() + r"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
+    def render_id(self, token):      self.f.write( self.stopNarrower() + '\n\n' + r"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
     def render_h(self, token):       self.f.write( '\n\n\RAHeader{' + token.value + '}\n')
     def render_mt1(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n\MT{' + token.value + '}\n')
     def render_mt2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n\MTT{' + token.value + '}\n')
@@ -276,7 +276,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
             \par ~
             {\midaligned {\WORD{Table of Contents}}}
             \par ~
-            \placelist[chapter]    
+            \placelist[chapter][criterium=all]
+
             """)
     #
     #   Introductory codes
@@ -313,17 +314,19 @@ class Renderer(abstractRenderer.AbstractRenderer):
     \setupfootertexts[pagenumber][]
 
     % Hide chapters but keep in TOC
-    \setuphead[chapter][placehead=hidden]
+    \setuphead[chapter][placehead=hidden,
+                        incrementnumber=yes,  % keep track of the number
+                        number=no]            % but don't show it
     \setuptexttexts[{\placerawheaddata[chapter]}]
 
     \setupspacing[packed]   % normal word space at the end of sentences
     \setupwhitespace[none]  % no space between paragraphs
     \setupindenting[small, yes]
-    \setupinterlinespace[line=11.5pt] % Line spacing
+    \setupinterlinespace[line=13pt] % Line spacing
 
     \setuphead[section][number=no, textstyle=em, before=\blank, after=\blank, align={middle, nothyphenated, verytolerant}]
 
-    \setuplist[chapter][alternative=c]
+    %\setuplist[chapter][alternative=c]
 
     \setupnote[footnote][way=bypage]
 
