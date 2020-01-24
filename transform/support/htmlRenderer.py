@@ -3,6 +3,7 @@
 
 import os
 import shutil
+import glob
 
 import abstractRenderer
 import books
@@ -54,11 +55,12 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # Write pages
         self.run()
         self.close()
-        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/jquery-3.2.1.min.js', self.outputDir + '/')
-        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/normalize.css', self.outputDir + '/')
-        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/style.css', self.outputDir + '/')
-        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/jump.js', self.outputDir + '/')
-        shutil.copy(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/header.png', self.outputDir + '/')
+        for f in glob.glob(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/*'):
+            if os.path.isdir(f):
+                shutil.copytree(f, self.outputDir + '/' + f.split('/')[-1])
+            else:
+                shutil.copy(f, self.outputDir + '/')
+        shutil.copy(self.config.get('HTML','frontlogo'), self.outputDir + '/')
         self.generateIndexFile()
         
     # File handling    
@@ -69,7 +71,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         c = c.replace('{{{ot}}}', self.bookList(1, 39))
         c = c.replace('{{{nt}}}', self.bookList(40, 67))
         c = c.replace(r'{{{translationname}}}',self.config.get('General','name'))
-        c = c.replace(r'{{{pathtologo}}}',self.config.get('HTML','frontlogo'))
+        c = c.replace(r'{{{pathtologo}}}',self.config.get('HTML','frontlogo').split('/')[-1])  # copy logo into place
         with open(self.outputDir + '/index.html', 'w') as f:
             f.write(c)
 
@@ -250,7 +252,7 @@ header_header = r"""<!DOCTYPE html>
     <head>
     <title>{{{translationname}}} | {{{ book name }}}</title>
     <meta charset='utf-8'>
-    <script src="jquery-3.2.1.min.js"></script>
+    <script src="jquery-3.4.1.min.js"></script>
     <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
     <link rel="stylesheet" href="fonts/crimsonpro/stylesheet.css" type="text/css" charset="utf-8" />
