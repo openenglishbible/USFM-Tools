@@ -28,9 +28,10 @@ class Checker(object):
                     print('     - Couldn\'t open ' + fname)
         return books
 
-    def check(self, dir):
+    def check(self, dir, oeb=False):
         books = self.loadBooks(dir)
-        for b in books:
+        for b in sorted(list(books)):
+            print(b)
             self.testMalformedCodes(b, books[b])
             self.testDuplicates(b, books[b])
             self.testMisplacedSpaces(b, books[b])
@@ -46,32 +47,58 @@ class Checker(object):
             self.testApostrophe(b, books[b])
             self.testNesting(b, books[b])
             self.testFootnotes(b, books[b])
+            if oeb:
+                self.testArchaic(b, books[b])
+                self.testInappropriate(b, books[b])
+                self.testTetragrammaton(b, books[b])
+                
+    def testArchaic(self, b, u):
+        w = re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u)
+        w = set([x.lower() for x in w])
+        archaicisms = set(['ere', 'thou', 'thee', 'thine'])
+        i = w.intersection(archaicisms)
+        if len(i) > 0:
+            print('  Archaisms: ', ' '.join(i))
+
+    def testInappropriate(self, b, u):
+        w = set(re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u))
+        bad = set(['ass', 'whore', 'harlot'])
+        i = w.intersection(bad)
+        if len(i) > 0:
+            print('  Inappropriate: ', ' '.join(i))
+
+    def testTetragrammaton(self, b, u):
+        w = set(re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u))
+        bad = set(['Jehovah'])
+        i = w.intersection(bad)
+        if len(i) > 0:
+            print('  Jehovah: ', ' '.join(i))
 
     def testMalformedCodes(self, b, u):
-        w = u.split(' \n\t.,:?;\'\"')
-        self.checkForCode('sea', w)
+        w = re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u)
+        self.checkForCode(r'\sea', w, u)
 
-    def checkForCode(self, c, w):
+    def checkForCode(self, c, w, u):
         if c in w:  print('     - Malformed code? \'' + c + '\' in ' + u[:50])
 
     def testDuplicates(self, b, u):
         for c in ':.,\'"‘’“”':
             if c + c in u:
-                print('Duplicate "' + c + '" in ' + b)
+                print('  Duplicate "' + c + '" in ' + b)
 
     def testExtraSpaces(self, b, u):
         for i, l in enumerate(u.split('\n')):
             if not l == '' and l[-1] == ' ':
-                print('Extra space on line: ' + str(i + 1) + ' of ' + b)
+                print('  Extra space on line: ' + str(i + 1) + ' of ' + b)
 
     def testMisplacedSpaces(self, b, u):
         for i, l in enumerate(u.split('\n')):
             if ' .' in l:
-                print('Misplaced ~. on line: ' + str(i + 1) + ' of ' + b)
+                print('  Misplaced ~. on line: ' + str(i + 1) + ' of ' + b)
             if ' ,' in l:
-                print('Misplaced ~, on line: ' + str(i + 1) + ' of ' + b)
+                print('  Misplaced ~, on line: ' + str(i + 1) + ' of ' + b)
             if ' ;' in l:
-                print('Misplaced ~; on line: ' + str(i + 1) + ' of ' + b)
+                print('  Misplaced ~; on line: ' + str(i + 1) + ' of ' + b)
 
     def testMissingSpaces(self, b, u):
         t = '.,;:'
@@ -79,7 +106,7 @@ class Checker(object):
             if c in t:
                 if i < len(u) - 1:
                     if not u[i + 1] in ' \n\\”’)0123456789':
-                        print('Missing space in ' + b + ' at ' + str(i))
+                        print('  Missing space in ' + b + ' at ' + str(i))
 
     def testParas(self, b, u):
         """
@@ -87,10 +114,10 @@ class Checker(object):
         (If there is no actual paragraph starting there, use \nb.)
         """
         if '\\p\n\\c' in u:
-            print('Misplaced Paragraph marker against chapter in: ' + b)
+            print('  Misplaced Paragraph marker against chapter in: ' + b)
         rx = re.compile('\\\\v [0-9]+\\n\\\\p')
         if not rx.search(u) == None:
-            print('Misplaced Paragraph marker against verse in: ' + b)
+            print('  Misplaced Paragraph marker against verse in: ' + b)
 
     def testSectionHeaders(self, b, u):
         """
@@ -105,7 +132,7 @@ class Checker(object):
             if c == -1:
                 return
             if c - i < 50:
-                print('Misplaced Section Header against chapter in: ' + b)
+                print('  Misplaced Section Header against chapter in: ' + b)
             i = c
 
     def testWJ(self, b, u):
@@ -132,7 +159,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         """
         \b cannot have text content.
         """
-        if not u.find(r'\b ') == -1: print('\\b tag with text content in: ' + b)
+        if not u.find(r'\b ') == -1: print('  \\b tag with text content in: ' + b)
 
     def testM(self, b, u):
         """
@@ -142,7 +169,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         while i < len(u):
             i = u.find('\\m\n', i)
             if i == -1: return
-            if not u[i + 3] == '\\': print('\\m tag with no text content in: ' + b)
+            if not u[i + 3] == '\\': print('  \\m tag with no text content in: ' + b)
             i = i + 3
 
     def testDash(self, b, u):
@@ -151,22 +178,22 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         """
         i = u.find('—')
         if not i == -1:
-            print('m-dash in ' + b + ' at position ' + str(pos(u, i)))
+            print('  m-dash in ' + b + ' at position ' + str(pos(u, i)))
         i2 = u.find(' - ')
         if not i2 == -1:
-            print('hyphen as n-dash in ' + b + ' at  ' + str(pos(u, i2)))
+            print('  hyphen as n-dash in ' + b + ' at  ' + str(pos(u, i2)))
         i3 = u.find(' -')
         if not i3 == -1:
-            print('hyphen as n-dash in ' + b + ' at  ' + str(pos(u, i3)))
+            print('  hyphen as n-dash in ' + b + ' at  ' + str(pos(u, i3)))
         i4 = u.find('-\n')
         if not i4 == -1:
-            print('hyphen as n-dash in ' + b + ' at  ' + str(pos(u, i4)))
+            print('  hyphen as n-dash in ' + b + ' at  ' + str(pos(u, i4)))
         rx = re.compile(r'[^\s]–')
         if not rx.search(u) == None:
-            print('n-dash without prior space in: ' + b)
+            print('  n-dash without prior space in: ' + b)
         rx = re.compile(r'–[^\\\s]') # OK if we have token directly after
         if not rx.search(u) == None:
-            print('n-dash without subsequent space in: ' + b)
+            print('  n-dash without subsequent space in: ' + b)
 
     def testApostrophe(self, b, u):
         """
@@ -174,7 +201,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         """
         i = u.find('\'')
         if not i == -1:
-            print('apostophe in ' + b + ' at line ' + str(pos(u, i)))
+            print('  apostophe in ' + b + ' at line ' + str(pos(u, i)))
 
     def testNesting(self, b, u):
         """
@@ -182,7 +209,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         """
         rx = re.compile(r'\\em[^\*][^\\]+\\nd')
         if not rx.search(u) == None:
-            print('Possible need for nested markup in: ' + b)
+            print('  Possible need for nested markup in: ' + b)
 
     def testPoetry(self, b, u):
         """
@@ -190,10 +217,10 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         """
         i = u.find('\\q\n\\c')
         if not i == -1:
-            print('Misplaced Poetry marker against chapter in: ' + b + ' at line ' + str(pos(u, i)))
+            print('  Misplaced Poetry marker against chapter in: ' + b + ' at line ' + str(pos(u, i)))
         rx = re.compile('\\\\v [0-9]+\\n\\\\q').finditer(u)
         for r in rx:
-            print('Misplaced poetry marker against verse in: ' + b + ' at line ' + str(pos(u, r.start())))
+            print('  Misplaced poetry marker against verse in: ' + b + ' at line ' + str(pos(u, r.start())))
 
     def testFootnotes(self, b, u):
         """
@@ -201,29 +228,32 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         """
         rx = re.compile(r'\\f \+ [^\\][^f][^r]')
         if not rx.search(u) == None:
-            print('Footnote without back reference in: ' + b)
+            print('  Footnote without back reference in: ' + b)
 
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "hs:", ["help", "source="])
+        opts, args = getopt.getopt(argv, "hs:", ["help", "source=", 'oeb'])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
 
     source = ''
+    oen = False
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
             return 0
         elif opt in ("-s", "--source"):
             source = arg
+        elif opt in ("--oeb"):
+            oeb = True
 
     if source == '':
         usage()
         return 0
 
-    Checker().check(source)
+    Checker().check(source, oeb)
 
 
 def usage():
@@ -235,6 +265,7 @@ def usage():
     
             -h or --help for these options
             -s or --source for directory of source .usfm files
+            --oeb to run additional tests related to the OEB
     
         """)
 

@@ -90,16 +90,18 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.set_header()
         self.write('{\\pard \\pagebb')
     
-    def render_heading_template(self, token, size):
+    def render_heading_template(self, token, size, italic=False):
         self.end_par()
-        self.write('\n{\\pard\\sb360\\sa360\\fs' + str(size) + ' ' + token.getValue() + '\n')
+        self.write('\n{\\pard\\sb360\\sa360\\fs' + str(size) + ' ')
+        self.write('{\\i ' + token.getValue() + '}') if italic else self.write(token.getValue())
+        self.write('\n')
         self.in_p = False
     def render_mt1(self, token):   self.render_heading_template(token, 72)
-    def render_mt2(self, token):   self.render_heading_template(token, 60)
-    def render_ms1(self, token):   self.render_heading_template(token, 48)
-    def render_ms2(self, token):   self.render_heading_template(token, 48)
-    def render_s1(self, token):    self.render_heading_template(token, 36)
-    def render_s2(self, token):    self.render_heading_template(token, 36)
+    def render_mt2(self, token):   self.render_heading_template(token, 56)
+    def render_ms1(self, token):   self.render_heading_template(token, 44)
+    def render_ms2(self, token):   self.render_heading_template(token, 36)
+    def render_s1(self, token):    self.render_heading_template(token, 32)
+    def render_s2(self, token):    self.render_heading_template(token, 24, italic=True)
         
 
     # Chapter and verse markers are a little different. We don't want them where they

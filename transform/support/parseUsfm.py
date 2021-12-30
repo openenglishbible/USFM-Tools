@@ -19,8 +19,8 @@ ParserElement.setDefaultWhitespaceChars('\n')
 def usfmTokenPart(key):                 return Suppress(backslash) + Literal(key) + Suppress(space)
 def usfmParagraphTokenPart(key):        return Or([StringStart(), LineStart()]) + usfmTokenPart(key)
 
-def usfmParagraphToken(key):            return Group(Suppress(backslash) + Literal(key) + Suppress(Or([space, LineEnd()])))
-def usfmParagraphTokenEmpty(key):       return Group(Suppress(backslash) + Literal(key) + Suppress(LineEnd()))
+def usfmParagraphToken(key):            return Group(Suppress(backslash) + Literal(key)) #+ Suppress(Or([space, LineEnd()])))
+def usfmParagraphTokenEmpty(key):       return Group(Suppress(backslash) + Literal(key)) #+ Suppress(LineEnd()))
 def usfmParagraphTokenWord(key):        return Group(usfmParagraphTokenPart(key) + singleword + Or([Suppress(space), FollowedBy(LineEnd())]))
 def usfmParagraphTokenLine(key):        return Group(usfmParagraphTokenPart(key) + line)
 

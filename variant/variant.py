@@ -15,7 +15,7 @@ import itertools
 
 import logging
 
-logLevel = logging.INFO
+logLevel = logging.WARNING
 currentLogger = logging.getLogger('variants')
 currentLogger.setLevel(logLevel)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
