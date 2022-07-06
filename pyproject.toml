@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "usfm-tools"
+version = "0.1.0"
+description = "Tools for manipulating USFM"
+authors = ["Open English Bible <oebible@openenglishbible.org>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pyparsing = "3.0.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

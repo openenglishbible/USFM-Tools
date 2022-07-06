@@ -74,6 +74,10 @@ def saveCWD():    global savedCWD ; savedCWD = os.getcwd() ; os.chdir(rootdiroft
 def restoreCWD(): os.chdir(savedCWD)
     
 def main(argv):
+    if argv == []:
+        usage()
+        sys.exit(0)
+ 
     # START
     saveCWD() 
     oebFlag = False  

@@ -239,7 +239,7 @@ def main(argv):
         sys.exit(2)
 
     source = ''
-    oen = False
+    oeb = False
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()

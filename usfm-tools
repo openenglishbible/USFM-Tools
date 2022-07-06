@@ -1,0 +1,78 @@
+#!/bin/env bash
+
+#
+# Quiet now
+#
+pushd () {
+    command pushd "$@" > /dev/null
+}
+
+popd () {
+    command popd "$@" > /dev/null
+}
+
+exit() {
+	popd
+	command exit $1
+}
+
+#
+# Where are we?
+#
+script_name1=`basename $0`
+script_path1=$(dirname $(readlink -f $0))
+script_path_with_name="$script_path1/$script_name1"
+pushd $script_path1
+
+#
+# Environment
+#
+POETRY=$(command -v poetry)
+if [[ ! $POETRY ]]; then
+	echo "This tool uses Python3 and Poetry."
+	echo "Plase install and try again."
+	exit 1
+fi
+POK=$(poetry check)
+if [[ ! $POK ]]; then
+	echo "Installing dependencies..."
+	poetry install
+fi
+
+#
+# Help
+#
+
+if [ -z $1 ]; then
+	echo "Choose something"
+    exit 
+fi
+if [ $1 = 'help' ]; then
+	echo "No Help for You"
+    exit 
+fi
+
+#
+# Execute
+#
+
+if [ $1 = 'variant' ]; then
+	poetry run python3 variant/variant.py "${@:2}"
+    exit 
+fi
+
+if [ $1 = 'check' ]; then
+	poetry run python3 check/check.py "${@:2}"
+    exit 
+fi
+
+if [ $1 = 'transform' ]; then
+
+	poetry run python3 transform/transform.py "${@:2}"
+    exit 
+fi
+
+#
+# Just in case
+#
+exit 1

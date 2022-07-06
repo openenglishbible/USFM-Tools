@@ -18,7 +18,7 @@ import abstractRenderer
 
 class Renderer(abstractRenderer.AbstractRenderer):
     def runscript(self, c, prefix='', repeatFilter=''):
-        pp = subprocess.Popen([c], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        pp = subprocess.Popen([c], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, executable="/bin/bash")
         (result, stderrdata) = pp.communicate()
         self.logger.debug(result)
         if not len(stderrdata) == 0:

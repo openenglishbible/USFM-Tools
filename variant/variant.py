@@ -213,6 +213,9 @@ def stage(src, to, tags, booklist, swap):
 #####################################################
 
 def main(argv):
+    if argv == []:
+        usage()
+        sys.exit(0)
     try:
         opts, args = getopt.getopt(argv, "has:d:b:t:up",
                                    ["help", "all", "source=", "destination=", "booklist=", "tags=", "unittests",
@@ -221,12 +224,14 @@ def main(argv):
         usage()
         sys.exit(2)
 
+
     source = build = tags = ''
     doAll = swap = False
     booklist = []
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
+            sys.exit(0)
         elif opt in ("-u", "--unittests"):
             tests()
             sys.exit(1)

@@ -16,16 +16,16 @@ ParserElement.setDefaultWhitespaceChars('\n')
 # SUPPORT
 #
 
-def usfmTokenPart(key):                 return Suppress(backslash) + Literal(key) + Suppress(space)
+def usfmTokenPart(key):                 return Suppress(backslash) + Keyword(key) + Suppress(space)
 def usfmParagraphTokenPart(key):        return Or([StringStart(), LineStart()]) + usfmTokenPart(key)
 
-def usfmParagraphToken(key):            return Group(Suppress(backslash) + Literal(key)) #+ Suppress(Or([space, LineEnd()])))
-def usfmParagraphTokenEmpty(key):       return Group(Suppress(backslash) + Literal(key)) #+ Suppress(LineEnd()))
+def usfmParagraphToken(key):            return Group(Suppress(backslash) + Keyword(key)) #+ Suppress(Or([space, LineEnd()])))
+def usfmParagraphTokenEmpty(key):       return Group(Suppress(backslash) + Keyword(key)) #+ Suppress(LineEnd()))
 def usfmParagraphTokenWord(key):        return Group(usfmParagraphTokenPart(key) + singleword + Or([Suppress(space), FollowedBy(LineEnd())]))
 def usfmParagraphTokenLine(key):        return Group(usfmParagraphTokenPart(key) + line)
 
 def usfmCharacterToken(key):            return Group(usfmTokenPart(key))
-def usfmCharacterEndToken(key):         return Group(Suppress(backslash) + Combine(Literal(key) + Literal('*')))
+def usfmCharacterEndToken(key):         return Group(Suppress(backslash) + Combine(Keyword(key) + Literal('*')))
 def usfmCharacterTokenWord(key):        return Group(usfmTokenPart(key) + singleword)
 
 #
@@ -50,10 +50,11 @@ def buildTokenSimple(tokens, knownTokens):
     for t in tokens:
         knownTokens.append(usfmCharacterToken(t))
 def buildTokenSimpleNumbered(tokens, knownTokens):
+    # Needs to be in this order
     for t in tokens:
-        knownTokens.append(usfmCharacterToken(t))
         for n in range(0,9):
             knownTokens.append(usfmCharacterToken(t + str(n)))
+        knownTokens.append(usfmCharacterToken(t))
 
 
 def buildTokenEmpty(tokens, knownTokens):
@@ -63,19 +64,21 @@ def buildTokenLine(tokens, knownTokens):
     for t in tokens:
         knownTokens.append(usfmParagraphTokenLine(t))
 def buildTokenLineNumbered(tokens, knownTokens):
+    # Needs to be in this order
     for t in tokens:
-        knownTokens.append(usfmParagraphTokenLine(t))
         for n in range(0,9):
             knownTokens.append(usfmParagraphTokenLine(t + str(n)))
+        knownTokens.append(usfmParagraphTokenLine(t))
 
 def buildTokenParagraph(tokens, knownTokens):
     for t in tokens:
         knownTokens.append(usfmParagraphToken(t))
 def buildTokenParagraphNumbered(tokens, knownTokens):
+    # Needs to be in this order
     for t in tokens:
-        knownTokens.append(usfmParagraphToken(t))
         for n in range(0,9):
             knownTokens.append(usfmParagraphToken(t + str(n)))
+        knownTokens.append(usfmParagraphToken(t))
 
 def buildTokenWord(tokens, knownTokens):
     for t in tokens:
