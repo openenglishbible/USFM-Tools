@@ -244,8 +244,15 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_em_e(self, token):    self.f.write( '} ' )
     def render_add_s(self, token):   self.f.write( '{\em ' )
     def render_add_e(self, token):   self.f.write( '} ' )
-    def render_nd_s(self, token):    self.f.write( '{\sc ' )
-    def render_nd_e(self, token):    self.justDidLORD = True; self.f.write( '}' )
+
+    # Don't render in SC when in header
+    def render_nd_s(self, token):
+        if not self.printerState['d']:
+            self.f.write( '{\sc ' )
+    def render_nd_e(self, token):
+        if not self.printerState['d']:
+            self.justDidLORD = True; self.f.write( '}' )
+
     def render_li(self, token):      self.f.write( self.startLI() )
     def render_d(self, token):       self.f.write( self.startD() )
     def render_sp(self, token):      self.f.write( self.startD() )

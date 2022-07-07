@@ -104,7 +104,8 @@ buildTokenLine(['usfm', 'id', 'ide', 'sts', 'rem', 'toc1', 'toc2', 'toc3'], know
 #   TITLES, HEADINGS AND LABELS
 #
 buildTokenLineNumbered(['mt', 'mte', 'ms', 's'], knownTokens)
-buildTokenLine(['sr', 'r', 'd', 'sp'], knownTokens)
+buildTokenLine(['sr', 'r', 'sp'], knownTokens)
+buildTokenParagraph(['d'], knownTokens)
 buildPairTokens(['rq'], knownTokens)
 
 # 
