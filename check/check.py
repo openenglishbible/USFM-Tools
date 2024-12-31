@@ -53,7 +53,7 @@ class Checker(object):
                 self.testTetragrammaton(b, books[b])
                 
     def testArchaic(self, b, u):
-        w = re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u)
+        w = re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u)
         w = set([x.lower() for x in w])
         archaicisms = set(['ere', 'thou', 'thee', 'thine'])
         i = w.intersection(archaicisms)
@@ -61,21 +61,21 @@ class Checker(object):
             print('  Archaisms: ', ' '.join(i))
 
     def testInappropriate(self, b, u):
-        w = set(re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u))
+        w = set(re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u))
         bad = set(['ass', 'whore', 'harlot'])
         i = w.intersection(bad)
         if len(i) > 0:
             print('  Inappropriate: ', ' '.join(i))
 
     def testTetragrammaton(self, b, u):
-        w = set(re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u))
+        w = set(re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u))
         bad = set(['Jehovah'])
         i = w.intersection(bad)
         if len(i) > 0:
             print('  Jehovah: ', ' '.join(i))
 
     def testMalformedCodes(self, b, u):
-        w = re.split(' |\n|\t|\.|,|\?|\;|\'|\"', u)
+        w = re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u)
         self.checkForCode(r'\sea', w, u)
 
     def checkForCode(self, c, w, u):
@@ -102,11 +102,14 @@ class Checker(object):
 
     def testMissingSpaces(self, b, u):
         t = '.,;:'
+        linenumber = 0
         for i, c in enumerate(u):
+            if c == '\n':
+                linenumber = linenumber + 1
             if c in t:
                 if i < len(u) - 1:
                     if not u[i + 1] in ' \n\\”’)0123456789':
-                        print('  Missing space in ' + b + ' at ' + str(i))
+                        print('  Missing space in ' + b + ' at line ' + str(linenumber))
 
     def testParas(self, b, u):
         """
@@ -136,7 +139,7 @@ class Checker(object):
             i = c
 
     def testWJ(self, b, u):
-        """
+        r"""
         Character styles cannot cross paragraph or verse boundaries, but must be stopped and restarted at those points. This is significant with \wj ...\wj*.
 Character styles (like \wj ...\wj*) cannot continue through footnotes, but must be stopped and restarted around the footnote.
         """
@@ -152,7 +155,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
             if e == -1:
                 return
             if f < e:
-                print('Interrupted \wj in: ' + b)
+                print(r'Interrupted \wj in: ' + b)
             i = e
 
     def testB(self, b, u):
@@ -162,7 +165,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
         if not u.find(r'\b ') == -1: print('  \\b tag with text content in: ' + b)
 
     def testM(self, b, u):
-        """
+        r"""
         \m cannot be empty of text content.
         """
         i = 0
@@ -204,7 +207,7 @@ Character styles (like \wj ...\wj*) cannot continue through footnotes, but must 
             print('  apostophe in ' + b + ' at line ' + str(pos(u, i)))
 
     def testNesting(self, b, u):
-        """
+        r"""
         \em I am the \+nd Lord\+nd*\em*
         """
         rx = re.compile(r'\\em[^\*][^\\]+\\nd')

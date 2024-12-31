@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 #
 # Quiet now
@@ -75,4 +75,5 @@ fi
 #
 # Just in case
 #
+echo Please choose one of 'variant', 'check' or 'transform'
 exit 1
