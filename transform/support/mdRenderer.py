@@ -78,8 +78,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_pi(self, token):      self.qStatus = OUT ; self.write('\n\n  ')
     def render_m(self, token):       self.qStatus = OUT; self.write('\n\n')
     def render_b(self, token):       self.write('\n\n')
-    def render_c(self, token):       self.currentC = token.value; self.write('\n\n [' + self.book + ' ' + self.currentC + '] \n\n')
-    def render_v(self, token):       self.write('[' + self.currentC + ':' + token.value + '] ')
+    def render_c(self, token):       self.currentC = token.value; self.write('\n\n[' + self.book + ' ' + self.currentC + ']\n\n')
+    def render_v(self, token):       self.write(' [' + self.currentC + ':' + token.value + '] ')
     def render_q(self, token):
         if self.qStatus == OUT: 
             self.write('\n\n')
