@@ -33,11 +33,6 @@ if [[ ! $UV ]]; then
 	echo "Please install uv and try again."
 	exit 1
 fi
-if [[ ! -f "venv/bin/python" ]]; then
-	echo "Creating virtual environment..."
-	uv venv
-	uv pip install -r requirements.txt
-fi
 
 #
 # Help
