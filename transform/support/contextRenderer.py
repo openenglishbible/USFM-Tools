@@ -51,12 +51,12 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # Layout
         if self.config.get('Context','layout') == 'singlesided':
              tex = tex.replace('{{{layout}}}', 'singlesided')
-             tex = tex.replace('{{{position}}}', '\inleft')
-             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [leftedge=0.25in,leftmargin=0.75in,width=4in,rightmargin=0.5in,rightedge=0.5in]')
+             tex = tex.replace('{{{position}}}', r'\inleft')
+             tex = tex.replace('{{{setuplayout}}}', r'\setuplayout [leftedge=0.25in,leftmargin=0.75in,width=4in,rightmargin=0.5in,rightedge=0.5in]')
         else:
              tex = tex.replace('{{{layout}}}', 'doublesided')
-             tex = tex.replace('{{{position}}}', '\inouter')
-             tex = tex.replace('{{{setuplayout}}}', '\setuplayout [location=middle, rightmargin=1in, width=90mm, marking=on]')
+             tex = tex.replace('{{{position}}}', r'\inouter')
+             tex = tex.replace('{{{setuplayout}}}', r'\setuplayout [location=middle, rightmargin=1in, width=90mm, marking=on]')
         tex = tex.replace('{{{layout}}}', self.config.get('Context','layout'))
         # Font
         tex = tex.replace('{{{bodyFont}}}', self.config.get('Context','bodyFont'))
@@ -65,7 +65,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         if self.config.get('Context','coverPage') == '/path/to/cover.pdf':
             tex = tex.replace('{{{coverPage}}}', '')
         else:
-            tex = tex.replace('{{{coverPage}}}', '\externalfigure[' + self.config.get('Context','coverPage') + ']\page[right]')
+            tex = tex.replace('{{{coverPage}}}', r'\externalfigure[' + self.config.get('Context','coverPage') + r']\page[right]')
         return tex
 
     def render(self, order='normal'):
@@ -79,7 +79,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # OPTIONALLY SAVE TEX FILE
         if self.config.get("Context",'saveTeX') == 'true':  shutil.copy(self.texFileName, self.outputFileName[:-4] + '.tex')
 
-        c = '. ' + os.path.dirname(os.path.realpath(__file__)) + '/thirdparty/context/tex/setuptex && '
+        c = ''
         if platform.system() == 'Darwin':
             c = c + 'export OSFONTDIR="/Library/Fonts//;/System/Library/Fonts;$HOME/Library/Fonts" && '
         elif platform.system() == 'Windows':
@@ -91,6 +91,11 @@ class Renderer(abstractRenderer.AbstractRenderer):
             print(" No idea what platform I'm on...")
             sys.exit(1)
         c = c + 'mtxrun --script fonts --reload && '
+
+        # TEMP
+        # ignore previous
+        # replace hardcoded path below with path relative to the path this file is at ai!
+        c = 'export PATH=$PATH:' + '/Users/russellallen/Documents/GitHub/USFM-Tools/transform/support/thirdparty/context/tex/texmf-osx-arm64/bin && '
         c = c + 'pushd "' + self.tempDir + '" && context bible.tex && cp bible.pdf "' + self.outputFileName + '" && popd'
         self.logger.debug(c)
         self.runscript(c, '    ')
@@ -130,12 +135,12 @@ class Renderer(abstractRenderer.AbstractRenderer):
          while i < len(s):
              if i < 50:  #we are early, look for comma
                  if s[i] == ',' or s[i] == ';' or s[i] == '(' or s[i:i+3] == 'and':
-                     return '{\sc ' + s[:i+1] + '}' + s[i+1:]
+                     return r'{\sc ' + s[:i+1] + '}' + s[i+1:]
              else: # look for space
                  if s[i] == ' ':
-                     return '{\sc ' + s[:i] + '}' + s[i:]
+                     return r'{\sc ' + s[:i] + '}' + s[i:]
              i = i + 1
-         return '{\sc ' + s + '}'
+         return r'{\sc ' + s + '}'
 
     def startLI(self):
         if self.printerState['li'] == False:
@@ -157,14 +162,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def startD(self):
         if self.printerState['d'] == False:
             self.printerState['d'] = True
-        return '\par {\startalignment[middle] \em '
+        return r'\par {\startalignment[middle] \em '
 
     def stopD(self):
         if self.printerState['d'] == False:
             return ''
         else:
             self.printerState['d'] = False
-            return '\stopalignment }'
+            return r'\stopalignment }'
 
     def startM(self):
         r = self.stopD() + self.stopLI() + self.stopNarrower()
@@ -173,20 +178,21 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def stopM(self):
         if self.printerState['m'] == False:
-            return ''
+            return r''
         else:
             self.printerState['m'] = False
-            return '\stopalignment }'
+            return r'\stopalignment }'
 
     def newLine(self):
-        s = '\n\par \n'
+        s = '\n' + r'\par ' + '\n'
         if self.doNB:
             self.doNB = False
             self.justDidNB = True
             s = s + r'\noindentation '
         elif self.justDidNB:
             self.justDidNB = False
-            s = s + r'\indentation '
+            # s = s + r'\indentation '
+            # causes problems with newer ConTeXt
         return s
 
 
@@ -195,22 +201,22 @@ class Renderer(abstractRenderer.AbstractRenderer):
     #
 
     def render_id(self, token):      self.f.write( self.stopNarrower() + '\n\n' + r"\marking[RAChapter]{ } \marking[RABook]{ } \marking[RASection]{ }" )
-    def render_h(self, token):       self.f.write( '\n\n\RAHeader{' + token.value + '}\n')
-    def render_mt1(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n\MT{' + token.value + '}\n')
-    def render_mt2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n\MTT{' + token.value + '}\n')
-    def render_mt3(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n\MTTT{' + token.value + '}\n')
-    def render_ms(self, token):      self.markForSmallCaps() ; self.f.write(self.stopNarrower() + '\n\MS{' + token.value + '}\n') ; self.doNB = True
-    def render_ms2(self, token):     self.doNB = True; self.markForSmallCaps() ; self.f.write( self.stopNarrower() + '\n\MSS{' + token.value + '}' + self.newLine() )
+    def render_h(self, token):       self.f.write( '\n\n' + r'\RAHeader{' + token.value + '}\n')
+    def render_mt1(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n' + r'\MT{' + token.value + '}\n')
+    def render_mt2(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n' + r'\MTT{' + token.value + '}\n')
+    def render_mt3(self, token):     self.f.write( self.stopLI() + self.stopNarrower() + '\n' + r'\MTTT{' + token.value + '}\n')
+    def render_ms(self, token):      self.markForSmallCaps() ; self.f.write(self.stopNarrower() + '\n' + r'\MS{' + token.value + '}\n') ; self.doNB = True
+    def render_ms2(self, token):     self.doNB = True; self.markForSmallCaps() ; self.f.write( self.stopNarrower() + '\n' + r'\MSS{' + token.value + '}' + self.newLine() )
     def render_p(self, token):       self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + self.newLine() )
     def render_b(self, token):       self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + '\\blank \n' )
-    def render_s1(self, token):      self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() +  '\n\\blank[big] ' + '\n\MSS{' + token.getValue() + '}' + self.newLine() ) ; self.doNB = True
-    def render_s2(self, token):      self.doNB = True; self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + '\n\\blank[big] ' + '\n\MSS{' + token.value + '}' + self.newLine() )
+    def render_s1(self, token):      self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() +  '\n\\blank[big] ' + '\n' + r'\MSS{' + token.getValue() + '}' + self.newLine() ) ; self.doNB = True
+    def render_s2(self, token):      self.doNB = True; self.f.write( self.stopM() + self.stopD() + self.stopLI() + self.stopNarrower() + '\n\\blank[big] ' + '\n' + r'\MSS{' + token.value + '}' + self.newLine() )
     def render_c(self, token):
-        self.doChapterOrVerse = '\C{' + token.value + '} '
+        self.doChapterOrVerse = r'\C{' + token.value + '} '
         self.f.write( ' ' )
     def render_v(self, token):
         if not token.value == '1':
-            self.doChapterOrVerse =  '\V{' + token.value + '} '
+            self.doChapterOrVerse =  r'\V{' + token.value + '} '
         self.f.write( ' ' )
     def render_wj_s(self, token):     self.f.write( " " )
     def render_wj_e(self, token):     self.f.write( " " )
@@ -237,21 +243,21 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_q1(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(1) )
     def render_q2(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(2) )
     def render_q3(self, token):      self.f.write( self.stopD() + self.stopLI() + self.startNarrower(3) )
-    def render_nb(self, token):      self.doNB = True ; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + '\\blank[medium] ' + self.newLine() )
-    def render_f_s(self, token):     self.f.write( '\\footnote{' )
-    def render_f_e(self, token):     self.f.write( '} ' )
-    def render_em_s(self, token):    self.f.write( '{\em ' )
-    def render_em_e(self, token):    self.f.write( '} ' )
-    def render_add_s(self, token):   self.f.write( '{\em ' )
-    def render_add_e(self, token):   self.f.write( '} ' )
+    def render_nb(self, token):      self.doNB = True ; self.f.write( self.stopD() + self.stopLI() + self.stopNarrower() + r'\blank[medium] ' + self.newLine() )
+    def render_f_s(self, token):     self.f.write( r'\footnote{' )
+    def render_f_e(self, token):     self.f.write( r'} ' )
+    def render_em_s(self, token):    self.f.write( r'{\em ' )
+    def render_em_e(self, token):    self.f.write( r'} ' )
+    def render_add_s(self, token):   self.f.write( r'{\em ' )
+    def render_add_e(self, token):   self.f.write( r'} ' )
 
     # Don't render in SC when in header
     def render_nd_s(self, token):
         if not self.printerState['d']:
-            self.f.write( '{\sc ' )
+            self.f.write( r'{\sc ' )
     def render_nd_e(self, token):
-        if not self.printerState['d']:
-            self.justDidLORD = True; self.f.write( '}' )
+        if not self.printerState[r'd']:
+            self.justDidLORD = True; self.f.write( r'}' )
 
     def render_li(self, token):      self.f.write( self.startLI() )
     def render_d(self, token):       self.f.write( self.startD() )
@@ -268,17 +274,17 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_iot(self, token):    self.render_q(token)
     def render_io1(self, token):    self.render_q2(token)
 
-    def render_qs_s(self, token):   self.f.write( '{\em ' )
-    def render_qs_e(self, token):   self.f.write( '} ' )
+    def render_qs_s(self, token):   self.f.write( r'{\em ' )
+    def render_qs_e(self, token):   self.f.write( r'} ' )
 
 
-    def render_pb(self, token):     self.f.write('\page ')
+    def render_pb(self, token):     self.f.write(r'\page ')
 
     def render_m(self, token):      self.f.write( self.stopM() + self.startM() )
 
     def render_periph(self, token):
-        if token.getValue() == 'Table of Contents':
-            self.f.write("""
+        if token.getValue() == r'Table of Contents':
+            self.f.write(r"""
             \page[right]
             \par ~
             {\midaligned {\WORD{Table of Contents}}}
