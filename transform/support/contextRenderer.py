@@ -92,10 +92,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
             sys.exit(1)
         c = c + 'mtxrun --script fonts --reload && '
 
-        # TEMP
-        # ignore previous
-        # replace hardcoded path below with path relative to the path this file is at ai!
-        c = 'export PATH=$PATH:' + '/Users/russellallen/Documents/GitHub/USFM-Tools/transform/support/thirdparty/context/tex/texmf-osx-arm64/bin && '
+        # Get path relative to this file's location
+        context_bin = os.path.join(os.path.dirname(__file__), 'thirdparty/context/tex/texmf-osx-arm64/bin')
+        c = 'export PATH=$PATH:' + context_bin + ' && '
         c = c + 'pushd "' + self.tempDir + '" && context bible.tex && cp bible.pdf "' + self.outputFileName + '" && popd'
         self.logger.debug(c)
         self.runscript(c, '    ')
