@@ -9,6 +9,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.8"
 pyparsing = "3.0.9"
+python-docx = "^1.1.2"
 
 [tool.poetry.dev-dependencies]
 
