@@ -27,16 +27,16 @@ pushd $script_path1
 #
 # Environment
 #
-POETRY=$(command -v poetry)
-if [[ ! $POETRY ]]; then
-	echo "This tool uses Python3 and Poetry."
-	echo "Plase install and try again."
+UV=$(command -v uv)
+if [[ ! $UV ]]; then
+	echo "This tool uses Python3 and uv."
+	echo "Please install uv and try again."
 	exit 1
 fi
-POK=$(poetry check)
-if [[ ! $POK ]]; then
-	echo "Installing dependencies..."
-	poetry install
+if [[ ! -f "venv/bin/python" ]]; then
+	echo "Creating virtual environment..."
+	uv venv
+	uv pip install -r requirements.txt
 fi
 
 #

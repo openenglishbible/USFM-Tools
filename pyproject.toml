@@ -1,18 +1,17 @@
-[tool.poetry]
+[project]
 name = "usfm-tools"
 version = "0.1.0"
 description = "Tools for manipulating USFM"
-authors = ["Open English Bible <oebible@openenglishbible.org>"]
-license = "MIT"
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.8"
-pyparsing = "3.0.9"
-python-docx = "^1.1.2"
-
-[tool.poetry.dev-dependencies]
+authors = [
+    {name = "Open English Bible", email = "oebible@openenglishbible.org"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "pyparsing==3.0.9",
+    "python-docx==1.1.2",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
