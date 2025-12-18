@@ -49,9 +49,28 @@ class Checker(object):
             self.testFootnotes(b, books[b])
             if oeb:
                 self.testArchaic(b, books[b])
+                self.testOldFashioned(b, books[b])
                 self.testInappropriate(b, books[b])
                 self.testTetragrammaton(b, books[b])
+                self.testUnwanted(b, books[b])
+                self.testFearOfGod(b, books[b])
                 
+    def testFearOfGod(self, b, u):
+        # Should be reverence, revere
+        # Space is needed after 'fear of God ' because of Romans
+        unwanted = set(['god-fearing', 'fear God', 'fear of God ', 'fear the \nd Lord\nd*', 'fear of the \nd Lord\nd*'])
+        for phrase in unwanted:
+            if phrase in u:
+                print('  Fear of God: "' + phrase + '"')
+
+    def testUnwanted(self, b, u):
+        w = re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u)
+        w = set([x.lower() for x in w])
+        unwanted = set(['kid', 'lad'])
+        i = w.intersection(unwanted)
+        if len(i) > 0:
+            print('  Unwanted: ', ' '.join(i))
+
     def testArchaic(self, b, u):
         w = re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u)
         w = set([x.lower() for x in w])
@@ -60,9 +79,17 @@ class Checker(object):
         if len(i) > 0:
             print('  Archaisms: ', ' '.join(i))
 
+    def testOldFashioned(self, b, u):
+        w = re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u)
+        w = set([x.lower() for x in w])
+        archaicisms = set(['befallen', 'lest', 'shall', 'mantle', 'builded', 'she-goat', 'she-donkey', 'she-goats', 'she-donkeys', 'jest', 'jesting'])
+        i = w.intersection(archaicisms)
+        if len(i) > 0:
+            print('  Old Fashioned: ', ' '.join(i))
+
     def testInappropriate(self, b, u):
         w = set(re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u))
-        bad = set(['ass', 'whore', 'harlot'])
+        bad = set(['ass', 'whore', 'harlot', 'crippled', 'lame'])
         i = w.intersection(bad)
         if len(i) > 0:
             print('  Inappropriate: ', ' '.join(i))
