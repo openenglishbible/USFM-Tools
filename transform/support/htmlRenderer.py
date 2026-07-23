@@ -229,9 +229,13 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.write(self.header())
         self.indentFlag = False
     def render_mt(self, token):     self.writeHeader(1, token)
-    def render_mt2(self, token):    self.writeHeader(2, token)
-    def render_ms(self, token):     self.writeHeader(4, token)
-    def render_ms2(self, token):    self.writeHeader(5, token)
+    def render_mt2(self, token):
+        # Subtitle above the book title ("THE" / "PSALMS"): styled text, not
+        # a heading, so the document outline starts at the h1.
+        self.afterHeader = True
+        self.write('\n<p class="mt2">' + html.escape(token.value, quote=False) + '</p>')
+    def render_ms(self, token):     self.writeHeader(2, token, 'ms')
+    def render_ms2(self, token):    self.writeHeader(3, token, 'ms2')
     def render_p(self, token):
         self.write('\n<!-- ' + self.cc + ' ' + self.cv + ' -->\n')
         self.indentFlag = False
@@ -245,10 +249,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
         if token.value == '~':
             self.write('<p>&nbsp;<p>')
         else:
-            self.writeHeader(6, token)
+            self.writeHeader(3, token, 's1')
     def render_s2(self, token):
         self.indentFlag = False
-        self.writeHeader(6, token, 's2')
+        self.writeHeader(4, token, 's2')
     def render_c(self, token):
         self.cc = token.value.zfill(3)
         self.chaptersSeen.append(token.value)
@@ -302,7 +306,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.noteCount += 1
         n = 'note-' + str(self.noteCount)
         self.write('<label class="rightnotemarker" for="' + n + '">*</label>'
-                   + '<input type="checkbox" class="notetoggle" id="' + n + '" />'
+                   + '<input type="checkbox" class="notetoggle" id="' + n
+                   + '" aria-label="Footnote ' + str(self.noteCount) + '" />'
                    + '<span class="rightnote">')
     def render_f_e(self, token):      self.write('</span>')
     

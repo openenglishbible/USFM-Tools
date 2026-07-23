@@ -127,6 +127,9 @@
             height: 1px;
             margin: 0;
         }
+        .rightnotemarker:has(+ .notetoggle:focus-visible) {
+            outline: 2px solid var(--accent);
+        }
         .rightnote{
         	position: absolute;
         	right: 0;
@@ -147,29 +150,28 @@
         	font-size: 180%;
         	color: var(--text);
         }
-        h3{
+        p.mt2{
             font-family: "Georgia", serif;
             text-transform: uppercase;
-            font-size: 140%;
-        	color: var(--text);
+            font-size: 180%;
+            color: var(--text);
+            text-align: center;
         }
-        h4{
+        h2.ms{
+        	font-size: 140%;
+            padding-top:2em;
+        }
+        h3.ms2{
         	font-size: 140%;
         	color: var(--text);
             padding-top:2em;
-            text-transform: uppercase;
         }
-        h5{
-         	font-size: 140%;
-        	color: var(--text);
-            padding-top:2em;
-        }
-        h6{
+        h3.s1{
         	font-size: 136%;
         	color: var(--text);
             padding-top:0;
         }
-        h6.s2{
+        h4.s2{
         	font-size: 120%;
         	color: var(--text);
             padding-top:0em;
@@ -229,15 +231,24 @@
             z-index: 999;
         }
 
-        /*hide the inputs/checkmarks*/
+        /* keep the menu checkbox out of sight but keyboard-reachable */
         #nav-menu input.label {
-            display: none;
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            margin: 0;
+        }
+        #nav-menu input.label:focus-visible + label {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
         }
 
         /*hide the submenu div*/
         #nav-menu div.submenu {
             max-height: 0;
             overflow: hidden;
+            visibility: hidden;
             color: var(--submenu-text);
             background-color: var(--submenu-bg);
             text-transform: none;
@@ -283,6 +294,7 @@
             overflow-y: auto;
             max-width: 20em;
             overflow-x: auto;
+            visibility: visible;
         }
 
         #navform {
