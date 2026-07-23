@@ -51,24 +51,18 @@ fi
 # Execute
 #
 
-if [[ ! -f "venv/bin/python" ]]; then
-	echo "Creating virtual environment..."
-	uv venv
-	uv pip install -r requirements.txt
-fi
-
 if [ $1 = 'variant' ]; then
-	venv/bin/python variant/variant.py "${@:2}"
+	uv run --quiet variant/variant.py "${@:2}"
     exit 
 fi
 
 if [ $1 = 'check' ]; then
-	venv/bin/python check/check.py "${@:2}"
+	uv run --quiet check/check.py "${@:2}"
     exit 
 fi
 
 if [ $1 = 'transform' ]; then
-	venv/bin/python transform/transform.py "${@:2}"
+	uv run --quiet transform/transform.py "${@:2}"
     exit 
 fi
 
