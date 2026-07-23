@@ -1,8 +1,61 @@
+    :root {
+        color-scheme: light dark;
+        /* Light palette */
+        --bg: #ffffff;
+        --text: #202020;
+        --accent: green;
+        --muted: gray;
+        --submenu-bg: #E6FAE6;
+        --submenu-text: black;
+        --notebox-text: #444444;
+        --notebox-bg: #f2f2f2;
+        --notebox-border: #b5d9b5;
+        --shadow-color: rgba(0, 0, 0, 0.46);
+        --logo-invert: 0;
+    }
+
+    /* Dark palette: applies automatically with the system preference unless
+       the reader forced light. Keep in sync with the forced-dark block below. */
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --bg: #181818;
+            --text: #c9c9c9;
+            --accent: #85c285;
+            --muted: #8f8f8f;
+            --submenu-bg: #1f2b1f;
+            --submenu-text: #c9c9c9;
+            --notebox-text: #a8a8a8;
+            --notebox-bg: #242424;
+            --notebox-border: #4f7a4f;
+            --shadow-color: rgba(0, 0, 0, 0.8);
+            --logo-invert: 1;
+        }
+    }
+    :root[data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #181818;
+        --text: #c9c9c9;
+        --accent: #85c285;
+        --muted: #8f8f8f;
+        --submenu-bg: #1f2b1f;
+        --submenu-text: #c9c9c9;
+        --notebox-text: #a8a8a8;
+        --notebox-bg: #242424;
+        --notebox-border: #4f7a4f;
+        --shadow-color: rgba(0, 0, 0, 0.8);
+        --logo-invert: 1;
+    }
+    :root[data-theme="light"] {
+        color-scheme: light;
+    }
+
     @media all {
         html {
             font-size: 20px;
             font-family: "Georgia", serif;
             text-align: center;
+            scroll-padding-top: 3rem;
+            background-color: var(--bg);
         }
         body {
             padding: 0 0 0 0;
@@ -12,6 +65,7 @@
             max-width:850px;
             min-height: 100%;
             position: relative;
+            background-color: var(--bg);
         }
         body > * {
             font-size: 100%;
@@ -20,9 +74,31 @@
             margin-left: 7rem;
             margin-right: 7rem;
         }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        h1 img {
+            filter: invert(var(--logo-invert));
+        }
         a {
-            color: green;  
-            text-decoration: none; 
+            color: var(--accent);
+            text-decoration: none;
+        }
+        #themetoggle {
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+            margin: 0;
+            border: none;
+            padding: 8px 14px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            background-color: var(--bg);
+            cursor: pointer;
         }
         .chapter{
         	position: absolute;
@@ -30,7 +106,7 @@
         	width: 6rem;
         	text-align: right;
         	font-size: 120%;
-        	color: #202020;
+        	color: var(--text);
         }
         .verse{
         	position: absolute;
@@ -38,56 +114,64 @@
         	width: 6rem;
         	text-align: right;
         	font-size: 80%;
-        	color: gray;
+        	color: var(--muted);
         }
         .rightnotemarker{
-            color: gray;
+            color: var(--muted);
+        }
+        /* Keep the note toggle out of sight but keyboard-reachable */
+        .notetoggle{
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            margin: 0;
         }
         .rightnote{
         	position: absolute;
         	right: 0;
         	width: 6rem;
-        	text-align: left;	
-        	color: gray;
+        	text-align: left;
+        	color: var(--muted);
         	font-size: 80%;
         }
         h1{
             font-family: "Georgia", serif;
             text-transform: uppercase;
             font-size: 240%;
-        	color: #202020;
+        	color: var(--text);
         }
         h2{
             font-family: "Georgia", serif;
             text-transform: uppercase;
         	font-size: 180%;
-        	color: #202020;
+        	color: var(--text);
         }
         h3{
             font-family: "Georgia", serif;
             text-transform: uppercase;
             font-size: 140%;
-        	color: #202020;
+        	color: var(--text);
         }
         h4{
         	font-size: 140%;
-        	color: #202020;
+        	color: var(--text);
             padding-top:2em;
             text-transform: uppercase;
         }
         h5{
          	font-size: 140%;
-        	color: #202020;
+        	color: var(--text);
             padding-top:2em;
         }
         h6{
         	font-size: 136%;
-        	color: #202020;
+        	color: var(--text);
             padding-top:0;
         }
-        h7{
+        h6.s2{
         	font-size: 120%;
-        	color: #202020;
+        	color: var(--text);
             padding-top:0em;
         }
         p{
@@ -97,7 +181,7 @@
         	-o-hyphens: auto;
         	hyphens: auto;
             font-family: "Georgia", serif;
-        	color: #202020;
+        	color: var(--text);
             -moz-font-feature-settings: "liga=1, dlig=1", "onum=1";
             -ms-font-feature-settings: "liga", "dlig","onum";
             -webkit-font-feature-settings: "liga", "dlig","onum";
@@ -131,10 +215,11 @@
             font-family: Arial, Helvetica, sans-serif;
             font-size: 70%;
             text-align: left;
-            background-color: white;
-            color: green;
+            background-color: var(--bg);
+            color: var(--accent);
             position: fixed;
-            width: 100vw;
+            width: 100%;
+            box-sizing: border-box;
             padding: 5px 0 5px 20px;
             margin: 0;
             left: 0;
@@ -153,13 +238,13 @@
         #nav-menu div.submenu {
             max-height: 0;
             overflow: hidden;
-            color: black;
-            background-color: #E6FAE6;
+            color: var(--submenu-text);
+            background-color: var(--submenu-bg);
             text-transform: none;
             max-width: 0;
             margin-top: 1em;
             border-bottom: 0 none;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.46);
+            box-shadow: 0 1px 5px var(--shadow-color);
             font-size: 100%;
             line-height: 135%;
         }
@@ -181,7 +266,7 @@
         }
 
         #nav-menu li.label3 {
-            color: black;
+            color: var(--submenu-text);
             padding-left: 2em;
         }
 
@@ -232,54 +317,82 @@
             text-align: left;
         }
 
+        .chapternav {
+            font-size: 80%;
+            text-align: left;
+            line-height: 1.8;
+            color: var(--muted);
+        }
+        .chapternav a {
+            padding: 0 0.2em;
+        }
+
+        .booknav {
+            display: flex;
+            justify-content: space-between;
+            gap: 1em;
+            margin-top: 3em;
+            margin-bottom: 3em;
+        }
+
     }
-    @media all and (max-width:800px){html {font-size: 19px;}}
-    @media all and (max-width:760px){html {font-size: 18px;}}
-    @media all and (max-width:720px){html {font-size: 17px;}}
-    @media all and (max-width:680px){html {font-size: 16px;}}
-    @media all and (max-width:640px){html {font-size: 14px;}}
-    @media all and (max-width:600px){html {font-size: 12px;}}
-    
-    /* Probably a phone  */
-    @media only screen 
-    and (max-device-width : 480px) {
-        html {font-size: 58px; margin-top:100px;}
-        body {
-            margin:0;
-            padding:0;
-        } 
-        body > * { margin-left:100px; margin-right:0; width:100%; }
-        .chapter{
-        	position: absolute;
-        	left: 20px;
-        	width: 60px;
-        	text-align: left;
-        	font-size: 100%;
-        	color: green;
-        }
-        .verse{
-        	position: absolute;
-        	left: 20px;
-        	width: 60px;
-        	text-align: left;
-        	font-size: 80%;
-        	color: green;
-        }
-        #headerImg {
-            width: 80%;
-        }
-
-        .rightnote{
-            visibility: hidden;
-        }
-        .rightnotemarker{
-            visibility: hidden;
-        }
-
-        #nav-menu{
-            height: 52px;
-        }
-        
+    @media all and (max-width: 800px) {
+        html { font-size: 18px; }
     }
 
+    /* Phones */
+    @media all and (max-width: 700px) {
+        html { font-size: 17px; }
+        body > * {
+            margin-left: 4rem;
+            margin-right: 1rem;
+        }
+        .chapter {
+            width: 3rem;
+        }
+        .verse {
+            width: 3rem;
+        }
+        .rightnote {
+            display: none;
+        }
+        .rightnotemarker {
+            color: var(--accent);
+            cursor: pointer;
+            padding: 0 0.3em;
+        }
+        .notetoggle:checked + .rightnote {
+            display: block;
+            position: static;
+            width: auto;
+            text-align: left;
+            font-size: 85%;
+            color: var(--notebox-text);
+            background: var(--notebox-bg);
+            border-left: 3px solid var(--notebox-border);
+            padding: 0.4em 0.6em;
+            margin: 0.4em 0;
+        }
+        #nav-menu {
+            height: auto;
+            min-height: 26px;
+        }
+        /* keep the book name clear of the theme button */
+        #nav-menu label {
+            padding-right: 5.5em;
+        }
+    }
 
+    /* Small phones */
+    @media all and (max-width: 450px) {
+        body > * {
+            margin-left: 3.25rem;
+            margin-right: 0.75rem;
+        }
+        .chapter {
+            width: 2.5rem;
+        }
+        .verse {
+            width: 2.5rem;
+        }
+    }

@@ -3,19 +3,27 @@
     <head>
     <title>{{{translationname}}} | Read</title>
     <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <script src="jquery-3.4.1.min.js"></script>
     <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <link rel="stylesheet" href="fonts/crimsonpro/stylesheet.css" type="text/css" charset="utf-8" />
     <script src="jump.js"></script>
+    <script src="theme.js" defer></script>
     </head>
 
     <body>
+        <button id="themetoggle" title="Switch between light, dark and automatic colours">&#9680; Auto</button>
         <h1><img src="{{{pathtologo}}}"></h1>
         <form id="navform">
             <input type="text" style="font-size: 140%;" id="txtSearch"/> (eg Ps 23)
         </form>
- 
+
+        <p>
+        {{{frontmatter}}}
+        </p>
+
         <h2>Old Testament</h2>
 
         <p>

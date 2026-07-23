@@ -4,9 +4,18 @@
 import os
 import shutil
 import glob
+import html
+import re
 
 import abstractRenderer
 import books
+
+# render_text pads every token with spaces, which strands punctuation after
+# closing inline tags ("Lord </span> ,"); this rejoins it to the preceding
+# word. The ’ branch covers split possessives and contractions
+# ("Lord </span> 's") without touching opening quotes (always ‘).
+punctuationGap = re.compile(
+    r'[ \t\n]+((?:</(?:span|i|b|em)>)*(?:[,;.:!?]|’(?=(?:s|t|ll|ve|re|d|m)\b)))')
 
 
 #
@@ -48,6 +57,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.indentFlag = False
         self.firstParagraphInBook = True
         self.afterHeader = False
+        # Chapters rendered in this book, in order
+        self.chaptersSeen = []
+        # Footnotes rendered in this book (for unique toggle ids)
+        self.noteCount = 0
 
     def render(self):
         # Load
@@ -69,7 +82,11 @@ class Renderer(abstractRenderer.AbstractRenderer):
         with open(os.path.dirname(os.path.realpath(__file__)) + '/htmlsupport/index.html') as f:
             c = f.read()
         c = c.replace('{{{ot}}}', self.bookList(1, 39))
-        c = c.replace('{{{nt}}}', self.bookList(40, 67))
+        c = c.replace('{{{nt}}}', self.bookList(40, 66))
+        if 'FRT' in self.booksUsfm:
+            c = c.replace('{{{frontmatter}}}', '<a href="b000.html">About this translation</a>')
+        else:
+            c = c.replace('{{{frontmatter}}}', '')
         c = c.replace(r'{{{translationname}}}',self.config.get('General','name'))
         c = c.replace(r'{{{pathtologo}}}',self.config.get('HTML','frontlogo').split('/')[-1])  # copy logo into place
         with open(self.outputDir + '/index.html', 'w') as f:
@@ -77,21 +94,26 @@ class Renderer(abstractRenderer.AbstractRenderer):
 
     def bookList(self, s, f):
         h = ''
-        for b in range(s, f):
+        for b in range(s, f + 1):
             if books.silNames[b] in self.booksUsfm:
-                h = h + '\n<a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b - 1].replace(' ', '&nbsp;') + '</a></br>'
+                h = h + '\n<a href="b' + str(b).zfill(3) + '.html">' + books.bookNames[b - 1].replace(' ', '&nbsp;') + '</a><br>'
             else:
-                h = h + '\n' + books.bookNames[b - 1] + '</br>'
+                h = h + '\n' + books.bookNames[b - 1] + '<br>'
         return h
                 
     def openFile(self, bookID):
         self.f = open(self.outputDir + '/b' + bookID + '.html', 'w')
         self.ft = []
         
-    def close(self): 
+    def close(self):
+        if self.cb:
+            self.write(self.bookNav())
+        self.write(footer)
         t = ''.join(self.ft)
+        t = t.replace(r'{{{chapternav}}}', self.chapterNav())
         self.f.write(self.cleanHTML(t))
         self.f.close()
+        self.ft = []
  
     def write(self, unicodeString):
         self.ft.append(unicodeString)
@@ -99,14 +121,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def cleanHTML(self, t):
         c = t
         c = c.replace(r'~', '&nbsp;')
-        c = c.replace(r'<span class="nd"> Lord </span> ,', r'<span class="nd"> Lord</span>,')
-        c = c.replace(r'<span class="nd"> Lord </span> ;', r'<span class="nd"> Lord</span>;')
-        c = c.replace(r'<span class="nd"> Lord </span> .', r'<span class="nd"> Lord</span>.')
-        c = c.replace(r'<span class="nd"> Lord </span> :', r'<span class="nd"> Lord</span>:')
-        c = c.replace(r'<span class="nd"> Lord </span> !', r'<span class="nd"> Lord</span>!')
-        c = c.replace(r'<span class="nd"> Lord </span> ?', r'<span class="nd"> Lord</span>?')
-        c = c.replace('<span class="nd"> Lord </span> \'', '<span class="nd"> Lord</span>\'')
-        
+        # Repeat until stable: a gap like "word </span> ," needs one pass for
+        # the space before the comma and another for the one before the tag.
+        while True:
+            c2 = punctuationGap.sub(r'\1', c)
+            if c2 == c:
+                break
+            c = c2
+
         c = c.replace(r'{{{navmarker}}}', 'Go to...')
         c = c.replace('{{{translationname}}}', self.config.get('General','name'))
         c = c.replace(r'{{{websiteURL}}}',self.config.get('HTML','websiteURL'))
@@ -152,8 +174,39 @@ class Renderer(abstractRenderer.AbstractRenderer):
         h = h + '\n</ul>'
         #h = h + '\n</tr><tr><td colspan = "2"><br><a href="{{{websiteURL}}}">{{{websiteName}}}</a></td></tr></table></div></div>'
         h = header_header.replace(r'{{{ book list }}}', h)
-        h = h.replace(r'{{{ book name }}}', books.fullName(int(self.cb)))
+        h = h.replace(r'{{{ book name }}}', self.bookTitle())
         return h
+
+    def bookTitle(self):
+        if self.cb == '000':
+            return 'About'
+        return books.fullName(int(self.cb))
+
+    def chapterNav(self):
+        if len(self.chaptersSeen) < 2:
+            return ''
+        h = '\n<div class="chapternav">Chapters: '
+        for c in self.chaptersSeen:
+            h = h + '<a href="#' + c.zfill(3) + '001">' + c + '</a> '
+        return h + '</div>\n'
+
+    def bookNav(self):
+        contents = '<span><a href="index.html">Contents</a></span>'
+        if self.cb == '000':
+            return '\n<div class="booknav"><span></span>' + contents + '<span></span></div>\n'
+        b = int(self.cb)
+        prev = ''
+        for i in range(b - 1, 0, -1):
+            if books.silNames[i] in self.booksUsfm:
+                prev = '<a href="b' + str(i).zfill(3) + '.html">&#8592;&nbsp;' + books.bookNames[i - 1] + '</a>'
+                break
+        nxt = ''
+        for i in range(b + 1, 67):
+            if books.silNames[i] in self.booksUsfm:
+                nxt = '<a href="b' + str(i).zfill(3) + '.html">' + books.bookNames[i - 1] + '&nbsp;&#8594;</a>'
+                break
+        return ('\n<div class="booknav"><span>' + prev + '</span>'
+                + contents + '<span>' + nxt + '</span></div>\n')
 
     def writeChapterMarker(self):
         self.write(self.cachedChapterMarker)
@@ -163,12 +216,12 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.write('\n<p class="indent' + str(level) + '">')
         self.writeChapterMarker()
 
-    def writeHeader(self, level, token):
+    def writeHeader(self, level, token, cssClass=''):
         self.afterHeader = True
-        self.write('\n<h' + str(level) + '>' + token.value + '</h' + str(level) + '>')
+        attr = ' class="' + cssClass + '"' if cssClass else ''
+        self.write('\n<h' + str(level) + attr + '>' + html.escape(token.value, quote=False) + '</h' + str(level) + '>')
 
-    def render_id(self, token): 
-        self.write(footer)
+    def render_id(self, token):
         self.close()
         self.resetBookStart()
         self.cb = books.bookKeyForIdValue(token.value)
@@ -195,9 +248,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
             self.writeHeader(6, token)
     def render_s2(self, token):
         self.indentFlag = False
-        self.writeHeader(7, token)
+        self.writeHeader(6, token, 's2')
     def render_c(self, token):
         self.cc = token.value.zfill(3)
+        self.chaptersSeen.append(token.value)
         self.cachedChapterMarker = '<span class="chapter" id="' + self.cc + '001">' + token.value + '</span>'
     def render_v(self, token):
         self.cv = token.value.zfill(3)
@@ -212,10 +266,12 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_nd_e(self, token):     self.write('</span>')
 
     def render_text(self, token):
+        text = html.escape(token.value, quote=False)
         if self.firstParagraphInBook:
-            self.write('<span class="dropcap">' + token.value[0] + '</span>' + token.value[1:] + ' ')
+            v = text.lstrip() or text
+            self.write('<span class="dropcap">' + v[0] + '</span>' + v[1:] + ' ')
         else:
-            self.write(" " + token.value + " ")
+            self.write(" " + text + " ")
         self.firstParagraphInBook = False
 
     def render_m(self, token):       self.render_p(token)
@@ -232,14 +288,22 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_d(self, token):
         self.write('\n<p>')
         self.writeChapterMarker()
-        self.write('<em>' + token.value + '</em>')
+        self.write('<em>' + html.escape(token.value, quote=False) + '</em>')
 
     def render_is1(self, token):    self.render_s1(token)
     def render_ip(self, token):     self.render_p(token)
     def render_iot(self, token):    self.render_q(token)
     def render_io1(self, token):    self.render_q2(token)
     
-    def render_f_s(self, token):      self.write('<span class="rightnotemarker">*</span><span class="rightnote">')
+    def render_f_s(self, token):
+        # Marker is a label tied to a hidden checkbox: on narrow screens
+        # :checked reveals the note inline (see style.css); on wide screens
+        # the note is always visible in the right margin.
+        self.noteCount += 1
+        n = 'note-' + str(self.noteCount)
+        self.write('<label class="rightnotemarker" for="' + n + '">*</label>'
+                   + '<input type="checkbox" class="notetoggle" id="' + n + '" />'
+                   + '<span class="rightnote">')
     def render_f_e(self, token):      self.write('</span>')
     
 
@@ -252,14 +316,18 @@ header_header = r"""<!DOCTYPE html>
     <head>
     <title>{{{translationname}}} | {{{ book name }}}</title>
     <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <script src="jquery-3.4.1.min.js"></script>
     <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <link rel="stylesheet" href="fonts/crimsonpro/stylesheet.css" type="text/css" charset="utf-8" />
     <script src="jump.js"></script>
+    <script src="theme.js" defer></script>
     </head>
 
     <body>
+<button id="themetoggle" title="Switch between light, dark and automatic colours">&#9680; Auto</button>
 <div id="nav-menu">
     <input id="menubar" type="checkbox" name="menu" class="label" />
     <label for="menubar">{{{translationname}}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{{ book name }}} &#9660;</label>
@@ -273,9 +341,11 @@ header_header = r"""<!DOCTYPE html>
 </div>
 
 <p>&nbsp;</p>
+{{{chapternav}}}
 """
 
 footer = r"""
-        </p></body>   
-        """
+</body>
+</html>
+"""
 

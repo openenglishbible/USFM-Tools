@@ -406,7 +406,7 @@ def bookKeyForIdValue(id):
     return bookKeys[i] 
 
 def bookID(usfm):
-    s = usfm.find('\id ') + 4
+    s = usfm.find(r'\id ') + 4
     e = usfm.find(' ', s)
     e2 = usfm.find('\n', s)
     e = e if e < e2 else e2
@@ -430,7 +430,7 @@ def loadBooks(path):
     logger.debug('Loading USFM files from ' + path)
     for fname in dirList:
       try:
-          f = open(path + '/' + fname,'U') # U handles line endings
+          f = open(path + '/' + fname,'r')
           usfm = f.read()
           if usfm[:4] == r'\id ' and usfm[4:7] in silNames:
               logger.debug('Loaded ' + fname + ' as ' + usfm[4:7])
