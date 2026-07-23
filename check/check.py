@@ -82,14 +82,14 @@ class Checker(object):
     def testOldFashioned(self, b, u):
         w = re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u)
         w = set([x.lower() for x in w])
-        archaicisms = set(['befallen', 'lest', 'shall', 'mantle', 'builded', 'she-goat', 'she-donkey', 'she-goats', 'she-donkeys', 'jest', 'jesting'])
+        archaicisms = set(['befallen', 'lest', 'shall', 'mantle', 'builded', 'she-goat', 'she-donkey', 'she-goats', 'she-donkeys', 'jest', 'jesting', 'loin', 'loins', 'awoke'])
         i = w.intersection(archaicisms)
         if len(i) > 0:
             print('  Old Fashioned: ', ' '.join(i))
 
     def testInappropriate(self, b, u):
         w = set(re.split(r' |\n|\t|\.|,|\?|\;|\'|\"', u))
-        bad = set(['ass', 'whore', 'harlot', 'crippled', 'lame'])
+        bad = set(['ass', 'whore', 'harlot', 'crippled', 'cripple', 'lame'])
         i = w.intersection(bad)
         if len(i) > 0:
             print('  Inappropriate: ', ' '.join(i))
