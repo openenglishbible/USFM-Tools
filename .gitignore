@@ -1,4 +1,5 @@
 *.pyc
 .idea/*
 transform/built/*
+transform/support/thirdparty/*
 .DS_Store
