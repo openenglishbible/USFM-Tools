@@ -301,6 +301,13 @@
             padding: 8px;
         }
 
+        .jumpmsg {
+            display: block;
+            color: var(--muted);
+            font-style: italic;
+            padding-top: 4px;
+        }
+
         .indent1 {
             text-indent: 1em;
             margin-top: 0;
