@@ -53,7 +53,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def wrap(self, t):
         nl = ''
         for i in t.split('\n'):
-            nl = nl + textwrap.fill(i, width=80) + '\n'
+            nl = nl + textwrap.fill(i, width=72) + '\n'
         return nl
         
     def clean(self, text):
@@ -92,15 +92,15 @@ class Renderer(abstractRenderer.AbstractRenderer):
         return t
         
     def box(self, text):
-        t = (80 * '#') + '\n'
-        t = t + '#' + (78 * ' ') + '#\n'
+        t = (72 * '#') + '\n'
+        t = t + '#' + (70 * ' ') + '#\n'
         t = t + '#' + text.center(78) + '#\n'
-        t = t + '#' + (78 * ' ') + '#\n'
-        t = t + (80 * '#') + '\n'
+        t = t + '#' + (70 * ' ') + '#\n'
+        t = t + (72 * '#') + '\n'
         return t
         
     def center(self, text):
-        return text.center(80)
+        return text.center(72)
         
     # Tokens
                     
