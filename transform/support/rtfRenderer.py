@@ -57,7 +57,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         n = []
         for c in u:
             if ord(c) > 127:
-                n.append('\\uc1\\u' + str(ord(c)) + '*')
+                n.append(r'\uc1\u' + str(ord(c)) + '*')
             else:
                 n.append(c)
         u = ''.join(n)
@@ -76,7 +76,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.needsEnd = True
                     
     def set_header(self):
-        self.write('\sectd\sect{\\header \\pard\\qr\\plain\\f0\\fs16 ' + self.h + ' (Page \\chpgn) \\par}')
+        self.write('\\sectd\\sect{\\header \\pard\\qr\\plain\\f0\\fs16 ' + self.h + ' (Page \\chpgn) \\par}')
         
 
     #
@@ -108,14 +108,19 @@ class Renderer(abstractRenderer.AbstractRenderer):
     # are marked but at the start of the relevant text.
     # However, they act as whitespace so we need to allow for that.
     # (removed self.write(' '); )
-    def render_c(self, token):  self.cc = token.getValue()
-    def render_v(self, token):  self.cv = token.getValue()
+    def render_c(self, token):  self.cc = token.getValue() + ' '
+    def render_v(self, token):
+        if token.getValue() == '1':
+            self.cv = ''
+        else:
+            #self.cv = ''
+            self.cv = token.getValue()
         
     def render_p(self, token):
         self.end_par()
         if not self.in_p:
             self.write('\n{\\pard\n\\par}')
-        self.write('\n{\\pard\sl280\slmult1\\fs24')  
+        self.write('\n{\\pard\\sl280\\slmult1\\fs24')  
         if self.in_p:
             self.write('\\fi360')
         self.write(' \n')
@@ -124,7 +129,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.end_par()
         if not self.in_p:
             self.write('\n{\\pard\n\\par}\n')
-        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi0\\li360') 
+        self.write('\n{\\pard\\sl280\\slmult1\\fs24\\fi0\\li360') 
         if self.in_p:
             self.write('\\fi360')
         self.in_p = True       
@@ -132,14 +137,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.end_par()
         if not self.in_p:
             self.write('\n{\\pard\n\\par}')
-        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi0 \n') 
+        self.write('\n{\\pard\\sl280\\slmult1\\fs24\\fi0 \n') 
         self.in_p = True       
     
     def render_q_template(self, level, token):
         self.end_par()
         if self.in_p:
             self.write('\n{\\pard\n\\par}\n')
-        self.write('\n{\\pard\sl280\slmult1\\fs24\\fi' + str((360 * level) - 2800) + '\\li2800\n')
+        self.write('\n{\\pard\\sl280\\slmult1\\fs24\\fi' + str((360 * level) - 2800) + '\\li2800\n')
         self.in_p = False
     def render_q1(self, token):      self.render_q_template(1, token)
     def render_q2(self, token):      self.render_q_template(2, token)
@@ -155,13 +160,13 @@ class Renderer(abstractRenderer.AbstractRenderer):
     
     def render_b(self, token):        self.end_par() ; self.write('\n{\\pard \n')
     
-    def render_em_s(self, token):     self.write('{\i ')
+    def render_em_s(self, token):     self.write('{\\i ')
     def render_em_e(self, token):     self.write('}')
         
-    def render_d(self, token):        self.render_m(token) ; self.write('{\i ' + token.getValue() + '}')
+    def render_d(self, token):        self.render_m(token) ; self.write('{\\i ' + token.getValue() + '}')
 
     # Que selah selah
-    def render_qs_s(self, token):     self.write('{\i ')
+    def render_qs_s(self, token):     self.write('{\\i ')
     def render_qs_e(self, token):     self.write('}')
 
     # Words of Jesus - ignore or mark
@@ -174,6 +179,6 @@ class Renderer(abstractRenderer.AbstractRenderer):
             self.cc = ''
         elif not self.cv == '' and not self.cv == '1':
             # elif because when we have a chapter number to write we don't need a verse number
-            self.write(r'{\super\f1\cf2\fs24 ' + self.cv + r'}')
+            self.write(r' {\super\f1\cf2\fs24 ' + self.cv + r'} ')
             self.cv = ''
         self.write(token.getValue())

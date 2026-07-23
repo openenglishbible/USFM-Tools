@@ -60,7 +60,7 @@ class MediaWikiPrinter(object):
             self.write('Bible:' + self.cb + '_' + token.value + ' ')
     def render_v(self, token):
         self.cv = token.value.zfill(3)
-        if not self.cv == '001': self.write('<\span>\n')
+        if not self.cv == '001': self.write(r'<\span>' + '\n')
         self.write('<span id="' + self.ccUnfil + '_' + token.getValue() + '"><sup>' + token.getValue() + '</sup>')
 
     def render_wj_s(self, token):     pass
@@ -87,7 +87,7 @@ class MediaWikiPrinter(object):
     def render_d(self, token):       pass
     def render_add_s(self, token):    pass
     def render_add_e(self, token):    pass
-    def render_li(self, token):      self.write('\n:<!-- \li -->')
+    def render_li(self, token):      self.write('\n' + r':<!-- \li -->')
     def render_sp(self, token):      pass
     def render_nd_s(self, token):     pass
     def render_nd_e(self, token):     pass
