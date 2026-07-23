@@ -116,6 +116,10 @@
         	font-size: 80%;
         	color: var(--muted);
         }
+        .chapter:hover, .verse:hover,
+        .chapter:focus, .verse:focus {
+            color: var(--accent);
+        }
         .rightnotemarker{
             color: var(--muted);
         }

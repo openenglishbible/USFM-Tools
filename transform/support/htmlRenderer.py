@@ -256,13 +256,19 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_c(self, token):
         self.cc = token.value.zfill(3)
         self.chaptersSeen.append(token.value)
-        self.cachedChapterMarker = '<span class="chapter" id="' + self.cc + '001">' + token.value + '</span>'
+        a = self.cc + '001'
+        self.cachedChapterMarker = ('<a class="chapter" href="#' + a + '" id="' + a
+                                    + '" tabindex="-1" title="Link to ' + self.bookTitle() + ' ' + token.value
+                                    + '">' + token.value + '</a>')
     def render_v(self, token):
         self.cv = token.value.zfill(3)
         if self.cv == '001':
             self.writeChapterMarker()
         else:
-            self.write('<span class="verse" rel="v' + self.cb + self.cc + self.cv + '" id="' + self.cc + self.cv + '" >' + token.value + '</span>\n')
+            a = self.cc + self.cv
+            self.write('<a class="verse" href="#' + a + '" id="' + a
+                       + '" tabindex="-1" title="Link to ' + self.bookTitle() + ' '
+                       + str(int(self.cc)) + ':' + token.value + '">' + token.value + '</a>\n')
     def render_wj_s(self, token):     self.write('<span class="woc">')
     def render_wj_e(self, token):     self.write('</span>')
 
@@ -328,6 +334,7 @@ header_header = r"""<!DOCTYPE html>
     <link href="style.css" rel="stylesheet">
     <script src="jump.js" defer></script>
     <script src="theme.js" defer></script>
+    <script src="reader.js" defer></script>
     </head>
 
     <body>
