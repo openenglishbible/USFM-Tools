@@ -68,6 +68,21 @@
     :root[data-theme="light"] {
         color-scheme: light;
     }
+    /* Paper: warm parchment with gently reduced contrast. */
+    :root[data-theme="paper"] {
+        color-scheme: light;
+        --bg: #f5ecd9;
+        --text: #443b30;
+        --accent: #33691e;
+        --muted: #7d7160;
+        --submenu-bg: #ebdfc4;
+        --submenu-text: #443b30;
+        --notebox-text: #574c3e;
+        --notebox-bg: #ece0c6;
+        --notebox-border: #7f9c5f;
+        --shadow-color: rgba(90, 70, 40, 0.35);
+        --logo-invert: 0;
+    }
 
     @media all {
         html {
