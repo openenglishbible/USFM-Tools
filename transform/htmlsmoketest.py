@@ -194,16 +194,25 @@ def main():
             problems.append('index.html: links to %s which was not built' % gone)
 
     # Page names referenced from shipped scripts (e.g. the jump box map)
-    # must all exist.
+    # must all exist, as must assets referenced from stylesheets (fonts).
     for asset in sorted(os.listdir(site)):
-        if not asset.endswith('.js'):
-            continue
-        with open(os.path.join(site, asset), encoding='utf-8') as f:
-            js = f.read()
-        for m in re.finditer(r"'([a-z0-9-]+\.html)'", js):
-            checked_links += 1
-            if not os.path.exists(os.path.join(site, m.group(1))):
-                problem(asset, 'references missing page "%s"' % m.group(1))
+        if asset.endswith('.js'):
+            with open(os.path.join(site, asset), encoding='utf-8') as f:
+                js = f.read()
+            for m in re.finditer(r"'([a-z0-9-]+\.html)'", js):
+                checked_links += 1
+                if not os.path.exists(os.path.join(site, m.group(1))):
+                    problem(asset, 'references missing page "%s"' % m.group(1))
+        elif asset.endswith('.css'):
+            with open(os.path.join(site, asset), encoding='utf-8') as f:
+                css = f.read()
+            for m in re.finditer(r"url\(\s*['\"]?([^)'\"]+)['\"]?\s*\)", css):
+                ref = m.group(1)
+                if ref.startswith(('data:', 'http:', 'https:', '#')):
+                    continue
+                checked_links += 1
+                if not os.path.exists(os.path.join(site, ref)):
+                    problem(asset, 'references missing asset "%s"' % ref)
 
     if problems:
         print('HTML smoke test FAILED (%d problems in %s):' % (len(problems), site))

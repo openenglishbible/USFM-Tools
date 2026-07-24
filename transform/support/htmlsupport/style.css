@@ -1,3 +1,23 @@
+    /* Crimson Pro (OFL) variable fonts, self-hosted; Georgia while loading
+       and for any glyph the latin subset lacks. size-adjust compensates for
+       Crimson Pro's smaller x-height so the fallback swap barely reflows. */
+    @font-face {
+        font-family: 'Crimson Pro';
+        src: url('fonts/CrimsonPro-Variable.woff2') format('woff2');
+        font-weight: 200 900;
+        font-style: normal;
+        font-display: swap;
+        size-adjust: 110%;
+    }
+    @font-face {
+        font-family: 'Crimson Pro';
+        src: url('fonts/CrimsonPro-Italic-Variable.woff2') format('woff2');
+        font-weight: 200 900;
+        font-style: italic;
+        font-display: swap;
+        size-adjust: 110%;
+    }
+
     :root {
         color-scheme: light dark;
         /* Light palette */
@@ -52,7 +72,7 @@
     @media all {
         html {
             font-size: 20px;
-            font-family: "Georgia", serif;
+            font-family: 'Crimson Pro', Georgia, serif;
             text-align: center;
             scroll-padding-top: 3rem;
             background-color: var(--bg);
@@ -143,19 +163,19 @@
         	font-size: 80%;
         }
         h1{
-            font-family: "Georgia", serif;
+            font-family: 'Crimson Pro', Georgia, serif;
             text-transform: uppercase;
             font-size: 240%;
         	color: var(--text);
         }
         h2{
-            font-family: "Georgia", serif;
+            font-family: 'Crimson Pro', Georgia, serif;
             text-transform: uppercase;
         	font-size: 180%;
         	color: var(--text);
         }
         p.mt2{
-            font-family: "Georgia", serif;
+            font-family: 'Crimson Pro', Georgia, serif;
             text-transform: uppercase;
             font-size: 180%;
             color: var(--text);
@@ -186,7 +206,7 @@
         	-ms-hyphens: auto;
         	-o-hyphens: auto;
         	hyphens: auto;
-            font-family: "Georgia", serif;
+            font-family: 'Crimson Pro', Georgia, serif;
         	color: var(--text);
             -moz-font-feature-settings: "liga=1, dlig=1", "onum=1";
             -ms-font-feature-settings: "liga", "dlig","onum";
@@ -195,6 +215,18 @@
             font-feature-settings: "liga", "dlig","onum";
             text-align: justify;
             hanging-punctuation: first last force-end;
+            /* Paragraph-level line breaking where supported (Safari 18.2+
+               applies it to justified text; Chrome more conservatively). */
+            text-wrap: pretty;
+            /* Only hyphenate words of 7+ chars, 4 before / 3 after the
+               break, and never more than two hyphenated lines in a row. */
+            hyphenate-limit-chars: 7 4 3;
+            -webkit-hyphenate-limit-before: 4;
+            -webkit-hyphenate-limit-after: 3;
+            -webkit-hyphenate-limit-lines: 2;
+        }
+        h1, h2, h3, h4, p.mt2 {
+            text-wrap: balance;
         }
         .dropcap {
             float: left;
