@@ -267,13 +267,15 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.openFile(self.cb)
         self.write(self.header())
         self.indentFlag = False
-    def render_mt(self, token):     self.writeHeader(1, token)
+    # The parser emits numbered tokens; abstractRenderer aliases the bare
+    # forms onto these (\mt -> render_mt1, \ms -> render_ms1).
+    def render_mt1(self, token):    self.writeHeader(1, token)
     def render_mt2(self, token):
         # Subtitle above the book title ("THE" / "PSALMS"): styled text, not
         # a heading, so the document outline starts at the h1.
         self.afterHeader = True
         self.write('\n<p class="mt2">' + html.escape(token.value, quote=False) + '</p>')
-    def render_ms(self, token):     self.writeHeader(2, token, 'ms')
+    def render_ms1(self, token):    self.writeHeader(2, token, 'ms')
     def render_ms2(self, token):    self.writeHeader(3, token, 'ms2')
     def render_p(self, token):
         self.write('\n<!-- ' + self.cc + ' ' + self.cv + ' -->\n')

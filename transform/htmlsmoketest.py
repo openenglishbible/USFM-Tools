@@ -183,6 +183,9 @@ def main():
             problem(page, 'missing nav menu')
         if 'class="booknav"' not in raw[page]:
             problem(page, 'missing book navigation footer')
+        if scans[page].counts.get('h1', 0) != 1:
+            problem(page, 'expected exactly one <h1> book title, found %d'
+                    % scans[page].counts.get('h1', 0))
 
     # Cross-page check: every built book must be linked from the index,
     # and every index book link must point at a built page.
