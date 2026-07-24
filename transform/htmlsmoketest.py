@@ -28,7 +28,8 @@ BALANCED_TAGS = ['html', 'head', 'body', 'title', 'div', 'span', 'a', 'ul',
                  'li', 'label', 'form', 'small', 'button', 'em', 'i', 'b',
                  'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 RAW_AMPERSAND = re.compile(r'&(?![a-zA-Z][a-zA-Z0-9]*;|#[0-9]+;|#x[0-9a-fA-F]+;)')
-BOOK_PAGE = re.compile(r'^b\d{3}\.html$')
+# Legacy bNNN.html names are kept as redirect stubs to the readable names.
+REDIRECT_PAGE = re.compile(r'^b\d{3}\.html$')
 
 
 class PageScan(HTMLParser):
@@ -41,6 +42,7 @@ class PageScan(HTMLParser):
         self.title = ''
         self.has_viewport = False
         self.has_description = False
+        self.refresh = None
         self.imgs_missing_alt = []
         self._in_title = False
 
@@ -57,6 +59,8 @@ class PageScan(HTMLParser):
             self.has_viewport = True
         if tag == 'meta' and a.get('name') == 'description' and (a.get('content') or '').strip():
             self.has_description = True
+        if tag == 'meta' and (a.get('http-equiv') or '').lower() == 'refresh':
+            self.refresh = a.get('content') or ''
         if tag == 'img' and not a.get('alt'):
             self.imgs_missing_alt.append(a.get('src', '?'))
         if tag == 'title':
@@ -79,7 +83,8 @@ def main():
     site = sys.argv[1]
 
     pages = sorted(f for f in os.listdir(site) if f.endswith('.html'))
-    book_pages = [f for f in pages if BOOK_PAGE.match(f)]
+    stub_pages = [f for f in pages if REDIRECT_PAGE.match(f)]
+    book_pages = [f for f in pages if f != 'index.html' and f not in stub_pages]
     problems = []
 
     def problem(page, message):
@@ -88,7 +93,7 @@ def main():
     if 'index.html' not in pages:
         problems.append('index.html is missing')
     if not book_pages:
-        problems.append('no bNNN.html book pages found')
+        problems.append('no book pages found')
 
     # Pass 1: parse every page.
     raw = {}
@@ -99,10 +104,20 @@ def main():
         scans[page] = PageScan()
         scans[page].feed(raw[page])
 
+    # Redirect stubs only need a working target.
+    for page in stub_pages:
+        m = re.search(r'url=([^\s;]+)', scans[page].refresh or '')
+        if not m:
+            problem(page, 'redirect stub missing meta refresh target')
+        elif not os.path.exists(os.path.join(site, m.group(1))):
+            problem(page, 'redirect stub target "%s" missing' % m.group(1))
+
     # Per-page checks.
     checked_links = 0
     checked_anchors = 0
     for page in pages:
+        if page in stub_pages:
+            continue
         text = raw[page]
         scan = scans[page]
 
@@ -171,12 +186,24 @@ def main():
     # and every index book link must point at a built page.
     if 'index.html' in pages:
         index_books = set(h.partition('#')[0] for h in scans['index.html'].hrefs
-                          if BOOK_PAGE.match(h.partition('#')[0]))
+                          if h.partition('#')[0].endswith('.html'))
         built = set(book_pages)
         for missing in sorted(built - index_books):
             problems.append('index.html: built book %s is not linked' % missing)
         for gone in sorted(index_books - built):
             problems.append('index.html: links to %s which was not built' % gone)
+
+    # Page names referenced from shipped scripts (e.g. the jump box map)
+    # must all exist.
+    for asset in sorted(os.listdir(site)):
+        if not asset.endswith('.js'):
+            continue
+        with open(os.path.join(site, asset), encoding='utf-8') as f:
+            js = f.read()
+        for m in re.finditer(r"'([a-z0-9-]+\.html)'", js):
+            checked_links += 1
+            if not os.path.exists(os.path.join(site, m.group(1))):
+                problem(asset, 'references missing page "%s"' % m.group(1))
 
     if problems:
         print('HTML smoke test FAILED (%d problems in %s):' % (len(problems), site))
