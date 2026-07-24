@@ -275,7 +275,16 @@
         }
 
         p.smallcappara::first-line {
-            font-variant: small-caps;
+            /* Capitals too, so the opening line has a level top. The
+               lowercase transform reaches inside inline spans (the
+               small-caps Lord) that would otherwise keep a full-height
+               capital. */
+            font-variant: all-small-caps;
+            text-transform: lowercase;
+            /* Synthesised small caps render ~80% of the em; scale the first
+               line up so it optically matches the body text size. */
+            font-size: 122%;
+            letter-spacing: 0.02em;
         }
         .smallcap{
             font-variant: small-caps;
