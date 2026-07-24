@@ -204,12 +204,12 @@ def parseString( unicodeString ):
     try:
         s = clean(unicodeString)
         tokens = usfm.parseString(s, parseAll=True )
-    except Exception as e:
+    except ParseBaseException as e:
         logger.error('\nParse error in book ' + unicodeString.split('\n')[0] +
                      '\n    in line reading <' + e.line + '>' +
                      '\n             at col ' + str(e.col) +
                      '\n              error ' + str(e))
-        sys.exit()
+        sys.exit(1)
     return [createToken(t) for t in tokens] # if isNotBlank(t)]
 
 def clean( unicodeString ):
@@ -247,10 +247,9 @@ class UsfmToken(object):
             return super.__getattr__(name)
             
     def renderOn(self, printer):
-        
-        try:
-            m = getattr(printer, 'render_' + self.getType().lower().replace('*', '_e').replace('+', 'nested_'))
-        except:
-            m = getattr(printer, 'render_unhandled')
+        name = 'render_' + self.getType().lower().replace('*', '_e').replace('+', 'nested_')
+        # Fall back only when the handler is genuinely missing; an exception
+        # raised inside a real handler must propagate, not silently reroute.
+        m = getattr(printer, name, printer.render_unhandled)
         return m(self)
         

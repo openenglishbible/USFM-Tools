@@ -163,6 +163,8 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.logger.debug(result)
         if not len(stderrdata) == 0:
             self.logger.warning(stderrdata)
+        if pp.returncode != 0:
+            raise RuntimeError('Command failed with status %d: %s' % (pp.returncode, c))
 
     def bookList(self, s, f):
         h = ''

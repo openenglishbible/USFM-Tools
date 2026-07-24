@@ -12,8 +12,11 @@ popd () {
 }
 
 exit() {
+	# Preserve the status of the command that ran before a bare `exit`;
+	# without this, popd's status (always 0) masked every failure.
+	local status=${1:-$?}
 	popd
-	command exit $1
+	command exit $status
 }
 
 #

@@ -166,6 +166,7 @@
         	text-align: right;
         	font-size: 120%;
         	color: var(--text);
+        	font-style: normal;
         }
         .verse{
         	position: absolute;
@@ -217,6 +218,13 @@
             font-family: var(--reading-font);
             text-transform: uppercase;
             font-size: 180%;
+            color: var(--text);
+            text-align: center;
+        }
+        p.mt3{
+            font-family: var(--reading-font);
+            text-transform: uppercase;
+            font-size: 140%;
             color: var(--text);
             text-align: center;
         }
@@ -292,6 +300,18 @@
 
         .nd { /* Lord */
             font-variant:small-caps;
+        }
+        .qs { /* Selah */
+            font-style: italic;
+        }
+        p.d { /* descriptive title, e.g. "A psalm of David" */
+            font-style: italic;
+        }
+        .notesource { /* verse reference at the start of a footnote */
+            font-style: italic;
+        }
+        .pi { /* indented paragraph */
+            margin-left: 1.5em;
         }
         .vspacer{
             height:1em;

@@ -18,6 +18,10 @@ class AbstractRenderer(object):
                          "\n  using: " + self.identity)
         self.oebFlag = False
         self.config = config
+        # Tokens that reached render_unhandled: type -> count, plus every
+        # dropped token that carried text content (real data loss).
+        self.unhandledTokens = {}
+        self.unhandledLost = []
 
     def setOEBFlag(self):
         self.oebFlag = True
@@ -34,6 +38,12 @@ class AbstractRenderer(object):
         elif order == 'ntpsalms':
             for bookName in books.silNamesNTPsalms:
                 self.renderBook(bookName)
+        if self.unhandledTokens:
+            summary = ', '.join('\\%s x%d' % (t, n)
+                                for t, n in sorted(self.unhandledTokens.items()))
+            self.logger.warning('Markers with no handler in this build: %s'
+                                ' (%d carried text that was lost)'
+                                % (summary, len(self.unhandledLost)))
             
     def renderBook(self, bookName):
         if bookName in self.booksUsfm:
@@ -46,7 +56,8 @@ class AbstractRenderer(object):
         
     def render_id(self, token):     pass
     def render_ide(self, token):    pass
-    def render_h(self, token):      return self.render_unhandled(token) 
+    # Metadata for tooling, not content: no renderer needs to output these.
+    def render_h(self, token):      pass
 
     def render_mt(self, token):     return self.render_mt1(token)
     def render_mt1(self, token):    return self.render_unhandled(token)
@@ -139,9 +150,9 @@ class AbstractRenderer(object):
     def render_add_s(self, token):    return self.render_unhandled(token)
     def render_add_e(self, token):    return self.render_unhandled(token)
     
-    def render_toc1(self, token):   return self.render_unhandled(token)
-    def render_toc2(self, token):   return self.render_unhandled(token)
-    def render_toc3(self, token):   return self.render_unhandled(token)
+    def render_toc1(self, token):   pass
+    def render_toc2(self, token):   pass
+    def render_toc3(self, token):   pass
 
     def render_is1(self, token):    return self.render_unhandled(token)
     def render_ip(self, token):     return self.render_unhandled(token)
@@ -177,6 +188,15 @@ class AbstractRenderer(object):
     def render_unknown(self, token):
         self.logger.warning("Unknown token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
 
-    # We do not specifically handle this!
+    # We do not specifically handle this! Dropping a marker is never silent:
+    # warn on first sight of each type, and track any dropped text content
+    # so builds can fail on real data loss (transform.py --strict).
     def render_unhandled(self, token):
-        self.logger.debug("Unhandled token ignored: " + token.getType() + " of value '" + token.getValue() + "'" )
+        tokenType = token.getType()
+        seen = self.unhandledTokens.get(tokenType, 0)
+        self.unhandledTokens[tokenType] = seen + 1
+        if token.getValue():
+            self.unhandledLost.append((tokenType, token.getValue()))
+        if seen == 0:
+            self.logger.warning("No handler for \\%s - dropped from output (value: %r)"
+                                % (tokenType, token.getValue()))

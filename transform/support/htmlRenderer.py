@@ -275,6 +275,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
         # a heading, so the document outline starts at the h1.
         self.afterHeader = True
         self.write('\n<p class="mt2">' + html.escape(token.value, quote=False) + '</p>')
+    def render_mt3(self, token):
+        self.afterHeader = True
+        self.write('\n<p class="mt3">' + html.escape(token.value, quote=False) + '</p>')
     def render_ms1(self, token):    self.writeHeader(2, token, 'ms')
     def render_ms2(self, token):    self.writeHeader(3, token, 'ms2')
     def render_p(self, token):
@@ -313,6 +316,12 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_wj_s(self, token):     self.write('<span class="woc">')
     def render_wj_e(self, token):     self.write('</span>')
 
+    def render_qs_s(self, token):     self.write('<span class="qs">')
+    def render_qs_e(self, token):     self.write('</span>')
+
+    def render_em_s(self, token):     self.write('<em>')
+    def render_em_e(self, token):     self.write('</em>')
+
     def render_nd_s(self, token):     self.write('<span class="nd">')
     def render_nd_e(self, token):     self.write('</span>')
 
@@ -326,6 +335,14 @@ class Renderer(abstractRenderer.AbstractRenderer):
         self.firstParagraphInBook = False
 
     def render_m(self, token):       self.render_p(token)
+    def render_pi(self, token):
+        self.write('\n<!-- ' + self.cc + ' ' + self.cv + ' -->\n')
+        self.indentFlag = False
+        self.write('\n\n<p class="pi">')
+        self.writeChapterMarker()
+    # Peripheral division labels ("Title Page" etc): structural metadata,
+    # deliberately not rendered - the front matter's own headings carry it.
+    def render_periph(self, token):  pass
     def render_q(self, token):       self.writeIndent(1)
     def render_q1(self, token):      self.writeIndent(1)
     def render_q2(self, token):      self.writeIndent(2)
@@ -337,9 +354,11 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def render_pbr(self, token):     self.write('<br />')
     
     def render_d(self, token):
-        self.write('\n<p>')
+        # \d is a paragraph marker: the descriptive title text follows as
+        # its own tokens, so style the paragraph rather than wrapping the
+        # (always empty) token value.
+        self.write('\n<p class="d">')
         self.writeChapterMarker()
-        self.write('<em>' + html.escape(token.value, quote=False) + '</em>')
 
     def render_is1(self, token):    self.render_s1(token)
     def render_ip(self, token):     self.render_p(token)
@@ -357,6 +376,10 @@ class Renderer(abstractRenderer.AbstractRenderer):
                    + '" aria-label="Footnote ' + str(self.noteCount) + '" />'
                    + '<span class="rightnote">')
     def render_f_e(self, token):      self.write('</span>')
+    def render_fr(self, token):
+        self.write('<span class="notesource">' + html.escape(token.value, quote=False) + '</span> ')
+    def render_ft(self, token):       pass
+    def render_ft_e(self, token):     pass
     
 
 #
