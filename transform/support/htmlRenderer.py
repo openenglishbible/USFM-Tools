@@ -32,6 +32,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     
     def __init__(self, inputDir, outputDir, outputName, config):
         self.identity = 'html renderer'
+        self.outputName = outputName
         self.outputDescription = os.path.join(outputDir, outputName + '_html')
         abstractRenderer.AbstractRenderer.__init__(self, inputDir, outputDir, outputName, config)
         # Unset
@@ -89,6 +90,9 @@ class Renderer(abstractRenderer.AbstractRenderer):
             c = c.replace('{{{frontmatter}}}', '')
         c = c.replace(r'{{{translationname}}}',self.config.get('General','name'))
         c = c.replace(r'{{{pathtologo}}}',self.config.get('HTML','frontlogo').split('/')[-1])  # copy logo into place
+        c = c.replace(r'{{{websiteURL}}}',self.config.get('HTML','websiteURL'))
+        c = c.replace(r'{{{websiteName}}}',self.config.get('HTML','websiteName'))
+        c = c.replace(r'{{{release}}}',self.outputName)
         with open(self.outputDir + '/index.html', 'w') as f:
             f.write(c)
 
@@ -108,6 +112,7 @@ class Renderer(abstractRenderer.AbstractRenderer):
     def close(self):
         if self.cb:
             self.write(self.bookNav())
+            self.write(self.pageFooter())
         self.write(footer)
         t = ''.join(self.ft)
         t = t.replace(r'{{{chapternav}}}', self.chapterNav())
@@ -181,6 +186,13 @@ class Renderer(abstractRenderer.AbstractRenderer):
         if self.cb == '000':
             return 'About'
         return books.fullName(int(self.cb))
+
+    def pageFooter(self):
+        h = ('\n<div class="pagefooter"><p><a href="{{{websiteURL}}}">{{{websiteName}}}</a>'
+             + ' &middot; ' + self.outputName + ' &middot; Public domain (CC0)')
+        if 'FRT' in self.booksUsfm:
+            h = h + ' &middot; <a href="b000.html">About this translation</a>'
+        return h + '</p></div>\n'
 
     def chapterNav(self):
         if len(self.chaptersSeen) < 2:
@@ -329,6 +341,11 @@ header_header = r"""<!DOCTYPE html>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Read {{{ book name }}} in the {{{translationname}}}, a modern English translation of the Bible in the public domain (CC0).">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#181818">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">

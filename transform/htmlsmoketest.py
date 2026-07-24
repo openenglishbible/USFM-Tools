@@ -40,6 +40,7 @@ class PageScan(HTMLParser):
         self.counts = {}
         self.title = ''
         self.has_viewport = False
+        self.has_description = False
         self.imgs_missing_alt = []
         self._in_title = False
 
@@ -54,6 +55,8 @@ class PageScan(HTMLParser):
             self.srcs.append(a['src'])
         if tag == 'meta' and a.get('name') == 'viewport':
             self.has_viewport = True
+        if tag == 'meta' and a.get('name') == 'description' and (a.get('content') or '').strip():
+            self.has_description = True
         if tag == 'img' and not a.get('alt'):
             self.imgs_missing_alt.append(a.get('src', '?'))
         if tag == 'title':
@@ -107,6 +110,8 @@ def main():
             problem(page, 'empty or missing <title>')
         if not scan.has_viewport:
             problem(page, 'missing viewport meta')
+        if not scan.has_description:
+            problem(page, 'missing meta description')
         for src in scan.imgs_missing_alt:
             problem(page, 'img missing alt text (%s)' % src)
         if '</html>' not in text:
