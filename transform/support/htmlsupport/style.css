@@ -17,6 +17,22 @@
         font-display: swap;
         size-adjust: 110%;
     }
+    /* Source Sans 3 (OFL): the sans-serif reading option. Its x-height
+       already sits close to Georgia's, so no size-adjust is needed. */
+    @font-face {
+        font-family: 'Source Sans 3';
+        src: url('fonts/SourceSans3-Variable.woff2') format('woff2');
+        font-weight: 200 900;
+        font-style: normal;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'Source Sans 3';
+        src: url('fonts/SourceSans3-Italic-Variable.woff2') format('woff2');
+        font-weight: 200 900;
+        font-style: italic;
+        font-display: swap;
+    }
 
     :root {
         color-scheme: light dark;
@@ -70,7 +86,7 @@
         color-scheme: light;
     }
     :root[data-font="sans"] {
-        --reading-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        --reading-font: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
     /* Paper: warm parchment with gently reduced contrast. */
     :root[data-theme="paper"] {
