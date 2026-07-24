@@ -374,7 +374,7 @@ header_header = r"""<!DOCTYPE html>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preload" href="fonts/CrimsonPro-Variable.woff2" as="font" type="font/woff2" crossorigin>
-    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'||t==='paper')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'||t==='paper')document.documentElement.setAttribute('data-theme',t);var f=localStorage.getItem('font');if(f==='sans')document.documentElement.setAttribute('data-font','sans');}catch(e){}</script>
     <link href="normalize.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
     <script src="bookmap.js" defer></script>
@@ -384,7 +384,10 @@ header_header = r"""<!DOCTYPE html>
     </head>
 
     <body>
-<button id="themetoggle" title="Switch between light, dark and automatic colours">&#9680; Auto</button>
+<div id="toolbar">
+<button id="fonttoggle" title="Switch between serif and sans-serif type">Aa Serif</button>
+<button id="themetoggle" title="Switch between light, paper, dark and automatic colours">&#9680; Auto</button>
+</div>
 <div id="nav-menu">
     <input id="menubar" type="checkbox" name="menu" class="label" />
     <label for="menubar">{{{translationname}}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{{ book name }}} &#9660;</label>

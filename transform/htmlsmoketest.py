@@ -175,6 +175,8 @@ def main():
 
         if '<button id="themetoggle"' not in text:
             problem(page, 'missing theme toggle button')
+        if '<button id="fonttoggle"' not in text:
+            problem(page, 'missing font toggle button')
 
     for page in book_pages:
         if 'id="nav-menu"' not in raw[page]:

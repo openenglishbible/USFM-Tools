@@ -21,22 +21,55 @@
             document.documentElement.removeAttribute('data-theme');
         }
     }
+    function currentFont() {
+        var f = null;
+        try { f = localStorage.getItem('font'); } catch (e) {}
+        return f === 'sans' ? 'sans' : 'serif';
+    }
+    function fontLabel(f) {
+        return f === 'sans' ? 'Aa Sans' : 'Aa Serif';
+    }
+    function applyFont(f) {
+        if (f === 'sans') {
+            document.documentElement.setAttribute('data-font', 'sans');
+        } else {
+            document.documentElement.removeAttribute('data-font');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         var button = document.getElementById('themetoggle');
-        if (!button) { return; }
-        button.textContent = label(current());
-        button.addEventListener('click', function () {
-            var order = ['auto'].concat(THEMES);
-            var next = order[(order.indexOf(current()) + 1) % order.length];
-            try {
-                if (next === 'auto') {
-                    localStorage.removeItem('theme');
-                } else {
-                    localStorage.setItem('theme', next);
-                }
-            } catch (e) {}
-            apply(next);
-            button.textContent = label(next);
-        });
+        if (button) {
+            button.textContent = label(current());
+            button.addEventListener('click', function () {
+                var order = ['auto'].concat(THEMES);
+                var next = order[(order.indexOf(current()) + 1) % order.length];
+                try {
+                    if (next === 'auto') {
+                        localStorage.removeItem('theme');
+                    } else {
+                        localStorage.setItem('theme', next);
+                    }
+                } catch (e) {}
+                apply(next);
+                button.textContent = label(next);
+            });
+        }
+        var fontButton = document.getElementById('fonttoggle');
+        if (fontButton) {
+            fontButton.textContent = fontLabel(currentFont());
+            fontButton.addEventListener('click', function () {
+                var next = currentFont() === 'sans' ? 'serif' : 'sans';
+                try {
+                    if (next === 'sans') {
+                        localStorage.setItem('font', 'sans');
+                    } else {
+                        localStorage.removeItem('font');
+                    }
+                } catch (e) {}
+                applyFont(next);
+                fontButton.textContent = fontLabel(next);
+            });
+        }
     });
 })();

@@ -20,6 +20,7 @@
 
     :root {
         color-scheme: light dark;
+        --reading-font: 'Crimson Pro', Georgia, serif;
         /* Light palette */
         --bg: #ffffff;
         --text: #202020;
@@ -68,6 +69,9 @@
     :root[data-theme="light"] {
         color-scheme: light;
     }
+    :root[data-font="sans"] {
+        --reading-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
     /* Paper: warm parchment with gently reduced contrast. */
     :root[data-theme="paper"] {
         color-scheme: light;
@@ -87,7 +91,7 @@
     @media all {
         html {
             font-size: 20px;
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: var(--reading-font);
             text-align: center;
             scroll-padding-top: 3rem;
             background-color: var(--bg);
@@ -120,11 +124,15 @@
             color: var(--accent);
             text-decoration: none;
         }
-        #themetoggle {
+        #toolbar {
             position: fixed;
             top: 0;
             right: 0;
             z-index: 1000;
+            margin: 0;
+            display: flex;
+        }
+        #toolbar button {
             margin: 0;
             border: none;
             padding: 8px 14px;
@@ -178,19 +186,19 @@
         	font-size: 80%;
         }
         h1{
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: var(--reading-font);
             text-transform: uppercase;
             font-size: 240%;
         	color: var(--text);
         }
         h2{
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: var(--reading-font);
             text-transform: uppercase;
         	font-size: 180%;
         	color: var(--text);
         }
         p.mt2{
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: var(--reading-font);
             text-transform: uppercase;
             font-size: 180%;
             color: var(--text);
@@ -221,7 +229,7 @@
         	-ms-hyphens: auto;
         	-o-hyphens: auto;
         	hyphens: auto;
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: var(--reading-font);
         	color: var(--text);
             -moz-font-feature-settings: "liga=1, dlig=1", "onum=1";
             -ms-font-feature-settings: "liga", "dlig","onum";
@@ -454,9 +462,9 @@
             height: auto;
             min-height: 26px;
         }
-        /* keep the book name clear of the theme button */
+        /* keep the book name clear of the toolbar buttons */
         #nav-menu label {
-            padding-right: 5.5em;
+            padding-right: 10rem;
         }
     }
 
